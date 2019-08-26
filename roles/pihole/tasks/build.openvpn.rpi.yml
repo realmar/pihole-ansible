@@ -1,0 +1,36 @@
+- name: Delete docker-openvpn dir if exists
+  file:
+    path: "{{ root_dir }}/docker-openvpn"
+    state: absent
+    force: yes
+
+- name: Clone docker-openvpn
+  git:
+    repo: https://github.com/kylemanna/docker-openvpn.git
+    dest: "{{ root_dir }}/docker-openvpn"
+    clone: yes
+
+- name: Modify Dockerfile to support RPI
+  replace:
+    path: "{{ root_dir }}/docker-openvpn/Dockerfile.aarch64"
+    after: FROM
+    regexp: "{{ item.regex }}"
+    replace: "{{ item.replace }}"
+  with_items:
+    - regex: aarch64
+      replace: arm32v7
+    - regex: latest
+      replace: alpine
+    - regex: 3\.5
+      replace: latest
+
+- name: Build docker-openvpn image for RPI
+  docker_image:
+    name: kylemanna/openvpn
+    source: build
+    build:
+      dockerfile: Dockerfile.aarch64
+      path: "{{ root_dir }}/docker-openvpn"
+      nocache: yes
+      rm: yes
+      pull: yes

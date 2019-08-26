@@ -1,0 +1,9 @@
+- name: restart ssh
+  service: name=sshd state=restarted
+
+- name: restart docker
+  service: name=docker state=restarted
+
+- name: restart computer
+  reboot:
+    reboot_timeout: 3600

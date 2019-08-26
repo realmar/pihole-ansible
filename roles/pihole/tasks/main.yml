@@ -1,0 +1,30 @@
+- name: Uninstall conflicting dependencies
+  apt:
+    name: [ 'dnsmasq-base', 'dnsmasq', 'apache2' ]
+    state: absent
+
+- include: create.pihole.user.yml
+- include: build.openvpn.rpi.yml
+  when: "'development' not in group_names"
+
+- name: Create docker network 
+  docker_network:
+    name: "{{ network.name }}"
+    driver: bridge
+    enable_ipv6: yes
+    ipam_config:
+      - subnet: "{{ network.v4.subnet }}"
+        gateway: "{{ network.v4.gateway }}"
+      - subnet: "{{ network.v6.subnet }}"
+        gateway: "{{ network.v6.gateway }}"
+
+- include: configure.openvpn.yml
+
+- name: Copy docker-compose.yml file
+  template:
+    src: docker-compose.yml
+    dest: "{{ root_dir }}/docker-compose.yml"
+    owner: "{{ user }}"
+    group: "{{ user }}"
+    mode: 0644
+  tags: compose_file

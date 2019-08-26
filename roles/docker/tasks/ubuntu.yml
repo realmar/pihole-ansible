@@ -1,0 +1,20 @@
+- name: Get LSB release
+  shell: lsb_release -cs
+  register: lsb_release
+
+- name: Add Docker GPG key
+  apt_key:
+    url: https://download.docker.com/linux/ubuntu/gpg
+    state: present
+
+- name: Add Docker apt repository
+  apt_repository:
+    repo: "deb [arch=amd64] https://download.docker.com/linux/ubuntu {{ lsb_release.stdout }} stable"
+    filename: docker
+
+- name: Install Docker
+  apt:
+    name: [ 'docker-ce', 'docker-ce-cli', 'containerd.io' ]
+    state: latest
+    update_cache: yes
+  notify: restart computer

@@ -1,0 +1,11 @@
+- hosts: development
+  gather_facts: yes
+  remote_user: root
+
+  roles:
+    - base_system
+    - docker
+    - pihole
+
+  handlers:
+    - import_tasks: handlers/services.yml

@@ -1,0 +1,20 @@
+- name: Get LSB release
+  shell: lsb_release -cs
+  register: lsb_release
+
+- name: Add Docker GPG key
+  apt_key:
+    url: https://yum.dockerproject.org/gpg
+    state: present
+
+- name: Add Docker apt repository
+  apt_repository:
+    repo: "deb https://apt.dockerproject.org/repo/ raspbian-{{ lsb_release.stdout }} main"
+    filename: docker
+
+- name: Install Docker
+  apt:
+    name: docker-engine
+    state: latest
+    update_cache: yes
+  notify: restart computer

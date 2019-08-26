@@ -1,0 +1,11 @@
+- hosts: development
+  gather_facts: yes
+  remote_user: root
+
+#
+# Define following vars
+#   - vpn_username
+#
+
+  roles:
+    - new_ovpn_user

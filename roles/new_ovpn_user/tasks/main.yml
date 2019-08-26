@@ -1,0 +1,17 @@
+- name: Get VPN CA Cert password
+  set_fact:
+    ca_cert_pw: "{{ lookup('password', 'vpn_ca_cert_password.txt chars=ascii_letters,digits,hexdigits,punctuation length=40') }}"
+
+- name: Generate VPN user password
+  set_fact:
+    user_cert_pw: "{{ lookup('password', vpn_username + '_vpn_password.txt chars=ascii_letters,digits,hexdigits,punctuation length=40') }}"
+
+- name: Create VPN user
+  expect:
+    command: "docker run -v {{ openvpn.volume }}:/etc/openvpn --rm -it kylemanna/openvpn easyrsa build-client-full {{ vpn_username }}"
+    responses:
+      'Enter PEM pass phrase:': "{{ user_cert_pw }}"
+      'Enter pass phrase for \/etc\/openvpn\/pki\/private\/ca\.key:': "{{ ca_cert_pw }}"
+
+- name: Store OVPN profile in config directory
+  shell: "docker run -v {{ openvpn.volume }}:/etc/openvpn --rm kylemanna/openvpn ovpn_getclient {{ vpn_username }} > {{ root_dir }}/{{ vpn_username }}.ovpn"

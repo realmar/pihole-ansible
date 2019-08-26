@@ -1,0 +1,15 @@
+- name: Create pihole user
+  user:
+    name: "{{ user }}"
+    shell: /bin/bash
+    groups: docker
+    create_home: yes
+    state: present
+
+- name: Create pihole directory
+  file:
+    path: "{{ root_dir }}"
+    state: directory
+    recurse: yes
+    owner: "{{ user }}"
+    group: "{{ user }}"

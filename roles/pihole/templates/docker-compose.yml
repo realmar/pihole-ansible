@@ -1,0 +1,118 @@
+version: '3'
+
+#
+# https://howchoo.com/g/nmrlzmq1ymn/how-to-install-docker-on-your-raspberry-pi
+# https://github.com/kylemanna/docker-openvpn/blob/master/docs/docker-compose.md
+# https://github.com/mr-bolle/docker-openvpn-pihole/blob/master/openvpn-install.sh
+#
+# IPv6:
+# https://github.com/kylemanna/docker-openvpn/blob/83b939456e5432ded267b2f08309b257affa2a03/docs/ipv6.md
+#
+# Build OpenVPN Docker image for RPI
+#
+# git clone https://github.com/kylemanna/docker-openvpn.git && cd docker-openvpn
+# sed -i "/FROM/s/aarch64/arm32v7/g" Dockerfile.aarch64
+# sed -i "/FROM/s/latest/alpine/g" Dockerfile.aarch64
+# sed -i "/FROM/s/3.5/latest/g" Dockerfile.aarch64
+# docker build --no-cache -t kylemanna/openvpn -f Dockerfile.aarch64 .
+# cd .. && rm -f -r docker-openvpn
+#
+# Setup
+#
+# export OVPN_DATA=`pwd`/etc-openvpn/
+#
+# docker network create --driver=bridge --subnet=172.110.1.0/24 --gateway=172.110.1.1 vpn-net
+#
+# docker run -v $OVPN_DATA:/etc/openvpn --rm kylemanna/openvpn ovpn_genconfig -n 172.110.1.4 -u udp://vpn.realmar.net
+# docker run -v $OVPN_DATA:/etc/openvpn --rm -it kylemanna/openvpn ovpn_initpki
+#
+# docker run -v $OVPN_DATA:/etc/openvpn --rm -it kylemanna/openvpn easyrsa build-client-full pihole-vpn
+# docker run -v $OVPN_DATA:/etc/openvpn --rm kylemanna/openvpn ovpn_getclient pihole-vpn > $OVPN_DATA/pihole-vpn.ovpn
+#
+
+services:
+  openvpn:
+    container_name: openvpn
+    image: kylemanna/openvpn
+    ports:
+      - "1194:1194/udp"
+      - "1194:1194/tcp"
+    environment:
+     #  - VIRTUAL_PORT=${VIRTUAL_PORT_OPENVPN}
+     #  - VIRTUAL_HOST=${VIRTUAL_HOST_OPENVPN}
+     #  - LETSENCRYPT_HOST=${LETSENCRYPT_HOST_VPN}
+     #  - LETSENCRYPT_EMAIL=${LETSENCRYPT_EMAIL}
+     #  - OPENVPN_PROVIDER=${OPENVPN_PROVIDER}
+     #  - OPENVPN_USERNAME=${OPENVPN_USERNAME}
+     #  - OPENVPN_PASSWORD=${OPENVPN_PASSWORD}
+     # - LOCAL_NETWORK=192.168.0.0/24
+      OPENVPN_OPTS: --inactive 3600 --ping 10 --ping-exit 60 -–log-driver json-file --log-opt max-size=10m
+    volumes:
+      - {{ openvpn.volume }}:/etc/openvpn
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
+    restart: always
+    networks:
+      vpn-net:
+        ipv4_address: {{ openvpn.ipv4 }}
+        ipv6_address: {{ openvpn.ipv6 }}
+    cap_add:
+      - NET_ADMIN
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  pihole:
+    image: pihole/pihole:latest
+    container_name: pihole
+    dns:
+      - 127.0.0.1
+      - 1.1.1.1
+      - 1.0.0.1
+    depends_on:
+      - openvpn
+    ports:
+      - "53:53/tcp"
+      - "53:53/udp"
+      - "67:67/udp"
+      - "80:80/tcp"
+      - "443:443/tcp"
+    environment:
+      WEBPASSWORD: '{{ lookup('password', 'web_password.txt chars=ascii_letters,digits,hexdigits,punctuation length=40') }}'
+      TZ: 'Europe/Zurich'
+      DNS1: 1.1.1.1
+      DNS2: 1.0.0.1
+      IPv6: "True"
+      ServerIP: {{ pihole.ipv4 }}
+      ServerIPv6: {{ pihole.ipv6 }}
+      DNSMASQ_LISTENING: all
+    volumes:
+      - {{ pihole.volumes.pihole }}:/etc/pihole/
+      - {{ pihole.volumes.dnsmasq }}:/etc/dnsmasq.d/
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
+    restart: always
+    networks:
+      vpn-net:
+        ipv4_address: {{ pihole.ipv4 }}
+        ipv6_address: {{ pihole.ipv6 }}
+    cap_add:
+      - NET_ADMIN     
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "5m"
+        max-file: "3"
+
+# docker network create --ipv6 --driver=bridge --subnet=172.16.0.1/24 --gateway=172.16.0.1 --subnet=2002:ac10:0001::/64 --gateway=2002:ac10:0001::1 vpn-net
+networks:
+  {{ network.name }}:
+    external: true
+
+volumes:
+  {{ openvpn.volume }}:
+    external: true
+  {{ pihole.volumes.pihole }}:
+  {{ pihole.volumes.dnsmasq }}:

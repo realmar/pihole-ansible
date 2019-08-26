@@ -1,0 +1,22 @@
+- name: Generate OpenVPN config
+  docker_container:
+    name: generate_openvpn_config
+    image: kylemanna/openvpn
+    command: "ovpn_genconfig -n {{ pihole.ipv4 }} -u udp://{{ openvpn.dns }}"
+    auto_remove: yes
+    volumes:
+      - "{{ openvpn.volume }}:/etc/openvpn"
+
+- name: Generate VPN CA Cert password
+  set_fact:
+    ca_cert_pw: "{{ lookup('password', 'vpn_ca_cert_password.txt chars=ascii_letters,digits,hexdigits,punctuation length=40') }}"
+
+- name: Generate VPN CA cert
+  expect:
+    command: "docker run -v {{ openvpn.volume }}:/etc/openvpn --rm -it kylemanna/openvpn ovpn_initpki"
+    responses:
+      'Enter New CA Key Passphrase:': "{{ ca_cert_pw }}"
+      'Re-Enter New CA Key Passphrase:': "{{ ca_cert_pw }}"
+      '\[Easy\-RSA\sCA\]:': "{{ openvpn.dns }}"
+      'Enter pass phrase for \/etc\/openvpn\/pki\/private\/ca\.key:': "{{ ca_cert_pw }}"
+    timeout: 3600

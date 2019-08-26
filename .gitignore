@@ -1,0 +1,3 @@
+*.log
+*_password.txt
+.vagrant

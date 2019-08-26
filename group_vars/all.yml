@@ -1,0 +1,24 @@
+user: pi
+root_dir: /home/pi/pihole
+network:
+  subnets:
+  v4:
+    subnet: 172.16.0.0/24
+    gateway: 172.16.0.1
+  v6:
+    subnet: 2002:ac10:0001::/64
+    gateway: 2002:ac10:0001::1
+  name: vpn-net
+
+pihole:
+  ipv4: 172.16.0.8
+  ipv6: 2002:ac10:0001::8
+  volumes:
+    pihole: main_config
+    dnsmasq: dnsmasq_config
+
+openvpn:
+  volume: ovpn_config
+  ipv4: 172.16.0.2
+  ipv6: 2002:ac10:0001::2
+  dns: vpn.realmar.net

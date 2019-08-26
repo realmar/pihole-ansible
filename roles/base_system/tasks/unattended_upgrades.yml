@@ -1,0 +1,9 @@
+- name: Install unattended-upgrades
+  package:
+    name: unattended-upgrades
+    state: latest
+
+- name: populating config file for unattended-upgrades
+  copy:
+    src: 50unattended-upgrades
+    dest: /etc/apt/apt.conf.d/50unattended-upgrades

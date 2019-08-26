@@ -1,0 +1,25 @@
+- name: Install Docker dependencies
+  apt:
+    name: [ 'apt-transport-https', 'ca-certificates', 'gnupg-agent', 'software-properties-common', 'python-docker', 'python-pexpect' ]
+    state: latest
+    update_cache: yes
+
+- include: rasbian.yml
+  when: "'development' not in group_names"
+
+- include: ubuntu.yml
+  when: "'development' in group_names"
+
+- name: Copy Docker daemon config
+  template:
+    src: daemon.json
+    dest: /etc/docker/daemon.json
+  notify: restart docker
+
+- name: Install docker-compose
+  pip:
+    name: docker-compose
+    state: latest
+    executable: pip3
+
+- meta: flush_handlers
