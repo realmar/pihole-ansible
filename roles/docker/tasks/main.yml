@@ -9,12 +9,7 @@
 
 - include: ubuntu.yml
   when: "'development' in group_names"
-
-- name: Copy Docker daemon config
-  template:
-    src: daemon.json
-    dest: /etc/docker/daemon.json
-  notify: restart docker
+  tags: i
 
 - name: Install docker-compose
   pip:

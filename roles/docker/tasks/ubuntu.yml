@@ -1,3 +1,8 @@
+- name: Remove obsolete docker packages
+  apt:
+    name: [ 'docker', 'docker-engine', 'docker.io', 'containerd', 'runc' ]
+    state: absent
+
 - name: Get LSB release
   shell: lsb_release -cs
   register: lsb_release

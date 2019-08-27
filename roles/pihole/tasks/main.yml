@@ -7,16 +7,20 @@
 - include: build.openvpn.rpi.yml
   when: "'development' not in group_names"
 
-- name: Create docker network 
+- name: Create docker networks
   docker_network:
-    name: "{{ network.name }}"
+    name: "{{ item.name }}"
     driver: bridge
     enable_ipv6: yes
     ipam_config:
-      - subnet: "{{ network.v4.subnet }}"
-        gateway: "{{ network.v4.gateway }}"
-      - subnet: "{{ network.v6.subnet }}"
-        gateway: "{{ network.v6.gateway }}"
+      - subnet: "{{ item.v4.subnet }}"
+        gateway: "{{ item.v4.gateway }}"
+      - subnet: "{{ item.v6.subnet }}"
+        # gateway: "{{ item.v6.gateway }}"
+  with_items:
+    - "{{ network.subnets.pihole }}"
+    - "{{ network.subnets.vpn }}"
+  tags: i
 
 - include: configure.openvpn.yml
 

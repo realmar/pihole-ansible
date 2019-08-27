@@ -2,8 +2,10 @@
 # vi: set ft=ruby :
 
 Vagrant.configure("2") do |config| 
-  config.vm.box = "generic/ubuntu1804"
+  config.vm.box = "ubuntu/eoan64"
   config.vm.hostname = "pihole-dev"
+  config.vm.network "public_network"
+  config.vm.synced_folder ".", "/vagrant", disabled: true
 
   config.vm.provision "shell" do |s|
     ssh_pub_key = File.readlines("#{Dir.home}/.ssh/id_rsa.pub").first.strip
