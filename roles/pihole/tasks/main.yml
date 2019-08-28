@@ -1,7 +1,7 @@
-- name: Uninstall conflicting dependencies
-  apt:
-    name: [ 'dnsmasq-base', 'dnsmasq', 'apache2' ]
-    state: absent
+# - name: Uninstall conflicting dependencies
+#   apt:
+#     name: [ 'dnsmasq-base', 'dnsmasq', 'apache2' ]
+#     state: absent
 
 - include: create.pihole.user.yml
 - include: build.openvpn.rpi.yml
@@ -16,11 +16,11 @@
       - subnet: "{{ item.v4.subnet }}"
         gateway: "{{ item.v4.gateway }}"
       - subnet: "{{ item.v6.subnet }}"
-        # gateway: "{{ item.v6.gateway }}"
+        gateway: "{{ item.v6.gateway }}"
   with_items:
     - "{{ network.subnets.pihole }}"
     - "{{ network.subnets.vpn }}"
-  tags: i
+  tags: docker_network
 
 - include: configure.openvpn.yml
 

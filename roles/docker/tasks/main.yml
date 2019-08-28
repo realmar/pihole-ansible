@@ -9,7 +9,6 @@
 
 - include: ubuntu.yml
   when: "'development' in group_names"
-  tags: i
 
 - name: Install docker-compose
   pip:

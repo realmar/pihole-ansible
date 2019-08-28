@@ -8,8 +8,8 @@ network:
         subnet: 172.16.1.0/24
         gateway: 172.16.1.1
       v6:
-        subnet: 2a02:120b:2c06:57d1::/64
-        gateway: fe80::7eb7:33ff:fed0:41a6
+        subnet: 2a02:120b:2c06:57df::/64
+        gateway: 2a02:120b:2c06:57d0:7eb7:33ff:fed0:41a6
       name: pihole-net
 
     vpn:
@@ -17,13 +17,13 @@ network:
         subnet: 172.16.2.0/24
         gateway: 172.16.2.1
       v6:
-        subnet: 2a02:120b:2c06:57d2::/64
-        gateway: fe80::7eb7:33ff:fed0:41a6
+        subnet: 2a02:120b:2c06:57de::/64
+        gateway: 2a02:120b:2c06:57d0:7eb7:33ff:fed0:41a6
       name: vpn-net
 
 pihole:
   ipv4: 172.16.1.2
-  ipv6: 2a02:120b:2c06:57d1::2
+  ipv6: 2a02:120b:2c06:57df::2
   volumes:
     pihole: main_config
     dnsmasq: dnsmasq_config
@@ -31,5 +31,5 @@ pihole:
 openvpn:
   volume: ovpn_config
   ipv4: 172.16.2.2
-  ipv6: 2a02:120b:2c06:57d2::2
+  ipv6: 2a02:120b:2c06:57de::2
   dns: vpn.realmar.net
