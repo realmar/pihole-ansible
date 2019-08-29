@@ -14,4 +14,10 @@
       'Enter pass phrase for \/etc\/openvpn\/pki\/private\/ca\.key:': "{{ ca_cert_pw }}"
 
 - name: Store OVPN profile in config directory
-  shell: "docker run -v {{ openvpn.volume }}:/etc/openvpn --rm kylemanna/openvpn ovpn_getclient {{ vpn_username }} > {{ root_dir }}/{{ vpn_username }}.ovpn"
+  shell: "docker run -v {{ openvpn.volume }}:/etc/openvpn --rm kylemanna/openvpn ovpn_getclient {{ vpn_username }} > {{ root_dirs.pihole }}/{{ vpn_username }}.ovpn"
+
+- name: Only route DNS through VPN
+  lineinfile:
+    path: "{{ root_dirs.pihole }}/{{ vpn_username }}.ovpn"
+    line: "redirect-gateway def1"
+    state: absent

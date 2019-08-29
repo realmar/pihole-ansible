@@ -8,7 +8,7 @@
 
 - name: Create pihole directory
   file:
-    path: "{{ root_dir }}"
+    path: "{{ root_dirs.pihole }}"
     state: directory
     recurse: yes
     owner: "{{ user }}"

@@ -1,0 +1,15 @@
+- name: Install dphys-swapfile
+  apt:
+    name: 'dphys-swapfile'
+    state: latest
+
+- name: Copy swap config
+  template:
+    src: dphys-swapfile
+    dest: /etc/dphys-swapfile
+
+- name: Setup swap
+  command: dphys-swapfile setup
+
+- name: Activate swap
+  command: dphys-swapfile swapon

@@ -6,6 +6,8 @@
     - base_system
     - docker
     - pihole
+    - vpn
+    - netdata
 
   handlers:
     - import_tasks: handlers/services.yml

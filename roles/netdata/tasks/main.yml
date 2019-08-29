@@ -1,0 +1,14 @@
+- name: Create project folder
+  file:
+    path: "{{ root_dirs.netdata }}"
+    state: directory
+    owner: "{{ user }}"
+    group: "{{ user }}"
+
+- name: Copy docker-compose file
+  template:
+    src: docker-compose.yml
+    dest: "{{ root_dirs.netdata }}"
+    owner: "{{ user }}"
+    group: "{{ user }}"
+    mode: 0644

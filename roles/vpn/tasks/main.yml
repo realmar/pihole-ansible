@@ -1,3 +1,6 @@
+- include: build.openvpn.rpi.yml
+  when: "'development' not in group_names"
+
 - name: Generate OpenVPN config
   docker_container:
     name: generate_openvpn_config
@@ -6,6 +9,15 @@
     auto_remove: yes
     volumes:
       - "{{ openvpn.volume }}:/etc/openvpn"
+
+- name: Copy OpenVPN server conf
+  template:
+    src: openvpn.conf
+    dest: "{{ docker_volume_root }}/{{ openvpn.volume }}/_data/{{ openvpn.serverconf }}"
+    owner: "{{ user }}"
+    group: "{{ user }}"
+    mode: 0644
+  tags: vpn_conf
 
 - name: Generate VPN CA Cert password
   set_fact:

@@ -4,7 +4,8 @@
 Vagrant.configure("2") do |config| 
   config.vm.box = "ubuntu/bionic64"
   config.vm.hostname = "pihole-dev"
-  config.vm.network "public_network", :mac => "080027370D99"
+  # config.vm.network "public_network", :mac => "080027370D99"
+  config.vm.network "private_network", ip: "192.168.250.102"
   config.vm.synced_folder ".", "/vagrant", disabled: true
 
   config.vm.provision "shell" do |s|

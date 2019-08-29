@@ -4,30 +4,26 @@
 #     state: absent
 
 - include: create.pihole.user.yml
-- include: build.openvpn.rpi.yml
-  when: "'development' not in group_names"
 
 - name: Create docker networks
   docker_network:
     name: "{{ item.name }}"
     driver: bridge
-    enable_ipv6: yes
+    # enable_ipv6: yes
     ipam_config:
       - subnet: "{{ item.v4.subnet }}"
         gateway: "{{ item.v4.gateway }}"
-      - subnet: "{{ item.v6.subnet }}"
-        gateway: "{{ item.v6.gateway }}"
+      # - subnet: "{{ item.v6.subnet }}"
+      #   gateway: "{{ item.v6.gateway }}"
   with_items:
     - "{{ network.subnets.pihole }}"
     - "{{ network.subnets.vpn }}"
   tags: docker_network
 
-- include: configure.openvpn.yml
-
 - name: Copy docker-compose.yml file
   template:
     src: docker-compose.yml
-    dest: "{{ root_dir }}/docker-compose.yml"
+    dest: "{{ root_dirs.pihole }}/docker-compose.yml"
     owner: "{{ user }}"
     group: "{{ user }}"
     mode: 0644

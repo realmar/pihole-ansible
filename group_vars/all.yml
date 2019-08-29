@@ -1,11 +1,16 @@
 user: pi
-root_dir: /home/pi/pihole
+root_dirs:
+  pihole: /home/pi/pihole
+  netdata: /home/pi/netdata
+docker_volume_root: /var/lib/docker/volumes
 
 network:
   subnets:
     pihole:
       v4:
         subnet: 172.16.1.0/24
+        netaddress: 172.16.1.0
+        netmask: 255.255.255.0
         gateway: 172.16.1.1
       v6:
         subnet: 2a02:120b:2c06:57df::/64
@@ -15,6 +20,8 @@ network:
     vpn:
       v4:
         subnet: 172.16.2.0/24
+        netaddress: 172.16.2.0
+        netmask: 255.255.255.0
         gateway: 172.16.2.1
       v6:
         subnet: 2a02:120b:2c06:57de::/64
@@ -33,3 +40,8 @@ openvpn:
   ipv4: 172.16.2.2
   ipv6: 2a02:120b:2c06:57de::2
   dns: vpn.realmar.net
+  serverconf: openvpn.conf
+  vpn_conf:
+    server:
+      netaddress: 192.168.255.0
+      netmask: 255.255.255.0
