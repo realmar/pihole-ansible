@@ -55,7 +55,9 @@ services:
     networks:
       {{ network.subnets.vpn.name }}:
         ipv4_address: {{ openvpn.ipv4 }}
+        {% if network.enable_ipv6 %}
         ipv6_address: {{ openvpn.ipv6 }}
+        {% endif %}
     cap_add:
       - NET_ADMIN
     logging:
@@ -86,7 +88,9 @@ services:
       DNS2: 1.0.0.1
       IPv6: "True"
       ServerIP: {{ pihole.ipv4 }}
+      {% if network.enable_ipv6 %}
       ServerIPv6: {{ pihole.ipv6 }}
+      {% endif %}
       DNSMASQ_LISTENING: all
     volumes:
       - {{ pihole.volumes.pihole }}:/etc/pihole/
@@ -97,7 +101,9 @@ services:
     networks:
       {{ network.subnets.pihole.name }}:
         ipv4_address: {{ pihole.ipv4 }}
+        {% if network.enable_ipv6 %}
         ipv6_address: {{ pihole.ipv6 }}
+        {% endif %}
     cap_add:
       - NET_ADMIN     
     logging:
