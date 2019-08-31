@@ -14,8 +14,8 @@
       - subnet: "{{ item.v4.subnet }}"
         gateway: "{{ item.v4.gateway }}"
   with_items:
-    - "{{ network.subnets.pihole }}"
-    - "{{ network.subnets.vpn }}"
+    - "{{ network.pihole }}"
+    - "{{ network.vpn }}"
   tags: docker_network
   when: "{{ network.enable_ipv6 is False }}"
 
@@ -30,8 +30,8 @@
       - subnet: "{{ item.v6.subnet }}"
         gateway: "{{ item.v6.gateway }}"
   with_items:
-    - "{{ network.subnets.pihole }}"
-    - "{{ network.subnets.vpn }}"
+    - "{{ network.pihole }}"
+    - "{{ network.vpn }}"
   tags: docker_network
   when: "{{ network.enable_ipv6 }}"
 

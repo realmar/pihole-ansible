@@ -21,3 +21,4 @@
     path: "{{ root_dirs.pihole }}/{{ vpn_username }}.ovpn"
     line: "redirect-gateway def1"
     state: absent
+  when: "{{ openvpn.conf.client.only_dns_over_vpn }}"

@@ -5,28 +5,32 @@ root_dirs:
 docker_volume_root: /var/lib/docker/volumes
 
 network:
-  subnets:
-    pihole:
-      v4:
-        subnet: 172.16.1.0/24
-        netaddress: 172.16.1.0
-        netmask: 255.255.255.0
-        gateway: 172.16.1.1
-      v6:
-        subnet: 2a02:120b:2c06:57df::/64
-        gateway: 2a02:120b:2c06:57d0:7eb7:33ff:fed0:41a6
-      name: pihole-net
+  home_net:
+    v4:
+      netaddress: 192.168.1.0
+      netmask: 255.255.255.0
 
-    vpn:
-      v4:
-        subnet: 172.16.2.0/24
-        netaddress: 172.16.2.0
-        netmask: 255.255.255.0
-        gateway: 172.16.2.1
-      v6:
-        subnet: 2a02:120b:2c06:57de::/64
-        gateway: 2a02:120b:2c06:57d0:7eb7:33ff:fed0:41a6
-      name: vpn-net
+  pihole:
+    v4:
+      subnet: 172.16.1.0/24
+      netaddress: 172.16.1.0
+      netmask: 255.255.255.0
+      gateway: 172.16.1.1
+    v6:
+      subnet: 2a02:120b:2c06:57df::/64
+      gateway: 2a02:120b:2c06:57d0:7eb7:33ff:fed0:41a6
+    name: pihole-net
+
+  vpn:
+    v4:
+      subnet: 172.16.2.0/24
+      netaddress: 172.16.2.0
+      netmask: 255.255.255.0
+      gateway: 172.16.2.1
+    v6:
+      subnet: 2a02:120b:2c06:57de::/64
+      gateway: 2a02:120b:2c06:57d0:7eb7:33ff:fed0:41a6
+    name: vpn-net
 
 pihole:
   ipv4: 172.16.1.2
@@ -40,8 +44,12 @@ openvpn:
   ipv4: 172.16.2.2
   ipv6: 2a02:120b:2c06:57de::2
   dns: vpn.realmar.net
-  serverconf: openvpn.conf
-  vpn_conf:
+
+  conf:
     server:
+      file: openvpn.conf
       netaddress: 192.168.255.0
       netmask: 255.255.255.0
+      route_home_network: yes
+    client:
+      only_dns_over_vpn: yes

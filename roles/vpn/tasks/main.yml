@@ -13,7 +13,7 @@
 - name: Copy OpenVPN server conf
   template:
     src: openvpn.conf
-    dest: "{{ docker_volume_root }}/{{ openvpn.volume }}/_data/{{ openvpn.serverconf }}"
+    dest: "{{ docker_volume_root }}/{{ openvpn.volume }}/_data/{{ openvpn.conf.server.file }}"
     owner: "{{ user }}"
     group: "{{ user }}"
     mode: 0644
