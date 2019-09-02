@@ -5,10 +5,10 @@
     update_cache: yes
 
 - include: rasbian.yml
-  when: "'development' not in group_names"
+  when: ansible_distribution != 'Debian' and ansible_distribution != 'Ubuntu'
 
 - include: ubuntu.yml
-  when: "'development' in group_names"
+  when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
 
 - name: Install docker-compose
   pip:

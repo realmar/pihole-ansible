@@ -8,14 +8,22 @@
   register: lsb_release
   changed_when: False
 
+- set_fact:
+    base_url: https://download.docker.com/linux/ubuntu
+  when: ansible_distribution == 'Ubuntu'
+
+- set_fact:
+    base_url: https://download.docker.com/linux/debian
+  when: ansible_distribution == 'Debian'
+
 - name: Add Docker GPG key
   apt_key:
-    url: https://download.docker.com/linux/ubuntu/gpg
+    url: "{{ base_url }}/gpg"
     state: present
 
 - name: Add Docker apt repository
   apt_repository:
-    repo: "deb [arch=amd64] https://download.docker.com/linux/ubuntu {{ lsb_release.stdout }} stable"
+    repo: "deb [arch=amd64] {{ base_url }} {{ lsb_release.stdout }} stable"
     filename: docker
 
 - name: Install Docker

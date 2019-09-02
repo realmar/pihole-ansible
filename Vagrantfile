@@ -2,11 +2,16 @@
 # vi: set ft=ruby :
 
 Vagrant.configure("2") do |config| 
-  config.vm.box = "brewsoftware/dietpi"
+  config.vm.box = "debian/buster64"
   config.vm.hostname = "pihole-dev"
   # config.vm.network "public_network", :mac => "080027370D99"
   config.vm.network "private_network", ip: "192.168.250.102"
   config.vm.synced_folder ".", "/vagrant", disabled: true
+
+  config.vm.provider "virtualbox" do |v|
+    v.memory = 2048
+    v.cpus = 4
+  end
 
   config.vm.provision "shell" do |s|
     ssh_pub_key = File.readlines("#{Dir.home}/.ssh/id_rsa.pub").first.strip
