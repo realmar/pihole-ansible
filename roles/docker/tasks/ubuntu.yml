@@ -6,6 +6,7 @@
 - name: Get LSB release
   shell: lsb_release -cs
   register: lsb_release
+  changed_when: False
 
 - name: Add Docker GPG key
   apt_key:

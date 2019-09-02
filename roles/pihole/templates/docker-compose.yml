@@ -48,16 +48,17 @@ services:
      # - LOCAL_NETWORK=192.168.0.0/24
       OPENVPN_OPTS: --inactive 3600 --ping 10 --ping-exit 60 -–log-driver json-file --log-opt max-size=10m
     volumes:
-      - {{ openvpn.volume }}:/etc/openvpn
+      - {{ volumes.vpn.config.name }}:{{ volumes.vpn.config.mount }}
       - /etc/localtime:/etc/localtime:ro
       - /etc/timezone:/etc/timezone:ro
     restart: always
     networks:
-      {{ network.vpn.name }}:
+      {{ networks.vpn.name }}:
         ipv4_address: {{ openvpn.ipv4 }}
-        {% if network.enable_ipv6 %}
+{% if networks.enable_ipv6 %}
         ipv6_address: {{ openvpn.ipv6 }}
-        {% endif %}
+{% endif %}
+      {{ networks.pihole.name }}:
     cap_add:
       - NET_ADMIN
     logging:
@@ -88,22 +89,27 @@ services:
       DNS2: 1.0.0.1
       IPv6: "True"
       ServerIP: {{ pihole.ipv4 }}
-      {% if network.enable_ipv6 %}
+{% if networks.enable_ipv6 %}
       ServerIPv6: {{ pihole.ipv6 }}
-      {% endif %}
+{% endif %}
       DNSMASQ_LISTENING: all
     volumes:
-      - {{ pihole.volumes.pihole }}:/etc/pihole/
-      - {{ pihole.volumes.dnsmasq }}:/etc/dnsmasq.d/
+{% set vols = [
+  volumes.pihole.main ,
+  volumes.pihole.dnsmasq
+] -%}
+{% for volume in vols %}
+      - {{ volume.name }}:{{ volume.mount }}
+{% endfor %}
       - /etc/localtime:/etc/localtime:ro
       - /etc/timezone:/etc/timezone:ro
     restart: always
     networks:
-      {{ network.pihole.name }}:
+      {{ networks.pihole.name }}:
         ipv4_address: {{ pihole.ipv4 }}
-        {% if network.enable_ipv6 %}
+{% if networks.enable_ipv6 %}
         ipv6_address: {{ pihole.ipv6 }}
-        {% endif %}
+{% endif %}
     cap_add:
       - NET_ADMIN     
     logging:
@@ -114,13 +120,39 @@ services:
 
 # docker network create --ipv6 --driver=bridge --subnet=172.16.0.1/24 --gateway=172.16.0.1 --subnet=2002:ac10:0001::/64 --gateway=2002:ac10:0001::1 vpn-net
 networks:
-  {{ network.pihole.name }}:
-    external: true
-  {{ network.vpn.name }}:
-    external: true
+{% set nets = [
+  networks.pihole ,
+  networks.vpn
+] -%}
+{% for network in nets %}
+  {{ network.name }}:
+    driver: bridge
+{% if networks.enable_ipv6 %}
+    driver_opts:
+      com.docker.network.enable_ipv6: "true"
+{% endif %}
+    ipam:
+      driver: default
+      config:
+        - subnet: {{ network.v4.subnet }}
+        # gateway: {{ network.v4.gateway }}
+{% if networks.enable_ipv6 %}
+        - subnet: {{ network.v6.subnet }}
+        # gateway: {{ network.v6.gateway }}
+{% endif %}
+{% endfor %}
 
 volumes:
-  {{ openvpn.volume }}:
-    external: true
-  {{ pihole.volumes.pihole }}:
-  {{ pihole.volumes.dnsmasq }}:
+{% set vols = [
+  volumes.pihole.main ,
+  volumes.pihole.dnsmasq,
+  volumes.vpn.config
+] -%}
+{% for volume in vols %}
+  {{ volume.name }}:
+    driver: local
+    driver_opts:
+      type: none
+      device: {{ volume.local_folder }}
+      o: bind
+{% endfor %}

@@ -11,6 +11,13 @@
     line: 'syntax on'
     create: true
 
+- name: Enable line endings in vim
+  lineinfile:
+    dest: /root/.vimrc
+    regexp: '^set nu'
+    line: 'set nu'
+    create: true
+
 - name: Disable password authentication for ssh
   lineinfile: >
     dest=/etc/ssh/sshd_config

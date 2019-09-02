@@ -5,40 +5,21 @@
 
 - include: create.pihole.user.yml
 
-- name: Create docker networks
-  docker_network:
-    name: "{{ item.name }}"
-    driver: bridge
-    enable_ipv6: no
-    ipam_config:
-      - subnet: "{{ item.v4.subnet }}"
-        gateway: "{{ item.v4.gateway }}"
+- name: Create pihole folders
+  file:
+    state: directory
+    path: "{{ item.local_folder }}"
+    owner: "{{ user }}"
+    group: "{{ user }}"
   with_items:
-    - "{{ network.pihole }}"
-    - "{{ network.vpn }}"
-  tags: docker_network
-  when: "{{ network.enable_ipv6 is False }}"
-
-- name: Create docker networks
-  docker_network:
-    name: "{{ item.name }}"
-    driver: bridge
-    enable_ipv6: yes
-    ipam_config:
-      - subnet: "{{ item.v4.subnet }}"
-        gateway: "{{ item.v4.gateway }}"
-      - subnet: "{{ item.v6.subnet }}"
-        gateway: "{{ item.v6.gateway }}"
-  with_items:
-    - "{{ network.pihole }}"
-    - "{{ network.vpn }}"
-  tags: docker_network
-  when: "{{ network.enable_ipv6 }}"
+    - "{{ volumes.pihole.main }}"
+    - "{{ volumes.pihole.dnsmasq }}"
+    - "{{ volumes.vpn.config }}"
 
 - name: Copy dnsmaq config extension
   template:
     src: 10-custom-dns.conf
-    dest: "{{ docker_volume_root }}/{{ pihole.volumes.dnsmaq }}/_data/10-custom-dns.conf"
+    dest: "{{ volumes.pihole.dnsmasq.local_folder }}/10-custom-dns.conf"
     owner: "{{ user }}"
     group: "{{ user }}"
     mode: 0644

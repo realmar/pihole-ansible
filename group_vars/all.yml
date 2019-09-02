@@ -4,7 +4,8 @@ root_dirs:
   netdata: /home/pi/netdata
 docker_volume_root: /var/lib/docker/volumes
 
-network:
+networks:
+  enable_ipv6: no
   home_net:
     v4:
       netaddress: 192.168.1.0
@@ -32,15 +33,27 @@ network:
       gateway: 2a02:120b:2c06:57d0:7eb7:33ff:fed0:41a6
     name: vpn-net
 
+volumes:
+  pihole:
+    main:
+      name: main_config
+      local_folder: "{{ root_dirs.pihole }}/etc-pihole"
+      mount: /etc/pihole/
+    dnsmasq:
+      name: dnsmasq_config
+      local_folder: "{{ root_dirs.pihole }}/etc-dnsmasq.d"
+      mount: /etc/dnsmasq.d/
+  vpn:
+    config:
+      name: ovpn_config
+      local_folder: "{{ root_dirs.pihole }}/etc-openvpn"
+      mount: /etc/openvpn
+
 pihole:
   ipv4: 172.16.1.2
   ipv6: 2a02:120b:2c06:57df::2
-  volumes:
-    pihole: main_config
-    dnsmasq: dnsmasq_config
 
 openvpn:
-  volume: ovpn_config
   ipv4: 172.16.2.2
   ipv6: 2a02:120b:2c06:57de::2
   dns: vpn.realmar.net

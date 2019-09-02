@@ -7,9 +7,12 @@
   template:
     src: dphys-swapfile
     dest: /etc/dphys-swapfile
+  register: copy_swapfile
 
 - name: Setup swap
   command: dphys-swapfile setup
+  when: copy_swapfile.changed
 
 - name: Activate swap
   command: dphys-swapfile swapon
+  when: copy_swapfile.changed

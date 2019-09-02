@@ -8,12 +8,12 @@
     command: "ovpn_genconfig -n {{ pihole.ipv4 }} -u udp://{{ openvpn.dns }}"
     auto_remove: yes
     volumes:
-      - "{{ openvpn.volume }}:/etc/openvpn"
+      - "{{ volumes.vpn.config.local_folder }}:{{ volumes.vpn.config.mount }}"
 
 - name: Copy OpenVPN server conf
   template:
     src: openvpn.conf
-    dest: "{{ docker_volume_root }}/{{ openvpn.volume }}/_data/{{ openvpn.conf.server.file }}"
+    dest: "{{ volumes.vpn.config.local_folder }}"
     owner: "{{ user }}"
     group: "{{ user }}"
     mode: 0644
@@ -25,7 +25,7 @@
 
 - name: Generate VPN CA cert
   expect:
-    command: "docker run -v {{ openvpn.volume }}:/etc/openvpn --rm -it kylemanna/openvpn ovpn_initpki"
+    command: "docker run -v {{ volumes.vpn.config.local_folder }}:{{ volumes.vpn.config.mount }} --rm -it kylemanna/openvpn ovpn_initpki"
     responses:
       'Enter New CA Key Passphrase:': "{{ ca_cert_pw }}"
       'Re-Enter New CA Key Passphrase:': "{{ ca_cert_pw }}"
