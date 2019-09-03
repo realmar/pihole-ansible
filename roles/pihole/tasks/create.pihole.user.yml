@@ -1,10 +1,13 @@
 - name: Create pihole user
   user:
     name: "{{ user }}"
+    state: present
     shell: /bin/bash
     groups: docker
     create_home: yes
-    state: present
+    password: "{{ lookup('password', user + '_password.txt chars=ascii_letters,digits,hexdigits,punctuation length=40') | password_hash('sha512') }}"
+    update_password: always
+  tags: pw
 
 - name: Create pihole directory
   file:

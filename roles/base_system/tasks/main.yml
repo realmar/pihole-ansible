@@ -32,6 +32,13 @@
     line='PermitRootLogin without-password'
   notify: restart ssh
 
+- name: Change root password
+  user:
+    name: root
+    password: "{{ lookup('password', 'root_password.txt chars=ascii_letters,digits,hexdigits,punctuation length=40') | password_hash('sha512') }}"
+    update_password: always
+  tags: pw
+
 - include: "{{ item }}"
   with_items:
     - unattended_upgrades.yml
