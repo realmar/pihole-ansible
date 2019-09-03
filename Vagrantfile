@@ -17,7 +17,7 @@ Vagrant.configure("2") do |config|
     ssh_pub_key = File.readlines("#{Dir.home}/.ssh/id_rsa.pub").first.strip
     s.inline = <<-SHELL
       apt-get update
-      apt-get install -y python
+      apt-get install -y python3 python3-pip
 
       mkdir -p /root/.ssh
       chmod 700 /root/.ssh

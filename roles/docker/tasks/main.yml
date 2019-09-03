@@ -1,6 +1,6 @@
 - name: Install Docker dependencies
   apt:
-    name: [ 'apt-transport-https', 'ca-certificates', 'gnupg-agent', 'software-properties-common', 'python-docker', 'python-pexpect' ]
+    name: [ 'apt-transport-https', 'ca-certificates', 'gnupg-agent', 'software-properties-common', 'python-docker', 'python-pexpect', 'python-pip' ]
     state: latest
     update_cache: yes
 
@@ -14,6 +14,9 @@
   pip:
     name: docker-compose
     state: latest
-    executable: pip3
+    executable: "{{ item }}"
+  with_items:
+    - pip
+    - pip3
 
 - meta: flush_handlers

@@ -9,5 +9,13 @@
     - vpn
     - netdata
 
+  tasks:
+    - name: Start docker containers
+      docker_compose:
+        project_src: "{{ item }}"
+      with_items:
+        - "{{ root_dirs.pihole }}"
+        - "{{ root_dirs.netdata }}"
+
   handlers:
     - import_tasks: handlers/services.yml
