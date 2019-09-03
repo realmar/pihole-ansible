@@ -31,6 +31,7 @@ version: '3'
 #
 
 {% import "pihole_ipam.jinja2" as pihole_ipam with context %}
+{% import "password_gen.jinja2" as gen with context %}
 
 services:
   openvpn:
@@ -89,7 +90,7 @@ services:
       - "443:443/tcp"
 {% endif %}
     environment:
-      WEBPASSWORD: '{{ lookup('password', 'web_password.txt chars=ascii_letters,digits,hexdigits,punctuation length=40') }}'
+        WEBPASSWORD: '{{ gen.pw("web") }}'
       TZ: 'Europe/Zurich'
       DNS1: 1.1.1.1
       DNS2: 1.0.0.1
