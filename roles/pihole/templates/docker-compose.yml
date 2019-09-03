@@ -30,9 +30,11 @@ version: '3'
 # docker run -v $OVPN_DATA:/etc/openvpn --rm kylemanna/openvpn ovpn_getclient pihole-vpn > $OVPN_DATA/pihole-vpn.ovpn
 #
 
+{% import "pihole_ipam.jinja2" as pihole_ipam with context %}
+
 services:
   openvpn:
-    container_name: openvpn
+    container_name: {{ openvpn.name }}
     image: kylemanna/openvpn
     ports:
       - "1194:1194/udp"
@@ -58,7 +60,9 @@ services:
 {% if networks.enable_ipv6 %}
         ipv6_address: {{ openvpn.ipv6 }}
 {% endif %}
+{% if pihole.use_host_net == false %}
       {{ networks.pihole.name }}:
+{% endif %}
     cap_add:
       - NET_ADMIN
     logging:
@@ -69,28 +73,30 @@ services:
 
   pihole:
     image: pihole/pihole:latest
-    container_name: pihole
+    container_name: {{ pihole.name }}
     dns:
       - 127.0.0.1
       - 1.1.1.1
       - 1.0.0.1
     depends_on:
       - openvpn
+{% if pihole.use_host_net == false %}
     ports:
       - "53:53/tcp"
       - "53:53/udp"
       - "67:67/udp"
       - "80:80/tcp"
       - "443:443/tcp"
+{% endif %}
     environment:
       WEBPASSWORD: '{{ lookup('password', 'web_password.txt chars=ascii_letters,digits,hexdigits,punctuation length=40') }}'
       TZ: 'Europe/Zurich'
       DNS1: 1.1.1.1
       DNS2: 1.0.0.1
-      IPv6: "True"
-      ServerIP: {{ pihole.ipv4 }}
+      ServerIP: {{ pihole_ipam.ipam.ipv4 }}
 {% if networks.enable_ipv6 %}
-      ServerIPv6: {{ pihole.ipv6 }}
+      IPv6: "True"
+      ServerIPv6: {{ pihole_ipam.ipam.ipv6 }}
 {% endif %}
       DNSMASQ_LISTENING: all
     volumes:
@@ -104,11 +110,15 @@ services:
       - /etc/localtime:/etc/localtime:ro
       - /etc/timezone:/etc/timezone:ro
     restart: always
+{% if pihole.use_host_net %}
+    network_mode: host
+{% else %}
     networks:
       {{ networks.pihole.name }}:
-        ipv4_address: {{ pihole.ipv4 }}
-{% if networks.enable_ipv6 %}
-        ipv6_address: {{ pihole.ipv6 }}
+        ipv4_address: {{ pihole_ipam.ipam.ipv4 }}
+{%      if networks.enable_ipv6 %}
+        ipv6_address: {{ pihole_ipam.ipam.ipv6 }}
+{%      endif %}
 {% endif %}
     cap_add:
       - NET_ADMIN     
@@ -119,27 +129,29 @@ services:
         max-file: "3"
 
 # docker network create --ipv6 --driver=bridge --subnet=172.16.0.1/24 --gateway=172.16.0.1 --subnet=2002:ac10:0001::/64 --gateway=2002:ac10:0001::1 vpn-net
-networks:
 {% set nets = [
-  networks.pihole ,
   networks.vpn
 ] -%}
+{% if pihole.use_host_net == false %}
+{{ nets.append(networks.pihole) }}
+{% endif %}
+networks:
 {% for network in nets %}
   {{ network.name }}:
     driver: bridge
-{% if networks.enable_ipv6 %}
+{%  if networks.enable_ipv6 %}
     driver_opts:
       com.docker.network.enable_ipv6: "true"
-{% endif %}
+{%  endif %}
     ipam:
       driver: default
       config:
         - subnet: {{ network.v4.subnet }}
         # gateway: {{ network.v4.gateway }}
-{% if networks.enable_ipv6 %}
+{%      if networks.enable_ipv6 %}
         - subnet: {{ network.v6.subnet }}
         # gateway: {{ network.v6.gateway }}
-{% endif %}
+{%      endif %}
 {% endfor %}
 
 volumes:

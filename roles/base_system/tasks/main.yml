@@ -6,14 +6,14 @@
 
 - name: Enable syntax highlighting in vim
   lineinfile:
-    dest: /root/.vimrc
+    dest: /etc/vim/vimrc
     regexp: '^syn'
     line: 'syntax on'
     create: true
 
 - name: Enable line endings in vim
   lineinfile:
-    dest: /root/.vimrc
+    dest: /etc/vim/vimrc
     regexp: '^set nu'
     line: 'set nu'
     create: true
@@ -32,8 +32,8 @@
     line='PermitRootLogin without-password'
   notify: restart ssh
 
-- name: Configuring unattended upgrades
-  include: unattended_upgrades.yml
-
-- name: Configuring swap file
-  include: swap.yml
+- include: "{{ item }}"
+  with_items:
+    - unattended_upgrades.yml
+    - swap.yml
+    #- network.yml

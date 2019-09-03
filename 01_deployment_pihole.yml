@@ -3,11 +3,11 @@
   remote_user: root
 
   roles:
-    - base_system
-    - docker
-    - pihole
-    - vpn
-    - netdata
+    - { role: base_system, tags: base }
+    - { role: docker, tags: docker }
+    - { role: pihole, tags: pihole }
+    - { role: vpn, tags: pihole }
+    - { role: netdata, tags: monitoring }
 
   tasks:
     - name: Start docker containers
@@ -16,6 +16,8 @@
       with_items:
         - "{{ root_dirs.pihole }}"
         - "{{ root_dirs.netdata }}"
+      tags:
+        - initialize
 
   handlers:
     - import_tasks: handlers/services.yml

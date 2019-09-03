@@ -7,3 +7,13 @@
 - name: restart computer
   reboot:
     reboot_timeout: 3600
+
+- name: restart openvpn
+  docker_container:
+    name: "{{ openvpn.name }}"
+    restart: yes
+
+- name: restart pihole
+  docker_container:
+    name: "{{ pihole.name }}"
+    restart: yes

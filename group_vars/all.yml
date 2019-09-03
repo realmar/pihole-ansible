@@ -6,7 +6,7 @@ docker_volume_root: /var/lib/docker/volumes
 
 networks:
   enable_ipv6: no
-  home_net:
+  host:
     v4:
       netaddress: 192.168.1.0
       netmask: 255.255.255.0
@@ -50,10 +50,13 @@ volumes:
       mount: /etc/openvpn
 
 pihole:
+  name: pihole
   ipv4: 172.16.1.20
   ipv6: 2a02:120b:2c06:57df::20
+  use_host_net: yes
 
 openvpn:
+  name: openvpn
   ipv4: 172.16.2.20
   ipv6: 2a02:120b:2c06:57de::20
   dns: vpn.realmar.net

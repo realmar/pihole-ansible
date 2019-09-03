@@ -17,6 +17,8 @@
     owner: "{{ user }}"
     group: "{{ user }}"
     mode: 0644
+  notify:
+    - restart openvpn
   tags: vpn_conf
 
 - name: Generate VPN CA Cert password
