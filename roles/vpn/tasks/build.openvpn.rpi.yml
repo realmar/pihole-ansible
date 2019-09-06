@@ -1,18 +1,33 @@
 - name: Delete docker-openvpn dir if exists
   file:
-    path: "{{ root_dir }}/docker-openvpn"
+    path: "{{ root_dirs.pihole }}/docker-openvpn"
     state: absent
     force: yes
 
 - name: Clone docker-openvpn
   git:
     repo: https://github.com/kylemanna/docker-openvpn.git
-    dest: "{{ root_dir }}/docker-openvpn"
+    dest: "{{ root_dirs.pihole }}/docker-openvpn"
     clone: yes
+
+- name: Get RPI CPU Revision
+  shell: "cat /proc/cpuinfo | grep Revision | cut -d ' ' -f2"
+  register: cpu_revision
+  # no need to report anything
+  changed_when: False
+
+# source: http://ozzmaker.com/check-raspberry-software-hardware-version-command-line/
+- set_fact:
+    rpi_version: 3
+  when: cpu_revision.stdout == "a02082" or cpu_revision.stdout == "a22082"
+
+- set_fact:
+    rpi_version: 4
+  when: cpu_revision.stdout == "c03111"
 
 - name: Modify Dockerfile to support RPI
   replace:
-    path: "{{ root_dir }}/docker-openvpn/Dockerfile.aarch64"
+    path: "{{ root_dirs.pihole }}/docker-openvpn/Dockerfile.aarch64"
     after: FROM
     regexp: "{{ item.regex }}"
     replace: "{{ item.replace }}"
@@ -23,14 +38,23 @@
       replace: alpine
     - regex: 3\.5
       replace: latest
+  when: rpi_version == 3
+
+- set_fact:
+    docker_file: Dockerfile.aarch64
+  when: rpi_version == 3
+
+- set_fact:
+    docker_file: Dockerfile
+  when: rpi_version == 4
 
 - name: Build docker-openvpn image for RPI
   docker_image:
     name: kylemanna/openvpn
     source: build
     build:
-      dockerfile: Dockerfile.aarch64
-      path: "{{ root_dir }}/docker-openvpn"
+      dockerfile: "{{ docker_file }}"
+      path: "{{ root_dirs.pihole }}/docker-openvpn"
       nocache: yes
       rm: yes
       pull: yes

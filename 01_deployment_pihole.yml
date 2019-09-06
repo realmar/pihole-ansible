@@ -1,12 +1,13 @@
-- hosts: development
+- hosts: production
   gather_facts: yes
   remote_user: root
+  debugger: on_failed
 
   roles:
     - { role: base_system, tags: base }
     - { role: docker, tags: docker }
     - { role: pihole, tags: pihole }
-    - { role: vpn, tags: pihole }
+    - { role: vpn, tags: [ 'pihole', 'vpn' ] }
     - { role: netdata, tags: monitoring }
 
   tasks:

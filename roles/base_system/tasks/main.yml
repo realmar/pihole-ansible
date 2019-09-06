@@ -1,6 +1,6 @@
 - name: Install base packages
   apt:
-    name: [ 'python3', 'python3-dev', 'python3-pip', 'bash-completion', 'git', 'htop', 'lsb-release', 'ncdu', 'tree', 'vim', 'wget', 'aptitude', 'fail2ban', 'net-tools', 'rsync', 'curl' ]
+    name: [ 'python3', 'python3-dev', 'python3-pip', 'python-dev', 'bash-completion', 'git', 'htop', 'lsb-release', 'ncdu', 'tree', 'vim', 'wget', 'aptitude', 'fail2ban', 'net-tools', 'rsync', 'curl' ]
     state: latest
     update_cache: yes
 
@@ -35,12 +35,37 @@
 - name: Change root password
   user:
     name: root
-    password: "{{ lookup('password', 'root_password.txt chars=ascii_letters,digits,hexdigits,punctuation length=40') | password_hash('sha512') }}"
+    password: "{{ lookup('template', 'standard_pw_gen.jinja2', template_vars=dict(name='root')) | password_hash('sha512') }}"
     update_password: always
   tags: pw
 
-- include: "{{ item }}"
-  with_items:
-    - unattended_upgrades.yml
-    - swap.yml
-    #- network.yml
+- name: Set hostname
+  hostname:
+    name: "{{ host.name }}"
+
+- name: Set hostname in /etc/hosts
+  lineinfile:
+    path: /etc/hosts
+    regexp: '^127\.0\.1\.1'
+    line: "127.0.1.1 {{ host.name }}"
+
+- name: Install unattended-upgrades
+  apt:
+    name: unattended-upgrades
+    state: latest
+
+- name: Configure DHCP Client
+  template:
+    src: dhcpcd.conf
+    dest: /etc/dhcpcd.conf
+  notify: restart dhcpcd
+
+- meta: flush_handlers
+
+- name: Setup swap
+  include: swap.yml
+
+- name: Update and upgrade packages
+  apt:
+    upgrade: safe
+    update_cache: yes

@@ -1,5 +1,13 @@
+- name: Check if is rasbian
+  stat:
+    path: /usr/bin/raspi-config
+  register: raspi_config_check
+
+- set_fact:
+    is_rasbian: "{{ raspi_config_check.stat.exists }}"
+
 - include: build.openvpn.rpi.yml
-  when: "'development' not in group_names"
+  when: is_rasbian
 
 - name: Generate OpenVPN config
   docker_container:
@@ -23,7 +31,7 @@
 
 - name: Generate VPN CA Cert password
   set_fact:
-    ca_cert_pw: "{{ lookup('password', 'vpn_ca_cert_password.txt chars=ascii_letters,digits,hexdigits,punctuation length=40') }}"
+    ca_cert_pw: "{{ lookup('template', 'standard_pw_gen.jinja2', template_vars=dict(name='vpn_ca_cert')) }}"
 
 - name: Generate VPN CA cert
   expect:

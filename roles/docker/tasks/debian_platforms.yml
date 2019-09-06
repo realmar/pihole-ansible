@@ -16,6 +16,14 @@
     base_url: https://download.docker.com/linux/debian
   when: ansible_distribution == 'Debian'
 
+- set_fact:
+    arch: amd64
+  when: is_rasbian|bool == false
+
+- set_fact:
+    arch: armhf
+  when: is_rasbian|bool
+
 - name: Add Docker GPG key
   apt_key:
     url: "{{ base_url }}/gpg"
@@ -23,12 +31,20 @@
 
 - name: Add Docker apt repository
   apt_repository:
-    repo: "deb [arch=amd64] {{ base_url }} {{ lsb_release.stdout }} stable"
+    repo: "deb [arch={{ arch }}] {{ base_url }} {{ lsb_release.stdout }} stable"
     filename: docker
+  # ??? need to restart computer before installing docker ??? wut
+  # for some reason this only needs to be done on my RPI4 with rasbian buster :thinking_face:
+  notify: restart computer
+
+- meta: flush_handlers
 
 - name: Install Docker
   apt:
     name: [ 'docker-ce', 'docker-ce-cli', 'containerd.io' ]
     state: latest
     update_cache: yes
+    # aufs-dkms does not work with RPI (no kernel support for it)
+    # also aint nobody needs recommended stuff ( ͡° ͜ʖ ͡°)
+    install_recommends: no
   notify: restart computer

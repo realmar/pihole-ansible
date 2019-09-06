@@ -12,3 +12,4 @@
     owner: "{{ user }}"
     group: "{{ user }}"
     mode: 0644
+  tags: compose_file

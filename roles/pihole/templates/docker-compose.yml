@@ -90,7 +90,8 @@ services:
       - "443:443/tcp"
 {% endif %}
     environment:
-        WEBPASSWORD: '{{ gen.pw("web") }}'
+{#                 We need to escape $-sign with two $$-signs #}
+      WEBPASSWORD: '{{ gen.pw("web") | replace("$", "$$") }}'
       TZ: 'Europe/Zurich'
       DNS1: 1.1.1.1
       DNS2: 1.0.0.1

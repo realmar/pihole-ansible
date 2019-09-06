@@ -1,10 +1,10 @@
 - name: Get VPN CA Cert password
   set_fact:
-    ca_cert_pw: "{{ lookup('password', 'vpn_ca_cert_password.txt chars=ascii_letters,digits,hexdigits,punctuation length=40') }}"
+    ca_cert_pw: "{{ lookup('template', 'standard_pw_gen.jinja2', template_vars=dict(name='vpn_ca_cert')) }}"
 
 - name: Generate VPN user password
   set_fact:
-    user_cert_pw: "{{ lookup('password', vpn_username + '_vpn_password.txt chars=ascii_letters,digits,hexdigits,punctuation length=40') }}"
+    user_cert_pw: "{{ lookup('template', 'standard_pw_gen.jinja2', template_vars=dict(name=vpn_username)) }}"
 
 - name: Create VPN user
   expect:

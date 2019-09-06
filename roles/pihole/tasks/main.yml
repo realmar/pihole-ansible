@@ -32,3 +32,10 @@
     group: "{{ user }}"
     mode: 0644
   tags: compose_file
+
+- name: Install update gravity cronjob
+  template:
+    src: pihole_update_gravitas
+    dest: /etc/cron.d/pihole_update_gravitas
+    mode: 0644
+  tags: cronjobs

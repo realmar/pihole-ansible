@@ -1,0 +1,6 @@
+{#
+
+  IN:
+    name: string    - name of the password
+
+#}{% import "password_gen.jinja2" as gen with context %}{{ gen.pw(name) }}

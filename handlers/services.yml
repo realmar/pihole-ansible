@@ -1,8 +1,12 @@
 - name: restart ssh
-  service: name=sshd state=restarted
+  service:
+    name: sshd
+    state: restarted
 
 - name: restart docker
-  service: name=docker state=restarted
+  service:
+    name: docker
+    state: restarted
 
 - name: restart computer
   reboot:
@@ -12,8 +16,17 @@
   docker_container:
     name: "{{ openvpn.name }}"
     restart: yes
+  ignore_errors: yes # yeet
 
 - name: restart pihole
   docker_container:
     name: "{{ pihole.name }}"
     restart: yes
+  ignore_errors: yes # yeet
+
+- name: restart dhcpcd
+  service:
+    name: dhcpcd
+    state: restarted
+  register: restart_status
+  ignore_errors: yes
