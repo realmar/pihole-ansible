@@ -1,3 +1,14 @@
+- name: Install haveged for more entropy (OpenVPN needs to generate certificates which is brutally slow on a RPI)
+  apt:
+    name: haveged
+    state: latest
+
+- name: Start and enable haveged service
+  service:
+    name: haveged 
+    state: started
+    enabled: yes
+
 - name: Check if is rasbian
   stat:
     path: /usr/bin/raspi-config
