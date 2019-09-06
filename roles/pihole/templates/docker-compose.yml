@@ -58,7 +58,7 @@ services:
     networks:
       {{ networks.vpn.name }}:
         ipv4_address: {{ openvpn.ipv4 }}
-{% if networks.enable_ipv6 %}
+{% if networks.vpn.v6.enable %}
         ipv6_address: {{ openvpn.ipv6 }}
 {% endif %}
 {% if pihole.use_host_net == false %}
@@ -96,7 +96,10 @@ services:
       DNS1: 1.1.1.1
       DNS2: 1.0.0.1
       ServerIP: {{ pihole_ipam.ipam.ipv4 }}
-{% if networks.enable_ipv6 %}
+{% if pihole.use_host_net %}
+      IPv6: "True"
+      ServerIPv6: {{ host.ipv6 }}
+{% elif networks.pihole.v6.enable %}
       IPv6: "True"
       ServerIPv6: {{ pihole_ipam.ipam.ipv6 }}
 {% endif %}
@@ -118,7 +121,7 @@ services:
     networks:
       {{ networks.pihole.name }}:
         ipv4_address: {{ pihole_ipam.ipam.ipv4 }}
-{%      if networks.enable_ipv6 %}
+{%      if networks.pihole.v6.enable %}
         ipv6_address: {{ pihole_ipam.ipam.ipv6 }}
 {%      endif %}
 {% endif %}
@@ -141,7 +144,7 @@ networks:
 {% for network in nets %}
   {{ network.name }}:
     driver: bridge
-{%  if networks.enable_ipv6 %}
+{%  if network.v6.enable %}
     driver_opts:
       com.docker.network.enable_ipv6: "true"
 {%  endif %}
@@ -150,7 +153,7 @@ networks:
       config:
         - subnet: {{ network.v4.subnet }}
         # gateway: {{ network.v4.gateway }}
-{%      if networks.enable_ipv6 %}
+{%      if network.v6.enable %}
         - subnet: {{ network.v6.subnet }}
         # gateway: {{ network.v6.gateway }}
 {%      endif %}

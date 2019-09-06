@@ -5,12 +5,15 @@ root_dirs:
 docker_volume_root: /var/lib/docker/volumes
 
 networks:
-  enable_ipv6: no
   host:
     v4:
       netaddress: 192.168.1.0
       netmask: 255.255.255.0
       gateway: 192.168.1.1
+    v6:
+      subnet: 2a02:120b:2c06:57d0::/64
+      netmask: 64
+      gateway: 2a02:120b:2c06:57d0:7eb7:33ff:fed0:41a6
 
   pihole:
     v4:
@@ -19,7 +22,9 @@ networks:
       netmask: 255.255.255.0
       gateway: 172.16.1.1
     v6:
+      enable: yes
       subnet: 2a02:120b:2c06:57df::/64
+      netmask: 64
       gateway: 2a02:120b:2c06:57d0:7eb7:33ff:fed0:41a6
     name: pihole-net
 
@@ -30,7 +35,9 @@ networks:
       netmask: 255.255.255.0
       gateway: 172.16.2.1
     v6:
+      enable: no
       subnet: 2a02:120b:2c06:57de::/64
+      netmask: 64
       gateway: 2a02:120b:2c06:57d0:7eb7:33ff:fed0:41a6
     name: vpn-net
 

@@ -1,0 +1,29 @@
+# interfaces(5) file used by ifup(8) and ifdown(8)
+
+# Please note that this file is written to be used with dhcpcd
+# For static IP, consult /etc/dhcpcd.conf and 'man dhcpcd.conf'
+
+# Include files from /etc/network/interfaces.d:
+source-directory /etc/network/interfaces.d
+
+# The loopback network interface
+auto lo
+iface lo inet loopback
+
+{% if 'development' in group_names %}
+# The primary network interface
+allow-hotplug eth0
+iface eth0 inet dhcp
+{% endif %}
+
+auto {{ host.public_interface }}
+
+iface {{ host.public_interface }} inet static
+    address {{ host.ipv4 }}
+    netmask {{ networks.host.v4.netmask }}
+    gateway {{ networks.host.v4.gateway }}
+
+iface {{ host.public_interface }} inet6 static
+    address {{ host.ipv6 }}
+    netmask {{ networks.host.v6.netmask }}
+    gateway {{ networks.host.v6.gateway }}

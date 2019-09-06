@@ -2,6 +2,7 @@
   apt:
     name: [ 'docker', 'docker-engine', 'docker.io', 'containerd', 'runc' ]
     state: absent
+    purge: yes
 
 - name: Get LSB release
   shell: lsb_release -cs

@@ -1,0 +1,23 @@
+- name: Stop dhcpcd client
+  service:
+    name: dhcpcd
+    state: stopped
+    enabled: no
+  ignore_errors: yes
+
+- name: Remove DHCP client
+  apt:
+    name: "{{ packages }}"
+    state: absent
+    purge: yes
+  vars:
+    packages:
+      - dhcpcd5
+      - isc-dhcp-client
+      - isc-dhcp-common
+
+- name: Configure static IPs
+  template:
+    src: interfaces
+    dest: /etc/network/interfaces
+  notify: restart computer

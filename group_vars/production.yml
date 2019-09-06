@@ -1,5 +1,5 @@
 host:
-  name: realmar
-  public_interface: enxb827eb2d375f
-  ipv4: 192.168.1.124
-  ipv6: 2a02:120b:2c06:57d0:3b31:f885:bf54:dcfc
+  name: realmar-rpi4
+  public_interface: eth0
+  ipv4: 192.168.1.128
+  ipv6: 2a02:120b:2c06:57d0::abcf
