@@ -1,0 +1,39 @@
+- local_action: command pwd
+  register: root_path_cmd
+  changed_when: False
+
+- set_fact:
+    relative_cert_dir: certs/etc-openvpn/pki
+
+- set_fact:
+    cert_dir: "{{ root_path_cmd.stdout }}/roles/vpn/files/{{ relative_cert_dir }}"
+
+- local_action:
+    module: stat
+    path: "{{ cert_dir }}"
+  register: cert_dir_stat
+
+- name: Copy pre-generated VPN CA cert files
+  copy:
+    src: "{{ relative_cert_dir }}"
+    dest: "{{ volumes.vpn.config.local_folder }}"
+    owner: "{{ user }}"
+    group: "{{ user }}"
+  when: cert_dir_stat.stat.exists
+
+- name: No pre-generated VPN CA cert found, generating one ...
+  block:
+  - name: Generate VPN CA Cert password
+    set_fact:
+      ca_cert_pw: "{{ lookup('template', 'standard_pw_gen.jinja2', template_vars=dict(name='vpn_ca_cert')) }}"
+
+  - name: Generate VPN CA cert
+    expect:
+      command: "docker run -v {{ volumes.vpn.config.local_folder }}:{{ volumes.vpn.config.mount }} --rm -it kylemanna/openvpn ovpn_initpki"
+      responses:
+        'Enter New CA Key Passphrase:': "{{ ca_cert_pw }}"
+        'Re-Enter New CA Key Passphrase:': "{{ ca_cert_pw }}"
+        '\[Easy\-RSA\sCA\]:': "{{ openvpn.dns }}"
+        'Enter pass phrase for \/etc\/openvpn\/pki\/private\/ca\.key:': "{{ ca_cert_pw }}"
+      timeout: 3600
+  when: cert_dir_stat.stat.exists == false

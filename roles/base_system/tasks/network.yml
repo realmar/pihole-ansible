@@ -21,3 +21,5 @@
     src: interfaces
     dest: /etc/network/interfaces
   notify: restart computer
+
+- meta: flush_handlers
