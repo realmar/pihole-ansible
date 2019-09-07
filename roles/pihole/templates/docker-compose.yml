@@ -55,15 +55,20 @@ services:
       - /etc/localtime:/etc/localtime:ro
       - /etc/timezone:/etc/timezone:ro
     restart: always
+{% if openvpn.use_host_net %}
+    network_mode: host
+{% else %}
     networks:
       {{ networks.vpn.name }}:
         ipv4_address: {{ openvpn.ipv4 }}
-{% if networks.vpn.v6.enable %}
+{%   if networks.vpn.v6.enable %}
         ipv6_address: {{ openvpn.ipv6 }}
-{% endif %}
-{% if pihole.use_host_net == false %}
+{%   endif %}
+{%   if pihole.use_host_net == false %}
       {{ networks.pihole.name }}:
+{%   endif %}
 {% endif %}
+    privileged: yes
     cap_add:
       - NET_ADMIN
     logging:
@@ -133,13 +138,15 @@ services:
         max-size: "5m"
         max-file: "3"
 
-# docker network create --ipv6 --driver=bridge --subnet=172.16.0.1/24 --gateway=172.16.0.1 --subnet=2002:ac10:0001::/64 --gateway=2002:ac10:0001::1 vpn-net
-{% set nets = [
-  networks.vpn
-] -%}
+{% set nets = [] %}
 {% if pihole.use_host_net == false %}
-{{ nets.append(networks.pihole) }}
+{{   nets.append(networks.pihole) }}
 {% endif %}
+{% if openvpn.use_host_net == false %}
+{{   nets.append(networks.vpn) }}
+{% endif %}
+{% if nets|length > 0 %}
+# docker network create --ipv6 --driver=bridge --subnet=172.16.0.1/24 --gateway=172.16.0.1 --subnet=2002:ac10:0001::/64 --gateway=2002:ac10:0001::1 vpn-net
 networks:
 {% for network in nets %}
   {{ network.name }}:
@@ -158,6 +165,7 @@ networks:
         # gateway: {{ network.v6.gateway }}
 {%      endif %}
 {% endfor %}
+{% endif %}
 
 volumes:
 {% set vols = [

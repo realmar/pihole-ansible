@@ -67,10 +67,12 @@ openvpn:
   name: openvpn
   ipv4: 172.16.2.20
   ipv6: 2a02:120b:2c06:57de::20
-  dns: vpn.realmar.net
+  use_host_net: no # "{{ True if 'development' not in group_names else False }}"
 
   conf:
-    ca_cert_bits: 2048
+    dns: vpn.realmar.net
+
+    ca_cert_bits: 4096
     tls_cipher: TLS-ECDHE-ECDSA-WITH-AES-256-GCM-SHA384
     cipher: AES-256-GCM
     auth: SHA3-512
