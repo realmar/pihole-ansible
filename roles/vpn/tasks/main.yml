@@ -21,13 +21,7 @@
   when: is_rasbian
 
 - name: Generate OpenVPN config
-  docker_container:
-    name: generate_openvpn_config
-    image: kylemanna/openvpn
-    command: "ovpn_genconfig -n {{ pihole.ipv4 }} -u udp://{{ openvpn.dns }}"
-    auto_remove: yes
-    volumes:
-      - "{{ volumes.vpn.config.local_folder }}:{{ volumes.vpn.config.mount }}"
+  shell: "docker run -v {{ volumes.vpn.config.local_folder }}:{{ volumes.vpn.config.mount }} --rm kylemanna/openvpn ovpn_genconfig -n {{ pihole.ipv4 }} -u udp://{{ openvpn.dns }}"
 
 - name: Copy OpenVPN server conf
   template:
