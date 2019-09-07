@@ -29,7 +29,7 @@
 
   - name: Generate VPN CA cert
     expect:
-      command: "docker run -e EASYRSA_KEY_SIZE=4096 -v {{ volumes.vpn.config.local_folder }}:{{ volumes.vpn.config.mount }} --rm -it kylemanna/openvpn ovpn_initpki"
+      command: "docker run -e EASYRSA_KEY_SIZE={{ openvpn.conf.ca_cert_bits }} -v {{ volumes.vpn.config.local_folder }}:{{ volumes.vpn.config.mount }} --rm -it kylemanna/openvpn ovpn_initpki"
       responses:
         'Enter New CA Key Passphrase:': "{{ ca_cert_pw }}"
         'Re-Enter New CA Key Passphrase:': "{{ ca_cert_pw }}"

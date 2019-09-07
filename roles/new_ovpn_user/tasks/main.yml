@@ -8,7 +8,7 @@
 
 - name: Create VPN user
   expect:
-    command: "docker run -e EASYRSA_KEY_SIZE=4096 -v {{ volumes.vpn.config.local_folder }}:{{ volumes.vpn.config.mount }} --rm -it kylemanna/openvpn easyrsa build-client-full {{ vpn_username }}"
+    command: "docker run -e EASYRSA_KEY_SIZE={{ openvpn.conf.ca_cert_bits }} -v {{ volumes.vpn.config.local_folder }}:{{ volumes.vpn.config.mount }} --rm -it kylemanna/openvpn easyrsa build-client-full {{ vpn_username }}"
     responses:
       'Enter PEM pass phrase:': "{{ user_cert_pw }}"
       'Enter pass phrase for \/etc\/openvpn\/pki\/private\/ca\.key:': "{{ ca_cert_pw }}"

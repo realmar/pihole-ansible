@@ -5,7 +5,7 @@
 
 - include: create.pihole.user.yml
 
-- name: Create pihole folders
+- name: Create pihole config folders
   file:
     state: directory
     path: "{{ item.local_folder }}"
@@ -14,7 +14,6 @@
   with_items:
     - "{{ volumes.pihole.main }}"
     - "{{ volumes.pihole.dnsmasq }}"
-    - "{{ volumes.vpn.config }}"
 
 - name: Copy dnsmaq config extension
   template:
