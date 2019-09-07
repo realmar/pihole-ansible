@@ -22,7 +22,7 @@ networks:
       netmask: 255.255.255.0
       gateway: 172.16.1.1
     v6:
-      enable: yes
+      enable: "{{ True if 'development' not in group_names else False }}"
       subnet: 2a02:120b:2c06:57df::/64
       netmask: 64
       gateway: 2a02:120b:2c06:57d0:7eb7:33ff:fed0:41a6
@@ -61,7 +61,7 @@ pihole:
   name: pihole
   ipv4: 172.16.1.20
   ipv6: 2a02:120b:2c06:57df::20
-  use_host_net: yes
+  use_host_net: "{{ True if 'development' not in group_names else False }}"
 
 openvpn:
   name: openvpn
