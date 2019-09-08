@@ -75,7 +75,7 @@ openvpn:
     ca_cert_bits: 4096
     tls_cipher: TLS-ECDHE-ECDSA-WITH-AES-256-GCM-SHA384
     cipher: AES-256-GCM
-    auth: SHA3-512
+    auth: SHA512
 
     server:
       file: openvpn.conf

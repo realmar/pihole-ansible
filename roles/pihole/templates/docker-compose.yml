@@ -37,9 +37,11 @@ services:
   openvpn:
     container_name: {{ openvpn.name }}
     image: kylemanna/openvpn
+{% if openvpn.use_host_net == false %}
     ports:
       - "1194:1194/udp"
       - "1194:1194/tcp"
+{% endif %}
     environment:
      #  - VIRTUAL_PORT=${VIRTUAL_PORT_OPENVPN}
      #  - VIRTUAL_HOST=${VIRTUAL_HOST_OPENVPN}
