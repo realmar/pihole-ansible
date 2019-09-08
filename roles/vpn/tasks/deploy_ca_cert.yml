@@ -35,5 +35,5 @@
         'Re-Enter New CA Key Passphrase:': "{{ ca_cert_pw }}"
         '\[Easy\-RSA\sCA\]:': "{{ openvpn.conf.dns }}"
         'Enter pass phrase for \/etc\/openvpn\/pki\/private\/ca\.key:': "{{ ca_cert_pw }}"
-      timeout: 3600
+      timeout: 604800
   when: cert_dir_stat.stat.exists == false
