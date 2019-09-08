@@ -70,7 +70,9 @@ services:
       {{ networks.pihole.name }}:
 {%   endif %}
 {% endif %}
+{% if networks.vpn.v6.enable %}
     privileged: yes
+{% endif %}
     cap_add:
       - NET_ADMIN
     logging:
@@ -152,20 +154,7 @@ services:
 networks:
 {% for network in nets %}
   {{ network.name }}:
-    driver: bridge
-{%  if network.v6.enable %}
-    driver_opts:
-      com.docker.network.enable_ipv6: "true"
-{%  endif %}
-    ipam:
-      driver: default
-      config:
-        - subnet: {{ network.v4.subnet }}
-        # gateway: {{ network.v4.gateway }}
-{%      if network.v6.enable %}
-        - subnet: {{ network.v6.subnet }}
-        # gateway: {{ network.v6.gateway }}
-{%      endif %}
+    external: true
 {% endfor %}
 {% endif %}
 

@@ -22,3 +22,10 @@
     line: "redirect-gateway def1"
     state: absent
   when: openvpn.conf.client.only_dns_over_vpn
+
+- name: Enable IPv6
+  lineinfile:
+    path: "{{ root_dirs.pihole }}/{{ vpn_username }}.ovpn"
+    line: "tun-ipv6"
+    state: present
+  when: networks.vpn.v6.enable

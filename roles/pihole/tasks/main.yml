@@ -38,3 +38,6 @@
     dest: /etc/cron.d/pihole_update_gravitas
     mode: 0644
   tags: cronjobs
+
+- include: docker_network.yml
+  tags: docker_net

@@ -35,7 +35,7 @@ networks:
       netmask: 255.255.255.0
       gateway: 172.16.2.1
     v6:
-      enable: no
+      enable: yes
       subnet: 2a02:120b:2c06:57de::/64
       netmask: 64
       gateway: 2a02:120b:2c06:57d0:7eb7:33ff:fed0:41a6
@@ -61,13 +61,15 @@ pihole:
   name: pihole
   ipv4: 172.16.1.20
   ipv6: 2a02:120b:2c06:57df::20
-  use_host_net: "{{ True if 'development' not in group_names else False }}"
+  use_host_net: yes # "{{ True if 'development' not in group_names else False }}"
+  network: "{{ networks.pihole }}"
 
 openvpn:
   name: openvpn
   ipv4: 172.16.2.20
   ipv6: 2a02:120b:2c06:57de::20
   use_host_net: no # "{{ True if 'development' not in group_names else False }}"
+  network: "{{ networks.vpn }}"
 
   conf:
     dns: vpn.realmar.net
@@ -84,3 +86,7 @@ openvpn:
       route_home_network: yes
     client:
       only_dns_over_vpn: yes
+
+containers:
+  - "{{ pihole }}"
+  - "{{ openvpn }}"
