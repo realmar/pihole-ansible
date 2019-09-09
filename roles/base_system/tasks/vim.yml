@@ -1,0 +1,20 @@
+- name: Enable syntax highlighting in vim
+  lineinfile:
+    dest: /etc/vim/vimrc
+    regexp: '^syn'
+    line: 'syntax on'
+    create: true
+
+- name: Enable line endings in vim
+  lineinfile:
+    dest: /etc/vim/vimrc
+    regexp: '^set nu'
+    line: 'set nu'
+    create: true
+
+- name: Readable colorscheme in powershell
+  lineinfile:
+    dest: /etc/vim/vimrc
+    regexp: '^colorscheme blue'
+    line: 'colorscheme blue'
+    create: true
