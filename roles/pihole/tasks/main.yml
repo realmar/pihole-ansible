@@ -14,6 +14,7 @@
   with_items:
     - "{{ volumes.pihole.main }}"
     - "{{ volumes.pihole.dnsmasq }}"
+  tags: pihole_conf
 
 - name: Copy dnsmaq config extension
   template:
@@ -22,16 +23,16 @@
     owner: "{{ user }}"
     group: "{{ user }}"
     mode: 0644
-  tags: dnsmasq_conf
+  tags: pihole_conf
 
-- name: Copy docker-compose.yml file
+- name: Copy pihole-FTL.conf file
   template:
-    src: docker-compose.yml
-    dest: "{{ root_dirs.pihole }}/docker-compose.yml"
+    src: pihole-FTL.conf
+    dest: "{{ volumes.pihole.main.local_folder }}/pihole-FTL.conf"
     owner: "{{ user }}"
     group: "{{ user }}"
     mode: 0644
-  tags: compose_file
+  tags: pihole_conf
 
 - name: Install update gravity cronjob
   template:
@@ -42,3 +43,12 @@
 
 - include: docker_network.yml
   tags: docker_net
+
+- name: Copy docker-compose.yml file
+  template:
+    src: docker-compose.yml
+    dest: "{{ root_dirs.pihole }}/docker-compose.yml"
+    owner: "{{ user }}"
+    group: "{{ user }}"
+    mode: 0644
+  tags: compose_file
