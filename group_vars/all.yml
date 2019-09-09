@@ -58,6 +58,7 @@ volumes:
       mount: /etc/openvpn
 
 pihole:
+  user: pihole
   name: pihole
   ipv4: 172.16.1.20
   ipv6: 2a02:120b:2c06:57df::20

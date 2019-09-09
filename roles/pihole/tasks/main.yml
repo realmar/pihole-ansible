@@ -4,6 +4,7 @@
 #     state: absent
 
 - include: create.pihole.user.yml
+  tags: pihole_users
 
 - name: Create pihole config folders
   file:

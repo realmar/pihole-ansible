@@ -113,6 +113,7 @@ services:
       ServerIPv6: {{ pihole_ipam.ipam.ipv6 }}
 {% endif %}
       DNSMASQ_LISTENING: all
+      DNSMASQ_USER: {{ pihole.user }}
     volumes:
 {% set vols = [
   volumes.pihole.main ,
@@ -135,6 +136,8 @@ services:
 {%      endif %}
 {% endif %}
     cap_add:
+      - CAP_NET_BIND_SERVICE
+      - CAP_NET_RAW
       - NET_ADMIN     
     logging:
       driver: "json-file"
