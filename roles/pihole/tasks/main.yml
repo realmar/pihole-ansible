@@ -22,6 +22,7 @@
     owner: "{{ user }}"
     group: "{{ user }}"
     mode: 0644
+  tags: dnsmasq_conf
 
 - name: Copy docker-compose.yml file
   template:
