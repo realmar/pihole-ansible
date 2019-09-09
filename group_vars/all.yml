@@ -56,6 +56,11 @@ volumes:
       name: ovpn_config
       local_folder: "{{ root_dirs.pihole }}/etc-openvpn"
       mount: /etc/openvpn
+  netdata:
+    main:
+      name: main_config
+      local_folder: "{{ root_dirs.netdata }}/etc-netdata"
+      mount: /etc/netdata
 
 pihole:
   user: pihole
@@ -87,6 +92,10 @@ openvpn:
       route_home_network: yes
     client:
       only_dns_over_vpn: yes
+
+netdata:
+  name: netdata
+  user: netdata
 
 containers:
   - "{{ pihole }}"

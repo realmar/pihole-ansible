@@ -7,22 +7,24 @@
     create_home: yes
     password: "{{ lookup('template', 'standard_pw_gen.jinja2', template_vars=dict(name=user)) | password_hash('sha512') }}"
     update_password: always
-  tags: pw
+  tags: users
 
 - name: "Create {{ pihole.user }} user"
   user:
     name: "{{ pihole.user }}"
     state: present
     shell: /bin/bash
-    group: "{{ user }}"
+    uid: 999
+    groups: "{{ user }}"
     create_home: no
     password: "{{ lookup('template', 'standard_pw_gen.jinja2', template_vars=dict(name=pihole.user)) | password_hash('sha512') }}"
     update_password: always
+  tags: users
 
 - name: Create pihole directory
   file:
     path: "{{ root_dirs.pihole }}"
     state: directory
     recurse: yes
-    owner: "{{ user }}"
+    owner: "{{ pihole.user }}"
     group: "{{ user }}"

@@ -1,15 +1,30 @@
-- name: Create project folder
+
+- name: "Create {{ netdata.user }} user"
+  user:
+    name: "{{ netdata.user }}"
+    state: present
+    shell: /bin/bash
+    uid: 201
+    create_home: no
+    password: "{{ lookup('template', 'standard_pw_gen.jinja2', template_vars=dict(name=netdata.user)) | password_hash('sha512') }}"
+    update_password: always
+  tags: users
+
+- name: Create project folders
   file:
-    path: "{{ root_dirs.netdata }}"
+    path: "{{ item }}"
     state: directory
-    owner: "{{ user }}"
+    owner: "{{ netdata.user }}"
     group: "{{ user }}"
+  with_items:
+    - "{{ root_dirs.netdata }}"
+    # - "{{ volumes.netdata.main.local_folder }}"
 
 - name: Copy docker-compose file
   template:
     src: docker-compose.yml
     dest: "{{ root_dirs.netdata }}"
-    owner: "{{ user }}"
+    owner: "{{ netdata.user }}"
     group: "{{ user }}"
     mode: 0644
   tags: compose_file

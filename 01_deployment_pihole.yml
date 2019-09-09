@@ -19,6 +19,17 @@
         - "{{ root_dirs.netdata }}"
       tags:
         - initialize
+    
+    - name: Fix permissions
+      file:
+        path: "{{ item.path }}"
+        owner: "{{ item.user }}"
+        group: "{{ item.group }}"
+        recurse: yes
+      with_items:
+        - { path: "{{ root_dirs.pihole }}", user: "{{ pihole.user }}", group: "{{ user }}" }
+        - { path: "{{ root_dirs.netdata }}", user: "{{ netdata.user }}", group: "{{ user }}" }
+      tags: permissions
 
   handlers:
     - import_tasks: handlers/services.yml

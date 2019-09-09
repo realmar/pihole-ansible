@@ -10,7 +10,7 @@
   file:
     state: directory
     path: "{{ item.local_folder }}"
-    owner: "{{ user }}"
+    owner: "{{ pihole.user }}"
     group: "{{ user }}"
   with_items:
     - "{{ volumes.pihole.main }}"
@@ -21,7 +21,7 @@
   template:
     src: 10-custom-dns.conf
     dest: "{{ volumes.pihole.dnsmasq.local_folder }}/10-custom-dns.conf"
-    owner: "{{ user }}"
+    owner: "{{ pihole.user }}"
     group: "{{ user }}"
     mode: 0644
   tags: pihole_conf
@@ -30,7 +30,7 @@
   template:
     src: pihole-FTL.conf
     dest: "{{ volumes.pihole.main.local_folder }}/pihole-FTL.conf"
-    owner: "{{ user }}"
+    owner: "{{ pihole.user }}"
     group: "{{ user }}"
     mode: 0644
   tags: pihole_conf
@@ -49,7 +49,7 @@
   template:
     src: docker-compose.yml
     dest: "{{ root_dirs.pihole }}/docker-compose.yml"
-    owner: "{{ user }}"
+    owner: "{{ pihole.user }}"
     group: "{{ user }}"
     mode: 0644
   tags: compose_file

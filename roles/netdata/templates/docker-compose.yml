@@ -1,11 +1,13 @@
 version: '3'
 services:
   netdata:
-    container_name: netdata
+    container_name: {{ netdata.name }}
     image: netdata/netdata
     hostname: pihole.home
     ports:
       - 19999:19999
+#     volumes:
+#       {{ volumes.netdata.main.name }}:{{ volumes.netdata.main.local_folder }}
     cap_add:
       - SYS_PTRACE
     security_opt:
@@ -16,3 +18,11 @@ services:
       - /proc:/host/proc:ro
       - /sys:/host/sys:ro
     restart: always
+
+# volumes:
+#   {{ volumes.netdata.main.name }}:
+#     driver: local
+#     driver_opts:
+#       type: none
+#       device: {{ volumes.netdata.main.local_folder }}
+#       o: bind
