@@ -1,0 +1,12 @@
+- name: Install unattended-upgrades
+  apt:
+    name: unattended-upgrades
+    state: latest
+
+- name: Copy config files
+  template:
+    src: "{{ item }}"
+    dest: "/etc/apt/apt.conf.d/{{ item }}"
+  with_items:
+    - 50unattended-upgrades
+    - 20auto-upgrades

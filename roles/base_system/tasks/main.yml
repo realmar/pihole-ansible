@@ -58,10 +58,8 @@
     regexp: '^127\.0\.1\.1'
     line: "127.0.1.1 {{ host.name }}"
 
-- name: Install unattended-upgrades
-  apt:
-    name: unattended-upgrades
-    state: latest
+- include: unattended_upgrades.yml
+  tags: unattended_upgrades
 
 - include: network.yml
   when: "'development' not in group_names"
