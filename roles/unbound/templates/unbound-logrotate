@@ -1,0 +1,13 @@
+{% set log_file = volumes.unbound.main.local_folder + '/var/unbound.log' %}
+{{ log_file }} {
+  rotate 2
+  weekly
+  compress
+  missingok
+  notifempty
+
+  postrotate
+    cd {{ root_dirs.pihole }}
+    docker-compose restart {{ unbound.name }}
+  endscript
+}

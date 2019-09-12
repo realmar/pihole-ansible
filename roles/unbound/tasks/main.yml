@@ -21,6 +21,7 @@
   with_items:
     - unbound.conf
     - a-records.conf
+  tags: unbound_conf
 
 - name: Copy cron job
   template:
@@ -34,3 +35,10 @@
     dest: "{{ volumes.unbound.main.local_folder }}/var/root.hints"
     owner: "{{ unbound.user }}"
     group: "{{ user }}"
+
+- name: Copy logrotate file
+  template:
+    src: unbound-logrotate
+    dest: /etc/logrotate.d/unbound
+    mode: 0644
+  tags: logrotate
