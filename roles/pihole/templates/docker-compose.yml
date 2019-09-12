@@ -32,6 +32,7 @@ version: '3'
 
 {% import "pihole_ipam.jinja2" as pihole_ipam with context %}
 {% import "password_gen.jinja2" as gen with context %}
+{% import 'docker_volumes.jinja2' as dv with context %}
 
 services:
   openvpn:
@@ -102,26 +103,30 @@ services:
 {#                 We need to escape $-sign with two $$-signs #}
       WEBPASSWORD: '{{ gen.pw("web") | replace("$", "$$") }}'
       TZ: 'Europe/Zurich'
-      DNS1: 1.1.1.1
-      DNS2: 1.0.0.1
-      ServerIP: {{ pihole_ipam.ipam.ipv4 }}
 {% if pihole.use_host_net %}
+      DNS1: 127.0.0.1#{{ unbound.port }}
+{% else %}
+      DNS1: {{ unbound.ipv4 }}#53
+{% endif %}
+      DNS2: "no"
+      ServerIP: {{ pihole_ipam.ipam.ipv4 }}
+{% if host.supports_v6 %}
+{%   if pihole.use_host_net %}
       IPv6: "True"
       ServerIPv6: {{ host.ipv6 }}
-{% elif networks.pihole.v6.enable %}
+{%   elif networks.pihole.v6.enable %}
       IPv6: "True"
       ServerIPv6: {{ pihole_ipam.ipam.ipv6 }}
+{%   endif %}
 {% endif %}
       DNSMASQ_LISTENING: all
       DNSMASQ_USER: {{ pihole.user }}
-    volumes:
 {% set vols = [
   volumes.pihole.main ,
   volumes.pihole.dnsmasq
-] -%}
-{% for volume in vols %}
-      - {{ volume.name }}:{{ volume.mount }}
-{% endfor %}
+] %}
+    volumes:
+      {{ dv.volumes_mapping(vols)|indent(width = 6) }}
       - /etc/localtime:/etc/localtime:ro
       - /etc/timezone:/etc/timezone:ro
     restart: always
@@ -134,18 +139,37 @@ services:
 {%      if networks.pihole.v6.enable %}
         ipv6_address: {{ pihole_ipam.ipam.ipv6 }}
 {%      endif %}
+      {{ networks.unbound.name }}:
 {% endif %}
     cap_add:
       - CAP_NET_BIND_SERVICE
       - CAP_NET_RAW
-      - NET_ADMIN     
+      - NET_ADMIN
     logging:
       driver: "json-file"
       options:
         max-size: "5m"
         max-file: "3"
 
-{% set nets = [] %}
+  unbound:
+    container_name: {{ unbound.name }}
+    # Note: make sure the image supports arm (the image on the latest tag does not)
+    image: mvance/unbound:{{ '1.9.3' if 'development' not in group_names else 'latest' }}
+{% if pihole.use_host_net %}
+    ports:
+      - {{ unbound.port }}:53/udp
+      - {{ unbound.port }}:53/tcp
+{% endif %}
+{%- set vols = [
+  volumes.unbound.main
+] %}
+    {{ dv.volumes_mapping_full(vols)|indent }}
+    networks:
+      {{ networks.unbound.name }}:
+        ipv4_address: {{ unbound.ipv4 }}
+    restart: always
+
+{% set nets = [ networks.unbound ] %}
 {% if pihole.use_host_net == false %}
 {{   nets.append(networks.pihole) }}
 {% endif %}
@@ -161,17 +185,10 @@ networks:
 {% endfor %}
 {% endif %}
 
-volumes:
 {% set vols = [
   volumes.pihole.main ,
   volumes.pihole.dnsmasq,
-  volumes.vpn.config
-] -%}
-{% for volume in vols %}
-  {{ volume.name }}:
-    driver: local
-    driver_opts:
-      type: none
-      device: {{ volume.local_folder }}
-      o: bind
-{% endfor %}
+  volumes.vpn.config,
+  volumes.unbound.main
+] %}
+{{ dv.volumes_declaration(vols) }}

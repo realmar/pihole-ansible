@@ -1,0 +1,22 @@
+{% macro volumes_mapping(vols) %}
+{% for volume in vols %}
+- {{ volume.name }}:{{ volume.mount }}
+{% endfor %}
+{% endmacro %}
+
+{% macro volumes_mapping_full(vols) %}
+volumes:
+{{ volumes_mapping(vols)|indent(width = 2, first = True) }}
+{% endmacro %}
+
+{% macro volumes_declaration(vols) %}
+volumes:
+{% for volume in vols %}
+  {{ volume.name }}:
+    driver: local
+    driver_opts:
+      type: none
+      device: {{ volume.local_folder }}
+      o: bind
+{% endfor %}
+{% endmacro %}

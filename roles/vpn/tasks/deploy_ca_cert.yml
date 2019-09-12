@@ -1,4 +1,5 @@
-- local_action: command pwd
+- name: Get pwd on local machine
+  local_action: command pwd
   register: root_path_cmd
   changed_when: False
 
@@ -8,10 +9,16 @@
 - set_fact:
     cert_dir: "{{ root_path_cmd.stdout }}/roles/vpn/files/{{ relative_cert_dir }}"
 
-- local_action:
+- name: Check if there is a pre-generated VPN CA cert
+  local_action:
     module: stat
     path: "{{ cert_dir }}"
   register: cert_dir_stat
+
+- name: Check if VPN CA cert files exists
+  stat:
+    path: "{{ volumes.vpn.config.local_folder }}/pki/ca.crt"
+  register: ca_cert
 
 - name: Copy pre-generated VPN CA cert files
   copy:
@@ -19,7 +26,7 @@
     dest: "{{ volumes.vpn.config.local_folder }}"
     owner: "{{ user }}"
     group: "{{ user }}"
-  when: cert_dir_stat.stat.exists
+  when: cert_dir_stat.stat.exists and ca_cert.stat.exists == false
 
 - name: No pre-generated VPN CA cert found, generating one ...
   block:
@@ -36,4 +43,4 @@
         '\[Easy\-RSA\sCA\]:': "{{ openvpn.conf.dns }}"
         'Enter pass phrase for \/etc\/openvpn\/pki\/private\/ca\.key:': "{{ ca_cert_pw }}"
       timeout: 604800
-  when: cert_dir_stat.stat.exists == false
+  when: cert_dir_stat.stat.exists == false and ca_cert.stat.exists == false

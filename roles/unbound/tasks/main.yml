@@ -1,0 +1,36 @@
+- include_tasks: create_user.yml
+  vars:
+    item: { name: "{{ unbound.user }}", uid: 107, create_home: no, groups: "" }
+
+- name: Create unbound dirs
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner: "{{ unbound.user }}"
+    group: "{{ user }}"
+  with_items:
+    - "{{ volumes.unbound.main.local_folder }}"
+    - "{{ volumes.unbound.main.local_folder }}/var"
+
+- name: Copy config files
+  template:
+    src: "{{ item }}"
+    dest: "{{ volumes.unbound.main.local_folder }}/{{ item }}"
+    owner: "{{ unbound.user }}"
+    group: "{{ user }}"
+  with_items:
+    - unbound.conf
+    - a-records.conf
+
+- name: Copy cron job
+  template:
+    src: download_unbound_root_hints
+    dest: /etc/cron.d/download_unbound_root_hints
+    mode: 0644
+
+- name: Download root.hints
+  get_url:
+    url: https://www.internic.net/domain/named.root
+    dest: "{{ volumes.unbound.main.local_folder }}/var/root.hints"
+    owner: "{{ unbound.user }}"
+    group: "{{ user }}"

@@ -1,43 +1,43 @@
 - hosts: development
-  gather_facts: yes
+  gather_facts: no
   remote_user: root
   debugger: on_failed
 
-  roles:
-    - debug_role
-
   tasks:
-    - name: Check if is rasbian
-      stat:
-        path: /usr/bin/raspi-config
-      register: raspi_config_check
-
-    - set_fact:
-        is_rasbian: "{{ raspi_config_check.stat.exists }}"
-
-    - set_fact:
-        arch: amd64
-      when: is_rasbian|bool == false
-
-    - set_fact:
-        arch: armhf
-      when: is_rasbian|bool
-
-    - name: Get RPI CPU Revision
-      shell: "cat /proc/cpuinfo | grep Revision | cut -d ' ' -f2"
-      register: cpu_revision
-      # no need to report anything
-      changed_when: False
+    #- name: Check if is rasbian
+    #  stat:
+    #    path: /usr/bin/raspi-config
+    #  register: raspi_config_check
+#
+    #- set_fact:
+    #    is_rasbian: "{{ raspi_config_check.stat.exists }}"
+#
+    #- set_fact:
+    #    arch: amd64
+    #  when: is_rasbian|bool == false
+#
+    #- set_fact:
+    #    arch: armhf
+    #  when: is_rasbian|bool
+#
+    #- name: Get RPI CPU Revision
+    #  shell: "cat /proc/cpuinfo | grep Revision | cut -d ' ' -f2"
+    #  register: cpu_revision
+    #  # no need to report anything
+    #  changed_when: False
 
     - debug:
         msg:
-          - "{{ cpu_revision }}"
-          - "{{ arch }}"
-          - "{{ raspi_config_check }}"
-          - "exists {{ raspi_config_check.stat.exists }}"
-          - "is_rasbian|bool {{ is_rasbian|bool }}"
-          - "is_rasbian {{ is_rasbian }}"
-          - "{{ ansible_distribution }}"
-          - "{{ ansible_distribution_major_version }}"
-          - "{{ ansible_distribution_version }}"
-          - "{{ lookup('template', 'standard_pw_gen.jinja2', template_vars=dict(name='dingdong')) }}"
+          #- "{{ flat_volumes }}"
+          #- "{{ cpu_revision }}"
+          #- "{{ arch }}"
+          #- "{{ raspi_config_check }}"
+          #- "exists {{ raspi_config_check.stat.exists }}"
+          #- "is_rasbian|bool {{ is_rasbian|bool }}"
+          #- "is_rasbian {{ is_rasbian }}"
+          #- "{{ ansible_distribution }}"
+          #- "{{ ansible_distribution_major_version }}"
+          #- "{{ ansible_distribution_version }}"
+          #- "{{ lookup('template', 'standard_pw_gen.jinja2', template_vars=dict(name='dingdong')) }}"
+          - "{{ item }}"
+      with_items: "{{ flat_volumes }}"

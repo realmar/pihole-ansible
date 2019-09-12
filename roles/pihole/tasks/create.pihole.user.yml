@@ -1,30 +1,10 @@
-- name: "Create {{ user }} user"
-  user:
-    name: "{{ user }}"
-    state: present
-    shell: /bin/bash
-    groups: docker
-    create_home: yes
-    password: "{{ lookup('template', 'standard_pw_gen.jinja2', template_vars=dict(name=user)) | password_hash('sha512') }}"
-    update_password: always
-  tags: users
-
-- name: "Create {{ pihole.user }} user"
-  user:
-    name: "{{ pihole.user }}"
-    state: present
-    shell: /bin/bash
-    uid: 999
-    groups: "{{ user }}"
-    create_home: no
-    password: "{{ lookup('template', 'standard_pw_gen.jinja2', template_vars=dict(name=pihole.user)) | password_hash('sha512') }}"
-    update_password: always
-  tags: users
+- include_tasks: create_user.yml
+  vars:
+    item: { name: "{{ pihole.user }}", uid: 999, create_home: no, groups: "{{ user }}" }
 
 - name: Create pihole directory
   file:
     path: "{{ root_dirs.pihole }}"
     state: directory
-    recurse: yes
     owner: "{{ pihole.user }}"
     group: "{{ user }}"

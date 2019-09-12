@@ -15,7 +15,7 @@
     ipam_config:
       - subnet: "{{ network.v4.subnet }}"
     state: present
-  when: network.v6.enable == false and result.exists == false
+  when: (network.v6 is not defined or network.v6.enable == false) and result.exists == false
 
 - name: Add v4 and v6 docker network
   docker_network:
@@ -26,4 +26,4 @@
       - subnet: "{{ network.v4.subnet }}"
       - subnet: "{{ network.v6.subnet }}"
     state: present
-  when: network.v6.enable and result.exists == false
+  when: network.v6 is defined and network.v6.enable and result.exists == false

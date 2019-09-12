@@ -53,3 +53,15 @@
     group: "{{ user }}"
     mode: 0644
   tags: compose_file
+
+- import_role:
+    name: vpn
+  tags:
+    - pihole
+    - vpn
+
+- import_role:
+    name: unbound
+  tags:
+    - pihole
+    - unbound

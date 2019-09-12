@@ -1,0 +1,33 @@
+#
+# IN
+#     item:
+#     {
+#       name: string
+#       uid: int?
+#       create_home: bool
+#       groups: list[string]
+#     }
+#
+
+- name: "Create {{ item.name }} user with uid"
+  user:
+    name: "{{ item.name }}"
+    state: present
+    shell: /bin/bash
+    # uid: "{{ item.uid }}"
+    groups: "{{ item.groups }}"
+    create_home: "{{ item.create_home|bool }}"
+    password: "{{ lookup('template', 'standard_pw_gen.jinja2', template_vars=dict(name=item.name)) | password_hash('sha512') }}"
+    update_password: on_create
+  when: item.uid is defined
+
+- name: "Create {{ item.name }} user without uid"
+  user:
+    name: "{{ item.name }}"
+    state: present
+    shell: /bin/bash
+    groups: "{{ item.groups }}"
+    create_home: "{{ item.create_home|bool }}"
+    password: "{{ lookup('template', 'standard_pw_gen.jinja2', template_vars=dict(name=item.name)) | password_hash('sha512') }}"
+    update_password: on_create
+  when: item.uid is not defined

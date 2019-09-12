@@ -23,6 +23,7 @@
       - rsync
       - curl
       - ntp
+      - dnsutils
 
 - include: vim.yml
   tags: vim
@@ -45,7 +46,7 @@
   user:
     name: root
     password: "{{ lookup('template', 'standard_pw_gen.jinja2', template_vars=dict(name='root')) | password_hash('sha512') }}"
-    update_password: always
+    update_password: on_create
   tags: pw
 
 - name: Set hostname

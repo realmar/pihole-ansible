@@ -4,32 +4,35 @@
   debugger: on_failed
 
   roles:
-    - { role: base_system, tags: base }
-    - { role: docker, tags: docker }
     - { role: pihole, tags: pihole }
-    - { role: vpn, tags: [ 'pihole', 'vpn' ] }
     - { role: netdata, tags: monitoring }
 
   tasks:
+    - name: Fix permissions
+      file:
+        path: "{{ item.volume.local_folder }}"
+        owner: "{{ item.container.user }}"
+        group: "{{ user }}"
+        recurse: yes
+      with_items: "{{ flat_volumes }}"
+      when: item.container.user is defined
+      tags: permissions
+
+    # I really don't want to install docker-compose via pip just to make the
+    # docker_container module work. This is because pip install docker-compose
+    # needs to compile a ton of C code and massively slows down the deployment
     - name: Start docker containers
-      docker_compose:
-        project_src: "{{ item }}"
+      shell: "docker-compose up -d"
+      args:
+        chdir: "{{ item }}"
       with_items:
         - "{{ root_dirs.pihole }}"
         - "{{ root_dirs.netdata }}"
+      register: cli_result
+      changed_when:
+        - '"up-to-date" not in cli_result.stderr'
       tags:
         - initialize
-    
-    - name: Fix permissions
-      file:
-        path: "{{ item.path }}"
-        owner: "{{ item.user }}"
-        group: "{{ item.group }}"
-        recurse: yes
-      with_items:
-        - { path: "{{ root_dirs.pihole }}", user: "{{ pihole.user }}", group: "{{ user }}" }
-        - { path: "{{ root_dirs.netdata }}", user: "{{ netdata.user }}", group: "{{ user }}" }
-      tags: permissions
 
   handlers:
     - import_tasks: handlers/services.yml

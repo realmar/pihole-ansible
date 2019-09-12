@@ -1,14 +1,6 @@
-
-- name: "Create {{ netdata.user }} user"
-  user:
-    name: "{{ netdata.user }}"
-    state: present
-    shell: /bin/bash
-    uid: 201
-    create_home: no
-    password: "{{ lookup('template', 'standard_pw_gen.jinja2', template_vars=dict(name=netdata.user)) | password_hash('sha512') }}"
-    update_password: always
-  tags: users
+- include_tasks: create_user.yml
+  vars:
+    item: { name: "{{ netdata.user }}", uid: 201, create_home: no, groups: "" }
 
 - name: Create project folders
   file:

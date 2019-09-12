@@ -27,18 +27,25 @@
     owner: "{{ user }}"
     group: "{{ user }}"
 
+- name: Check if OpenVPN config exists
+  stat:
+    path: "{{ volumes.vpn.config.local_folder }}/openvpn.conf"
+  register: ovpn_conf
+
 - name: Generate OpenVPN config
   shell: "docker run -v {{ volumes.vpn.config.local_folder }}:{{ volumes.vpn.config.mount }} --rm kylemanna/openvpn ovpn_genconfig -n {{ host.ipv4 if pihole.use_host_net else pihole.ipv4 }} -u udp://{{ openvpn.conf.dns }} -T {{ openvpn.conf.tls_cipher }} -C '{{ openvpn.conf.cipher }}' -a '{{ openvpn.conf.auth }}'"
+  when: ovpn_conf.stat.exists == false
 
 - name: Copy OpenVPN server conf
   template:
     src: openvpn.conf
     dest: "{{ volumes.vpn.config.local_folder }}"
-    owner: "{{ user }}"
+    owner: "{{ openvpn.user }}"
     group: "{{ user }}"
     mode: 0644
   notify:
     - restart openvpn
-  tags: vpn_conf
+  tags:
+    - vpn_conf
 
 - include: deploy_ca_cert.yml
