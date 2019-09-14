@@ -21,6 +21,7 @@
   with_items:
     - unbound.conf
     - a-records.conf
+  notify: restart unbound
   tags: unbound_conf
 
 - name: Copy cron job

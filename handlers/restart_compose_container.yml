@@ -1,0 +1,12 @@
+#
+# IN
+#     item
+#     {
+#         name: string      - container name
+#         dir: string       - docker compose project dir
+#     }
+#
+
+- shell: "docker-compose restart {{ item.name }}"
+  args:
+    chdir: "{{ item.dir }}"
