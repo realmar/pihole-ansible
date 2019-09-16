@@ -103,8 +103,12 @@ openvpn:
 
     server:
       file: openvpn.conf
-      netaddress: 192.168.255.0
-      netmask: 255.255.255.0
+      v4:
+        netaddress: 192.168.255.0
+        netmask: 255.255.255.0
+      v6:
+        netaddress: "2a02:120b:2c06:57dc::"
+        netmask: 64
       route_home_network: yes
     client:
       only_dns_over_vpn: yes

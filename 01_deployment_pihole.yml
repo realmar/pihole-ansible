@@ -1,4 +1,4 @@
-- hosts: development
+- hosts: production
   gather_facts: yes
   remote_user: root
   debugger: on_failed
@@ -36,3 +36,4 @@
 
   handlers:
     - import_tasks: handlers/services.yml
+    - import_tasks: handlers/docker.yml
