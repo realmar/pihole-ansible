@@ -89,7 +89,7 @@ openvpn:
   user: "{{ user }}"
   ipv4: 172.16.2.20
   ipv6: 2a02:120b:2c06:57de::20
-  use_host_net: no
+  use_host_net: yes
   network: "{{ networks.vpn }}"
   volumes: "{{ volumes.vpn }}"
 

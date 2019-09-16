@@ -21,3 +21,9 @@
       name: "{{ unbound.name }}"
       dir: "{{ root_dirs.pihole }}"
   ignore_errors: yes # yeet
+
+- name: restart pihole project
+  shell: "docker-compose restart"
+  args:
+    chdir: "{{ root_dirs.pihole }}"
+  ignore_errors: yes # yeet
