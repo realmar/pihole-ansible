@@ -6,6 +6,7 @@
   roles:
     - { role: pihole, tags: pihole }
     - { role: netdata, tags: monitoring }
+    - { role: docker_update, tags: autoupdate }
 
   tasks:
     - name: Fix permissions
@@ -28,6 +29,7 @@
       with_items:
         - "{{ root_dirs.pihole }}"
         - "{{ root_dirs.netdata }}"
+        - "{{ root_dirs.autoupdate }}"
       register: cli_result
       changed_when:
         - '"up-to-date" not in cli_result.stderr'

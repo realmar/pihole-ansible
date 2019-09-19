@@ -2,7 +2,7 @@ user: pi
 root_dirs:
   pihole: /home/pi/pihole
   netdata: /home/pi/netdata
-docker_volume_root: /var/lib/docker/volumes
+  autoupdate: /home/pi/autoupdate
 
 networks:
   host:
@@ -90,6 +90,7 @@ openvpn:
   ipv4: 172.16.2.20
   ipv6: 2a02:120b:2c06:57de::20
   use_host_net: yes
+  autoupdate: no
   network: "{{ networks.vpn }}"
   volumes: "{{ volumes.vpn }}"
 
@@ -133,7 +134,7 @@ containers:
   - "{{ netdata }}"
   - "{{ unbound }}"
 
-__flat_volumes_tmp: |
+__flat_volumes: |
   {% set vols = [] %}
   {% for c in containers %}
     {% for k, vol in c.volumes.items() %}
@@ -141,7 +142,14 @@ __flat_volumes_tmp: |
     {% endfor %}
   {% endfor %}
   {{ vols|to_json }}
+flat_volumes: "{{ __flat_volumes|from_json }}"
 
-# if we dont do that, then ansible will interpret the list as string
-# doing {{ vols|to_json|from_json }} doesnt work neither
-flat_volumes: "{{ __flat_volumes_tmp|from_json }}"
+__exclude_autoupdate_containers: |
+  {% set exclude = [] %}
+  {% for c in containers %}
+    {% if c.autoupdate is defined and c.autoupdate == false %}
+      {% set x = exclude.append(c) %}
+    {% endif %}
+  {% endfor %}
+  {{ exclude|to_json }}
+containers_autoupdate_disabled: "{{ __exclude_autoupdate_containers|from_json }}"

@@ -2,7 +2,7 @@ version: '3'
 services:
   netdata:
     container_name: {{ netdata.name }}
-    image: netdata/netdata
+    image: netdata/netdata:latest
     hostname: pihole.home
     ports:
       - 19999:19999

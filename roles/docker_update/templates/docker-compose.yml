@@ -1,0 +1,18 @@
+version: '3'
+services:
+  ouroboros:
+    container_name: ouroboros
+    hostname: ouroboros
+    image: pyouroboros/ouroboros
+    environment:
+      - CLEANUP=true
+      - INTERVAL=300
+      - LOG_LEVEL=info
+      - SELF_UPDATE=true
+      - IGNORE={% for c in containers_autoupdate_disabled %}{{ c.name }}{% endfor %}
+
+    restart: always
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro

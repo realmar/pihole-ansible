@@ -52,7 +52,7 @@
     owner: "{{ pihole.user }}"
     group: "{{ user }}"
     mode: 0644
-  notify: restart pihole project
+  # notify: restart pihole project
   tags: compose_file
 
 - import_role:
