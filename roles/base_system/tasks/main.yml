@@ -24,6 +24,7 @@
       - curl
       - ntp
       - dnsutils
+      - tcpdump
 
 - include: vim.yml
   tags: vim
