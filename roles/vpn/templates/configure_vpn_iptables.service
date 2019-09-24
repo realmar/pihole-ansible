@@ -1,0 +1,18 @@
+[Unit]
+Description=Configure vpn iptables so that vpn net and local net are routed by forwarding
+After=network.target docker.service
+
+[Service]
+Type=oneshot
+
+User=root
+Group=root
+
+ExecStart={{ volumes.vpn.config.local_folder }}/up-route_lan.py
+ExecStop={{ volumes.vpn.config.local_folder }}/down-route_lan.py
+
+RemainAfterExit=true
+StandardOutput=journal
+
+[Install]
+WantedBy=multi-user.target

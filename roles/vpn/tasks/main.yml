@@ -49,3 +49,7 @@
     - vpn_conf
 
 - include: deploy_ca_cert.yml
+
+- include: route_lan.yml
+  when: openvpn.use_host_net
+  tags: vpn_route_lan
