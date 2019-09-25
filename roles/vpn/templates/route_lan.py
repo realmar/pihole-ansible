@@ -21,10 +21,13 @@ def execute(command):
     
     return rc
 
-lan_to_vpn = 'FORWARD -i {{ host.public_interface }} -o {{ openvpn.tun_device_name }} -s {{ openvpn.conf.server.v4.subnet }} -d {{ networks.host.v4.subnet }} -j ACCEPT'
-vpn_to_lan = 'FORWARD -i {{ openvpn.tun_device_name }} -o {{ host.public_interface }} -s {{ networks.host.v4.subnet }} -d {{ openvpn.conf.server.v4.subnet }} -j ACCEPT'
+rules = [ \
+    'FORWARD -i {{ host.public_interface }} -o {{ openvpn.tun_device_name }} -s {{ networks.host.v4.subnet }} -d {{ openvpn.conf.server.v4.subnet }} -j ACCEPT', \
+    'FORWARD -i {{ openvpn.tun_device_name }} -o {{ host.public_interface }} -s {{ openvpn.conf.server.v4.subnet }} -d {{ networks.host.v4.subnet }} -j ACCEPT' \
+]
 
-rc = execute(lan_to_vpn)
-rc = execute(vpn_to_lan)
+rc = 0
+for rule in rules:
+    rc = rc + execute(rule)
 
 sys.exit(rc)
