@@ -1,0 +1,26 @@
+# docker run -it --rm  -v /home/pi/bkp:/data -v /home/pi:/home/pi -p 8200:8200 duplicati/duplicati
+
+{% import 'docker_volumes.jinja2' as dv with context -%}
+
+{%- set vols = [
+  volumes.duplicati.config,
+  volumes.duplicati.backup_target
+] -%}
+
+version: '3'
+services:
+  duplicati:
+    container_name: duplicati
+    hostname: duplicati
+    image: linuxserver/duplicati:latest
+    environment:
+      PUID: 0 # ding dong root bad
+      PGID: 0 # ding dong root bad
+      TZ: {{ timezone }}
+      CLI_ARGS: --restore-permissions=true
+    ports:
+      - 8200:8200
+    {{ dv.volumes_section_complete(vols)|indent(width = 4) }}
+    restart: always
+
+{{ dv.volumes_declaration(vols) }}

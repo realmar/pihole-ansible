@@ -1,0 +1,40 @@
+#
+# IN
+#
+#   required:
+#     usr: string
+#     root_dir: string
+#
+#   optional:
+#     grp: string
+#     dirs: string[]
+#
+
+- set_fact:
+    grp: "{{ usr }}"
+  when: grp is not defined
+
+- name: Create root folder
+  file:
+    path: "{{ root_dir }}"
+    state: directory
+    owner: "{{ usr }}"
+    group: "{{ grp }}"
+
+- name: Create project folders
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner: "{{ usr }}"
+    group: "{{ grp }}"
+  with_items: "{{ dirs }}"
+  when: dirs is defined
+
+- name: Copy docker-compose file
+  template:
+    src: docker-compose.yml
+    dest: "{{ root_dir }}"
+    owner: "{{ usr }}"
+    group: "{{ grp }}"
+    mode: 0644
+  tags: compose_file

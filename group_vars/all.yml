@@ -1,8 +1,10 @@
+timezone: Europe/Zurich
 user: pi
 root_dirs:
   pihole: /home/pi/pihole
   netdata: /home/pi/netdata
   autoupdate: /home/pi/autoupdate
+  backup: /home/pi/backup
 
 networks:
   host:
@@ -75,6 +77,15 @@ volumes:
       name: unbound_config
       local_folder: "{{ root_dirs.pihole }}/etc-unbound"
       mount: /opt/unbound/etc/unbound
+  duplicati:
+    config:
+      name: duplicati_config
+      local_folder: "{{ root_dirs.backup }}/config"
+      mount: /config
+    backup_target:
+      name: duplicati_backup_target
+      local_folder: "/home/{{ user }}"
+      mount: "/source"
 
 pihole:
   user: pihole

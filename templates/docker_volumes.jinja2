@@ -6,7 +6,7 @@
 
 {% macro volumes_mapping_full(vols) %}
 volumes:
-{{ volumes_mapping(vols)|indent(width = 2, first = True) }}
+  {{ volumes_mapping(vols)|indent(width = 2) -}}
 {% endmacro %}
 
 {% macro volumes_declaration(vols) %}
@@ -19,4 +19,14 @@ volumes:
       device: {{ volume.local_folder }}
       o: bind
 {% endfor %}
+{% endmacro %}
+
+{% macro datetime_mapping() %}
+- /etc/localtime:/etc/localtime:ro
+- /etc/timezone:/etc/timezone:ro
+{% endmacro %}
+
+{% macro volumes_section_complete(vols) %}
+{{ volumes_mapping_full(vols) }}
+  {{ datetime_mapping()|indent(width = 2) -}}
 {% endmacro %}

@@ -75,13 +75,13 @@
 
 - include: swap.yml
 
+- name: Update and upgrade packages
+  apt:
+    upgrade: safe
+    update_cache: yes
+
 - name: Copy resolv.conf
   template:
     src: resolv.conf
     dest: /etc/resolv.conf
     mode: 0644
-
-- name: Update and upgrade packages
-  apt:
-    upgrade: safe
-    update_cache: yes

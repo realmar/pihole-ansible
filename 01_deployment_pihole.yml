@@ -1,4 +1,4 @@
-- hosts: production
+- hosts: development
   gather_facts: yes
   remote_user: root
   debugger: on_failed
@@ -7,6 +7,7 @@
     - { role: pihole, tags: pihole }
     - { role: netdata, tags: monitoring }
     - { role: docker_update, tags: autoupdate }
+    - { role: backup, tags: backup }
 
   tasks:
     - name: Fix permissions
@@ -30,6 +31,7 @@
         - "{{ root_dirs.pihole }}"
         - "{{ root_dirs.netdata }}"
         - "{{ root_dirs.autoupdate }}"
+        - "{{ root_dirs.backup }}"
       register: cli_result
       changed_when:
         - '"up-to-date" not in cli_result.stderr'

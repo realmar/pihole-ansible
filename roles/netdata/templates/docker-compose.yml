@@ -1,3 +1,5 @@
+{%- import 'docker_volumes.jinja2' as dv with context -%}
+
 version: '3'
 services:
   netdata:
@@ -17,6 +19,7 @@ services:
       - /etc/group:/host/etc/group:ro
       - /proc:/host/proc:ro
       - /sys:/host/sys:ro
+      {{ dv.datetime_mapping()|indent(width = 6) }}
     restart: always
 
 # volumes:

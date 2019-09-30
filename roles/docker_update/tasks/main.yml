@@ -1,17 +1,6 @@
-- name: Create project folders
-  file:
-    path: "{{ item }}"
-    state: directory
-    owner: "{{ user }}"
-    group: "{{ user }}"
-  with_items:
-    - "{{ root_dirs.autoupdate }}"
-
-- name: Copy docker-compose file
-  template:
-    src: docker-compose.yml
-    dest: "{{ root_dirs.autoupdate }}"
-    owner: "{{ user }}"
-    group: "{{ user }}"
-    mode: 0644
+- block:
+    - include_tasks: standard_service.yml
+      vars:
+        usr: "{{ user }}"
+        root_dir: "{{ root_dirs.autoupdate }}"
   tags: compose_file

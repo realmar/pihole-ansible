@@ -1,9 +1,11 @@
+{%- import 'docker_volumes.jinja2' as dv with context -%}
+
 version: '3'
 services:
   ouroboros:
     container_name: ouroboros
     hostname: ouroboros
-    image: pyouroboros/ouroboros
+    image: pyouroboros/ouroboros:latest
     environment:
       - CLEANUP=true
       - INTERVAL=300
@@ -14,5 +16,4 @@ services:
     restart: always
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-      - /etc/localtime:/etc/localtime:ro
-      - /etc/timezone:/etc/timezone:ro
+      {{ dv.datetime_mapping()|indent(width = 6) }}
