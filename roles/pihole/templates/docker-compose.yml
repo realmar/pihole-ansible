@@ -145,7 +145,7 @@ services:
   unbound:
     container_name: {{ unbound.name }}
     # Note: make sure the image supports arm (the image on the latest tag does not)
-    image: {{ 'mvance/unbound-rpi:1.9.3' if 'development' not in group_names else 'mvance/unbound:latest' }}
+    image: {{ 'mvance/unbound-rpi:latest' if 'development' not in group_names else 'mvance/unbound:latest' }}
 {% set vols = [
   volumes.unbound.main
 ] %}
