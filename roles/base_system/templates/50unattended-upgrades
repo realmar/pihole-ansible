@@ -32,6 +32,9 @@ Unattended-Upgrade::Origins-Pattern {
         "origin=${distro_id},codename=${distro_codename},label=Debian";
         "origin=${distro_id},codename=${distro_codename},label=Debian-Security";
 
+        // Docker
+        "origin=Docker,suite=${distro_codename},label=Docker CE";
+
 {% if is_rasbian %}
         // Match packages from the Raspberry Pi Foundation as well.
         "origin=Raspberry Pi Foundation,codename=${distro_codename},label=Raspberry Pi Foundation";
