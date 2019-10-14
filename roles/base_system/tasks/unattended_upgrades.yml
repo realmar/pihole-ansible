@@ -1,3 +1,11 @@
+- name: Check if is rasbian
+  stat:
+    path: /usr/bin/raspi-config
+  register: raspi_config_check
+
+- set_fact:
+    is_rasbian: "{{ raspi_config_check.stat.exists }}"
+
 - name: Install unattended-upgrades
   apt:
     name: unattended-upgrades
