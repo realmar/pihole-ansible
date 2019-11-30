@@ -75,6 +75,13 @@
 
 - include: swap.yml
 
+- name: Disable autocomplete beep
+  lineinfile:
+    path: /etc/inputrc
+    regexp: '^(# )?set bell-style none'
+    line: "set bell-style none"
+  tags: bell_beep
+
 - name: Update and upgrade packages
   apt:
     upgrade: safe

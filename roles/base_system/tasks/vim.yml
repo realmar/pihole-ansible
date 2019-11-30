@@ -18,3 +18,11 @@
     regexp: '^colorscheme blue'
     line: 'colorscheme blue'
     create: true
+
+- name: Disable bell beep
+  lineinfile:
+    dest: /etc/vim/vimrc
+    regexp: '^set visualbell'
+    line: 'set visualbell'
+    create: true
+  tags: bell_beep
