@@ -1,0 +1,23 @@
+- set_fact:
+    tools_dest: /root/tools
+  tags: tool_files
+
+- name: Install python dependencies
+  pip:
+    name: ['git+https://github.com/nicmcd/vcgencmd.git', 'sty']
+    state: latest
+    executable: pip3
+
+- name: Create tools folder
+  file:
+    path: "{{ tools_dest }}"
+    state: directory
+
+- name: Copy tools
+  template:
+    src: "{{ item }}"
+    dest: "{{ tools_dest }}"
+    mode: 0755
+  with_fileglob:
+    - ../templates/tools/*
+  tags: tool_files

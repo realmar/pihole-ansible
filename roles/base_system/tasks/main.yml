@@ -25,6 +25,7 @@
       - ntp
       - dnsutils
       - tcpdump
+      - tmux
 
 - include: vim.yml
   tags: vim
@@ -81,6 +82,9 @@
     regexp: '^(# )?set bell-style none'
     line: "set bell-style none"
   tags: bell_beep
+
+- include: tools.yml
+  tags: tools
 
 - name: Update and upgrade packages
   apt:
