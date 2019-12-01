@@ -2,3 +2,4 @@
 *_password.txt
 .vagrant
 *.ovpn
+.venv

@@ -4,7 +4,7 @@
 
 - name: Install python dependencies
   pip:
-    name: ['git+https://github.com/nicmcd/vcgencmd.git', 'sty']
+    name: ['git+https://github.com/nicmcd/vcgencmd.git', 'sty', 'psutil']
     state: latest
     executable: pip3
 
