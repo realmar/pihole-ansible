@@ -1,6 +1,6 @@
-- include_tasks: create_user.yml
-  vars:
-    item: { name: "{{ unbound.user }}", uid: 107, create_home: no, groups: "" }
+# - include_tasks: create_user.yml
+#   vars:
+#     item: { name: "{{ unbound.user }}", uid: 107, create_home: no, groups: "" }
 
 - name: Create unbound dirs
   file:
