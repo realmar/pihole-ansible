@@ -8,7 +8,7 @@ services:
     image: pyouroboros/ouroboros:latest
     environment:
       - CLEANUP=true
-      - INTERVAL=300
+      - INTERVAL=3600
       - LOG_LEVEL=info
       - SELF_UPDATE=true
       - IGNORE={% for c in containers_autoupdate_disabled %}{{ c.name }}{% endfor %}
