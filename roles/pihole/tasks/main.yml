@@ -55,6 +55,13 @@
   # notify: restart pihole project
   tags: compose_file
 
+- name: stop and disable systemd-resolved (conflicts with dnsmasq)
+  service:
+    name: systemd-resolved
+    state: stopped
+    enabled: no
+  when: ansible_distribution == 'Ubuntu'
+
 - import_role:
     name: vpn
   tags:
