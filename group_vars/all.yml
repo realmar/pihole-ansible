@@ -2,9 +2,7 @@ timezone: Europe/Zurich
 user: pi
 root_dirs:
   pihole: /home/pi/pihole
-  netdata: /home/pi/netdata
-  autoupdate: /home/pi/autoupdate
-  backup: /home/pi/backup
+  maintenance: /home/pi/maintenance
 
 networks:
   host:
@@ -67,11 +65,6 @@ volumes:
       name: ovpn_config
       local_folder: "{{ root_dirs.pihole }}/etc-openvpn"
       mount: /etc/openvpn
-  netdata:
-    main:
-      name: main_config
-      local_folder: "{{ root_dirs.netdata }}/etc-netdata"
-      mount: /etc/netdata
   unbound:
     main:
       name: unbound_config
@@ -80,12 +73,17 @@ volumes:
   duplicati:
     config:
       name: duplicati_config
-      local_folder: "{{ root_dirs.backup }}/config"
+      local_folder: "{{ root_dirs.maintenance }}/duplicati_config"
       mount: /config
     backup_target:
       name: duplicati_backup_target
       local_folder: "/home/{{ user }}"
       mount: "/source"
+  portainer:
+    data:
+      name: portainer_data
+      local_folder: "{{ root_dirs.maintenance }}/portainer_config"
+      mount: /data
 
 pihole:
   user: pihole
@@ -130,7 +128,6 @@ openvpn:
 netdata:
   name: netdata
   user: netdata
-  volumes: "{{ volumes.netdata }}"
 
 unbound:
   name: unbound
@@ -144,8 +141,17 @@ unbound:
 containers:
   - "{{ pihole }}"
   - "{{ openvpn }}"
-  - "{{ netdata }}"
   - "{{ unbound }}"
+
+stacks:
+  maintenance:
+    volumes:
+      - "{{ volumes.duplicati.config }}"
+      - "{{ volumes.duplicati.backup_target }}"
+      - "{{ volumes.portainer.data }}"
+    local_folders:
+      - "{{ volumes.duplicati.config.local_folder }}"
+      - "{{ volumes.portainer.data.local_folder }}"
 
 __flat_volumes: |
   {% set vols = [] %}

@@ -171,7 +171,7 @@ networks:
 {% endif %}
 
 {% set vols = [
-  volumes.pihole.main ,
+  volumes.pihole.main,
   volumes.pihole.dnsmasq,
   volumes.vpn.config,
   volumes.unbound.main

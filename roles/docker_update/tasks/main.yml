@@ -1,6 +1,0 @@
-- block:
-    - include_tasks: standard_service.yml
-      vars:
-        usr: "{{ user }}"
-        root_dir: "{{ root_dirs.autoupdate }}"
-  tags: compose_file

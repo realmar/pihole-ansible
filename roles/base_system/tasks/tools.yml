@@ -2,11 +2,11 @@
     tools_dest: /root/tools
   tags: tool_files
 
-- name: Install python dependencies
-  pip:
-    name: ['git+https://github.com/nicmcd/vcgencmd.git', 'sty', 'psutil']
-    state: latest
-    executable: pip3
+# - name: Install python dependencies
+#   pip:
+#     name: ['git+https://github.com/nicmcd/vcgencmd.git', 'sty', 'psutil']
+#     state: latest
+#     executable: pip3
 
 - name: Create tools folder
   file:

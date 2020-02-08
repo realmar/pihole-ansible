@@ -1,0 +1,7 @@
+- block:
+  - include_tasks: standard_service.yml
+    vars:
+      usr: "{{ user }}"
+      root_dir: "{{ root_dirs.maintenance }}"
+      dirs: "{{ stacks.maintenance.local_folders }}"
+  tags: compose_file

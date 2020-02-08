@@ -1,0 +1,17 @@
+{% import "utils.jinja2" as utils with context -%}
+{% import 'docker_volumes.jinja2' as dv with context -%}
+
+{% set services = [
+  'docker_update.yml',
+  'backup.yml',
+  'netdata.yml',
+  'container_management.yml'
+] %}
+
+version: '3'
+services:
+{% for service in services %}
+  {{ utils.include(service)|indent(width = 2) }}
+{% endfor %}
+
+{{ dv.volumes_declaration(stacks.maintenance.volumes) }}

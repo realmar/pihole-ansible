@@ -1,8 +1,0 @@
-- block:
-    - include_tasks: standard_service.yml
-      vars:
-        usr: "{{ user }}"
-        root_dir: "{{ root_dirs.backup }}"
-        dirs:
-          - "{{ volumes.duplicati.config.local_folder }}"
-  tags: compose_file
