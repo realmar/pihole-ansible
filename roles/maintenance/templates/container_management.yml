@@ -1,10 +1,11 @@
 {%- import 'docker_volumes.jinja2' as dv with context -%}
 
 portainer:
-  image: portainer/portainer
+  container_name: portainer
+  hostname: portainer
+  image: portainer/portainer:latest
   ports:
     - 9000:9000
-  volumes:
-    - /var/run/docker.sock:/var/run/docker.sock
   {{ dv.volumes_section_complete([ volumes.portainer.data ])|indent(width = 2) }}
+    - /var/run/docker.sock:/var/run/docker.sock
   restart: always
