@@ -7,7 +7,7 @@
     relative_cert_dir: certs/etc-openvpn/pki
 
 - set_fact:
-    cert_dir: "{{ root_path_cmd.stdout }}/roles/vpn/files/{{ relative_cert_dir }}"
+    cert_dir: "{{ root_path_cmd.stdout }}/roles/pihole/files/openvpn/{{ relative_cert_dir }}"
 
 - name: Check if there is a pre-generated VPN CA cert
   local_action:
@@ -22,7 +22,7 @@
 
 - name: Copy pre-generated VPN CA cert files
   copy:
-    src: "{{ relative_cert_dir }}"
+    src: "openvpn/{{ relative_cert_dir }}"
     dest: "{{ volumes.vpn.config.local_folder }}"
     owner: "{{ user }}"
     group: "{{ user }}"

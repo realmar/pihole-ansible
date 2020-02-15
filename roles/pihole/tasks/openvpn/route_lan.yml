@@ -1,6 +1,6 @@
 - name: Copy vpn up script
   template:
-    src: route_lan.py
+    src: openvpn/route_lan.py
     dest: "{{ volumes.vpn.config.local_folder }}/up-route_lan.py"
     owner: "{{ user }}"
     group: "{{ user }}"
@@ -10,7 +10,7 @@
 
 - name: Copy vpn down script
   template:
-    src: route_lan.py
+    src: openvpn/route_lan.py
     dest: "{{ volumes.vpn.config.local_folder }}/down-route_lan.py"
     owner: "{{ user }}"
     group: "{{ user }}"
@@ -20,7 +20,7 @@
 
 - name: Copy systemd oneshot service for configuring iptables
   template:
-    src: configure_vpn_iptables.service
+    src: openvpn/configure_vpn_iptables.service
     dest: /etc/systemd/system/configure_vpn_iptables.service
     mode: 0644
 

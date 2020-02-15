@@ -27,7 +27,7 @@
       - tcpdump
       - tmux
 
-- include: vim.yml
+- include_tasks: vim.yml
   tags: vim
 
 - name: Disable password authentication for ssh
@@ -61,10 +61,10 @@
     regexp: '^127\.0\.1\.1'
     line: "127.0.1.1 {{ host.name }}"
 
-- include: unattended_upgrades.yml
+- include_tasks: unattended_upgrades.yml
   tags: unattended_upgrades
 
-- include: network.yml
+- include_tasks: network.yml
   when: "'development' not in group_names"
   tags: network
 
@@ -74,7 +74,7 @@
   timezone:
     name: Europe/Zurich
 
-- include: swap.yml
+- include_tasks: swap.yml
 
 - name: Disable autocomplete beep
   lineinfile:
@@ -83,7 +83,7 @@
     line: "set bell-style none"
   tags: bell_beep
 
-- include: tools.yml
+- include_tasks: tools.yml
   tags: tools
 
 - name: Update and upgrade packages

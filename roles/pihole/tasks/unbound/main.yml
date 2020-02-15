@@ -4,29 +4,33 @@
 
 - name: Create unbound dirs
   file:
-    path: "{{ item }}"
+    path: "{{ folder }}"
     state: directory
     owner: "{{ unbound.user }}"
     group: "{{ user }}"
-  with_items:
+  loop:
     - "{{ volumes.unbound.main.local_folder }}"
     - "{{ volumes.unbound.main.local_folder }}/var"
+  loop_control:
+    loop_var: folder
 
 - name: Copy config files
   template:
-    src: "{{ item }}"
-    dest: "{{ volumes.unbound.main.local_folder }}/{{ item }}"
+    src: "unbound/{{ file }}"
+    dest: "{{ volumes.unbound.main.local_folder }}/{{ file }}"
     owner: "{{ unbound.user }}"
     group: "{{ user }}"
-  with_items:
+  loop:
     - unbound.conf
     - a-records.conf
+  loop_control:
+    loop_var: file
   notify: restart unbound
   tags: unbound_conf
 
 - name: Copy cron job
   template:
-    src: download_unbound_root_hints
+    src: unbound/download_unbound_root_hints
     dest: /etc/cron.d/download_unbound_root_hints
     mode: 0644
 
@@ -39,7 +43,7 @@
 
 - name: Copy logrotate file
   template:
-    src: unbound-logrotate
+    src: unbound/unbound-logrotate
     dest: /etc/logrotate.d/unbound
     mode: 0644
   tags: logrotate

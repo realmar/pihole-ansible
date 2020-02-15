@@ -1,0 +1,19 @@
+- block:
+  - name: Remove obsolete docker networks
+    include_tasks: remove_docker_network.yml
+    vars:
+      network: "{{ container.network }}"
+    loop: "{{ containers }}"
+    loop_control:
+      loop_var: container
+    when: container.network is defined and container.use_host_net
+
+  - name: Create docker networks
+    include_tasks: add_docker_network.yml
+    vars:
+      network: "{{ container.network }}"
+    loop: "{{ containers }}"
+    loop_control:
+      loop_var: container
+    when: container.network is defined and container.use_host_net == false
+  tags: docker_network

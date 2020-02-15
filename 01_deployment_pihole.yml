@@ -8,6 +8,7 @@
     - { role: maintenance, tags: maintenance }
 
   tasks:
+    # big hackkus, permissions should be set on deploy
     - name: Fix permissions
       file:
         path: "{{ item.volume.local_folder }}"

@@ -12,10 +12,10 @@
 - set_fact:
     is_rasbian: "{{ raspi_config_check.stat.exists }}"
 
-- include: rasbian_stretch.yml
+- include_tasks: rasbian_stretch.yml
   when: is_rasbian and ansible_distribution_major_version|int == 9
 
-- include: debian_platforms.yml is_rasbian="{{ is_rasbian }}"
+- include_tasks: debian_platforms.yml
   when: ansible_distribution == 'Debian' and ansible_distribution_major_version|int > 9 or ansible_distribution == 'Ubuntu'
 
 - meta: flush_handlers

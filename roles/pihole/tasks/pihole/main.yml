@@ -1,0 +1,63 @@
+# - name: Uninstall conflicting dependencies
+#   apt:
+#     name: [ 'dnsmasq-base', 'dnsmasq', 'apache2' ]
+#     state: absent
+
+- include_tasks: create.pihole.user.yml
+  tags: pihole_users
+
+- name: Create pihole config folders
+  file:
+    state: directory
+    path: "{{ folder.local_folder }}"
+    owner: "{{ pihole.user }}"
+    group: "{{ user }}"
+  loop:
+    - "{{ volumes.pihole.main }}"
+    - "{{ volumes.pihole.dnsmasq }}"
+  loop_control:
+    loop_var: folder
+  tags: pihole_conf
+
+- name: Copy dnsmaq config extension
+  template:
+    src: pihole/10-custom-dns.conf
+    dest: "{{ volumes.pihole.dnsmasq.local_folder }}/10-custom-dns.conf"
+    owner: "{{ pihole.user }}"
+    group: "{{ user }}"
+    mode: 0644
+  tags: pihole_conf
+
+- name: Copy pihole-FTL.conf file
+  template:
+    src: pihole/pihole-FTL.conf
+    dest: "{{ volumes.pihole.main.local_folder }}/pihole-FTL.conf"
+    owner: "{{ pihole.user }}"
+    group: "{{ user }}"
+    mode: 0644
+  tags: pihole_conf
+
+- name: Install update gravity cronjob
+  template:
+    src: pihole/pihole_update_gravitas
+    dest: /etc/cron.d/pihole_update_gravitas
+    mode: 0644
+  tags: cronjobs
+
+- name: Copy docker-compose.yml file
+  template:
+    src: docker-compose.yml
+    dest: "{{ root_dirs.pihole }}/docker-compose.yml"
+    owner: "{{ pihole.user }}"
+    group: "{{ user }}"
+    mode: 0644
+  # notify: restart pihole project
+  tags: compose_file
+
+- name: stop and disable systemd-resolved (conflicts with dnsmasq)
+  service:
+    name: systemd-resolved
+    state: stopped
+    enabled: no
+  when: ansible_distribution == 'Ubuntu'
+
