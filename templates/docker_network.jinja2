@@ -1,0 +1,19 @@
+{% macro networks_declaration(networks) %}
+{% set use_v6 = network.v6 is defined and network.v6.enable %}
+networks:
+{% for network in networks %}
+  {{ network.name }}:
+    driver: bridge
+{%  if use_v6 %}
+    driver_opts:
+      com.docker.network.enable_ipv6: "true"
+{%  endif %}
+    ipam:
+      driver: default
+      config:
+        - subnet: "{{ network.v4.subnet }}"
+{%    if use_v6 %}
+        - subnet: "{{ network.v6.subnet }}"
+{%    endif %}
+{% endfor %}
+{% endmacro %}

@@ -27,7 +27,7 @@ networks:
       subnet: 2a02:120b:2c06:57df::/64
       netmask: 64
       gateway: 2a02:120b:2c06:57d0:7eb7:33ff:fed0:41a6
-    name: pihole-net
+    name: pihole_net
 
   vpn:
     v4:
@@ -40,7 +40,7 @@ networks:
       subnet: 2a02:120b:2c06:57de::/64
       netmask: 64
       gateway: 2a02:120b:2c06:57d0:7eb7:33ff:fed0:41a6
-    name: vpn-net
+    name: vpn_net
 
   unbound:
     v4:
@@ -48,7 +48,7 @@ networks:
       netaddress: 172.16.3.0
       netmask: 255.255.255.0
       gateway: 172.16.3.1
-    name: unbound-net
+    name: unbound_net
 
 volumes:
   pihole:

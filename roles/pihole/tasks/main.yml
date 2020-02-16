@@ -3,3 +3,4 @@
     - pihole/main.yml
     - openvpn/main.yml
     - unbound/main.yml
+  tags: compose_file

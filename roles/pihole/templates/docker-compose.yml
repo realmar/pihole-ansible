@@ -33,6 +33,7 @@ version: '3'
 {% import "pihole_ipam.jinja2" as pihole_ipam with context -%}
 {% import "password_gen.jinja2" as gen with context -%}
 {% import 'docker_volumes.jinja2' as dv with context -%}
+{% import 'docker_network.jinja2' as dn with context -%}
 
 services:
   openvpn:
@@ -161,14 +162,8 @@ services:
 {% if openvpn.use_host_net == false %}
 {{   nets.append(networks.vpn) }}
 {% endif %}
-{% if nets|length > 0 %}
 # docker network create --ipv6 --driver=bridge --subnet=172.16.0.1/24 --gateway=172.16.0.1 --subnet=2002:ac10:0001::/64 --gateway=2002:ac10:0001::1 vpn-net
-networks:
-{% for network in nets %}
-  {{ network.name }}:
-    external: true
-{% endfor %}
-{% endif %}
+{{ dn.networks_declaration(nets) }}
 
 {% set vols = [
   volumes.pihole.main,
