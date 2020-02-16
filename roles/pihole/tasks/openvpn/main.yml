@@ -9,16 +9,8 @@
     state: started
     enabled: yes
 
-- name: Check if is rasbian
-  stat:
-    path: /usr/bin/raspi-config
-  register: raspi_config_check
-
-- set_fact:
-    is_rasbian: "{{ raspi_config_check.stat.exists }}"
-
 - include_tasks: build.openvpn.rpi.yml
-  when: is_rasbian
+  when: is_rpi
 
 - name: Create VPN config folder
   file:

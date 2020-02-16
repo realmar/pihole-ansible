@@ -19,11 +19,15 @@
 
 - set_fact:
     arch: amd64
-  when: is_rasbian|bool == false
+  when: is_rpi|bool == false
 
 - set_fact:
     arch: armhf
-  when: is_rasbian|bool
+  when: is_rpi|bool and arch_short == "armv7l"
+
+- set_fact:
+    arch: arm64
+  when: is_rpi|bool and arch_short == "aarch64"
 
 - name: Add Docker GPG key
   apt_key:

@@ -1,3 +1,5 @@
+- include_tasks: collect_system_data.yml
+
 - name: Install base packages
   apt:
     name: "{{ packages }}"

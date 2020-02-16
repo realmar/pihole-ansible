@@ -1,0 +1,25 @@
+- name: Check if is rasbian
+  stat:
+    path: /usr/bin/raspi-config
+  register: raspi_config_check
+
+- shell: uname -a
+  ignore_errors: yes
+  register: uname_result
+  changed_when: False
+  
+- shell: uname -m
+  ignore_errors: yes
+  register: arch_raw
+  changed_when: False
+
+- set_fact:
+    is_rasbian: "{{ raspi_config_check.stat.exists }}"
+
+- name: Aggregating facts
+  set_fact:
+    is_rpi: "{{ is_rasbian or 'raspi' in uname_result.stdout }}"
+    arch_short: "{{ arch_raw.stdout }}"
+
+- debug:
+    msg: "is_rpi = {{ is_rpi }} arch = {{ arch_short }}"
