@@ -1,0 +1,32 @@
+---
+network:
+  version: 2
+  renderer: networkd
+  ethernets:
+    {{ host.public_interface }}:
+      dhcp4: false
+{% if host.supports_v6 %}
+      dhcp6: false
+{% endif %}
+      addresses:
+        - {{ host.ipv4 }}/{{ networks.host.v4.netmask_short }}
+{% if host.supports_v6 %}
+        - "{{ host.ipv6 }}/{{ networks.host.v6.netmask }}"
+      gateway6: "{{ networks.host.v6.gateway }}"
+      # routes:
+      #   - to: "::/0"
+      #     via: "{{ networks.host.v6.gateway }}"
+      #     on-link: true
+      #     metric: 1024
+{% endif %}
+      gateway4: {{ networks.host.v4.gateway }}
+      nameservers:
+        addresses:
+          - 127.0.0.1
+          - 1.1.1.1
+          - 1.0.0.1
+{% if host.supports_v6 %}
+          - "::1"
+          - "2606:4700:4700::1111"
+          - "2606:4700:4700::1001"
+{% endif %}

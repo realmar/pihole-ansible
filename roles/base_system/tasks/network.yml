@@ -14,14 +14,36 @@
     packages:
       - dhcpcd5
       - isc-dhcp-client
-      - isc-dhcp-common
+      - isc-dhcp-common      
 
-- name: Configure static IPs
+- name: Configure static IPs for debian
   template:
-    src: interfaces
+    src: interfaces-debian
     dest: /etc/network/interfaces
   tags: net_conf
   notify: restart computer
+  when: is_debian
+
+- name: Configure static IPs for ubuntu
+  block:
+    - name: remove old netplan config
+      file:
+        path: /etc/netplan/50-cloud-init.yaml
+        state: absent
+
+    - name: copy netplan config
+      template:
+        src: netplan-ubuntu.yml
+        dest: /etc/netplan/99-ip-configuration.yaml
+      notify: restart computer
+      register: netplan_config
+    
+    - name: apply config
+      shell: netplan apply
+      when: netplan_config.changed
+
+  tags: net_conf
+  when: is_ubuntu
 
 - name: Copy sysctl config for static ipv6
   template:

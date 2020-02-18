@@ -20,6 +20,9 @@
   set_fact:
     is_rpi: "{{ is_rasbian or 'raspi' in uname_result.stdout }}"
     arch_short: "{{ arch_raw.stdout }}"
+    is_ubuntu: "{{ ansible_distribution == 'Ubuntu' }}"
+    is_debian: "{{ ansible_distribution == 'Debian' }}"
+    is_dev: "{{ 'development' in group_names }}"
 
 - debug:
     msg: "is_rpi = {{ is_rpi }} arch = {{ arch_short }}"

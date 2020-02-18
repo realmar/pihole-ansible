@@ -11,11 +11,11 @@
 
 - set_fact:
     base_url: https://download.docker.com/linux/ubuntu
-  when: ansible_distribution == 'Ubuntu'
+  when: is_ubuntu
 
 - set_fact:
     base_url: https://download.docker.com/linux/debian
-  when: ansible_distribution == 'Debian'
+  when: is_debian
 
 - set_fact:
     arch: amd64

@@ -10,6 +10,7 @@ networks:
       subnet: 192.168.1.0/24
       netaddress: 192.168.1.0
       netmask: 255.255.255.0
+      netmask_short: 24
       gateway: 192.168.1.1
     v6:
       subnet: 2a02:120b:2c06:57d0::/64

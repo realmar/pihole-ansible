@@ -59,5 +59,4 @@
     name: systemd-resolved
     state: stopped
     enabled: no
-  when: ansible_distribution == 'Ubuntu'
-
+  when: is_ubuntu
