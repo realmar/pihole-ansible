@@ -7,5 +7,9 @@
 #   - vpn_username
 #
 
+  pre_tasks:
+    - include: tasks/collect_system_data.yml
+      tags: always
+
   roles:
     - new_ovpn_user

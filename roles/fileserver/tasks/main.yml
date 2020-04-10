@@ -1,0 +1,50 @@
+- name: Install packages
+  apt:
+    name: samba
+    state: latest
+    update_cache: yes
+
+- name: Include custom config
+  lineinfile:
+    path: /etc/samba/smb.conf
+    line: include = /etc/samba/custom_smb.conf
+    insertafter: EOF
+  notify: restart smbd
+
+- name: Deploy custom config
+  template:
+    src: custom_smb.conf
+    dest: /etc/samba/custom_smb.conf
+  notify: restart smbd
+  tags: fileserver_config
+
+- name: Create samba user
+  include_tasks: create_user.yml
+  vars:
+    item: { name: "{{ share_user }}", create_home: yes, groups: sambashare  }
+
+- name: Set permissions on share
+  file:
+    path: "{{ share_path }}"
+    owner: "{{ share_user }}"
+    group: sambashare
+    recurse: yes
+
+- name: Create share directory
+  file:
+    path: "{{ share_path }}"
+    state: directory
+    owner: "{{ share_user }}"
+    group: sambashare
+
+- name: Create samba user
+  shell: "echo '{{ lookup('template', 'standard_pw_gen.jinja2', template_vars=dict(name=share_user)) }}' > smbpasswd -a {{ share_user }}"
+
+- name: start and enable smbd and nmbd services
+  service:
+    name: "{{ item }}"
+    state: started
+    enabled: yes
+  with_items:
+    - smbd
+    - nmbd
