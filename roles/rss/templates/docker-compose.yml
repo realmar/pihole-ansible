@@ -1,0 +1,34 @@
+{% import "password_gen.jinja2" as gen with context -%}
+{% import "docker_volumes.jinja2" as dv with context -%}
+{% import "docker_network.jinja2" as dn with context -%}
+{% import "docker_misc.jinja2" as dm with context -%}
+
+version: "3"
+services:
+  rss:
+    image: linuxserver/freshrss
+    container_name: freshrss
+    environment:
+      PUID: 1000
+      PGID: 1000
+      TZ: {{ timezone }}
+    {{ dv.volumes_section_complete([ volumes2.rss ])|indent(width = 4) }}
+    {{ dn.map_ports([ (9090, 80) ])|indent(width = 4) }}
+    depends_on:
+      - db
+    {{ dm.restart_policy() }}
+  db:
+    image: postgres
+    environment:
+      POSTGRES_USER: freshrss
+      POSTGRES_PASSWORD: '{{ gen.pw("freshrss_db") }}'
+      POSTGRES_DB: na_default
+      TZ: {{ timezone }}
+    {{ dv.volumes_section_complete([ volumes2.db ])|indent(width = 4) }}
+    {{ dm.restart_policy() }}
+
+{% set vols = [
+  volumes2.rss,
+  volumes2.db
+] %}
+{{ dv.volumes_declaration(vols) }}

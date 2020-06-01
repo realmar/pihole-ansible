@@ -1,4 +1,4 @@
-- hosts: production
+- hosts: development
   gather_facts: yes
   remote_user: root
   debugger: on_failed
@@ -11,6 +11,7 @@
     - { role: pihole, tags: pihole }
     - { role: maintenance, tags: maintenance }
     - { role: fileserver, tags: fileserver }
+    - { role: rss, tags: rss }
 
   post_tasks:
     # big hackkus, permissions should be set on deploy
@@ -20,7 +21,7 @@
         owner: "{{ item.container.user }}"
         group: "{{ user }}"
         recurse: yes
-      with_items: "{{ flat_volumes }}"
+      with_items: "{{ flat_volumes) }}"
       when: item.container.user is defined
       tags: permissions
 
@@ -34,6 +35,7 @@
       with_items:
         - "{{ root_dirs.pihole }}"
         - "{{ root_dirs.maintenance }}"
+        - "{{ root_dirs.rss }}"
       register: cli_result
       changed_when:
         - '"up-to-date" not in cli_result.stderr'

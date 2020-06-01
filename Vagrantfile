@@ -8,7 +8,7 @@ Vagrant.configure("2") do |config|
   # config.vm.network "public_network", :mac => "080027370D99"
   config.vm.network "private_network", ip: "192.168.250.102"
   config.vm.synced_folder ".", "/vagrant", disabled: true
-  config.disksize.size = '50GB'
+  # config.disksize.size = '50GB'
 
   config.vm.provider "virtualbox" do |v|
     v.memory = 16384

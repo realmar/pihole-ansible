@@ -1,0 +1,9 @@
+volumes2:
+  rss:
+    name: rss_config
+    local_folder: "{{ root_dirs.rss }}/rss-config"
+    mount: /config
+  db:
+    name: db_data
+    local_folder: "{{ root_dirs.rss }}/db-data"
+    mount: /var/lib/postgresql/data

@@ -1,0 +1,9 @@
+- block:
+  - include_tasks: standard_service.yml
+    vars:
+      usr: "{{ user }}"
+      root_dir: "{{ root_dirs.rss }}"
+      dirs:
+        - "{{ volumes2.rss.local_folder }}"
+        - "{{ volumes2.db.local_folder }}"
+  tags: compose_file

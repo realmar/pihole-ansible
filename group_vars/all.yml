@@ -3,6 +3,7 @@ user: pi
 root_dirs:
   pihole: /home/pi/pihole
   maintenance: /home/pi/maintenance
+  rss: /home/pi/rss
 
 networks:
   host:

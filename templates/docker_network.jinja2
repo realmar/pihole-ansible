@@ -17,3 +17,13 @@ networks:
 {%    endif %}
 {% endfor %}
 {% endmacro %}
+
+{#
+  ports: (host: int, container: int)[]
+#}
+{% macro map_ports(ports) %}
+ports:
+{% for from, to in ports %}
+  - {{ from }}:{{ to }}
+{% endfor %}
+{% endmacro %}
