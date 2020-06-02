@@ -19,11 +19,12 @@ networks:
 {% endmacro %}
 
 {#
-  ports: (host: int, container: int)[]
+  ports: (host: int, container: int, protocol: "udp" | "tcp")[]
 #}
 {% macro map_ports(ports) %}
 ports:
-{% for from, to in ports %}
-  - {{ from }}:{{ to }}
+{% for data in ports %}
+  - {{ data[0] }}:{{ data[1] }}{% if data|length > 2 %}/{{ data[2] }}{% endif %}
+
 {% endfor %}
 {% endmacro %}

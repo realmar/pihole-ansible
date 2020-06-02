@@ -1,6 +1,8 @@
 # docker run -it --rm  -v /home/pi/bkp:/data -v /home/pi:/home/pi -p 8200:8200 duplicati/duplicati
 
 {% import 'docker_volumes.jinja2' as dv with context -%}
+{% import 'docker_network.jinja2' as dn with context -%}
+{% import "docker_misc.jinja2" as dm with context -%}
 
 {%- set vols = [
   duplicati.volumes.config,
@@ -16,7 +18,6 @@ duplicati:
     PGID: 0 # ding dong root bad
     TZ: {{ timezone }}
     CLI_ARGS: --restore-permissions=true
-  ports:
-    - 8200:8200
+  {{ dn.map_ports([ (8200, 8200) ])|indent(width = 2) }}
   {{ dv.volumes_section_complete(vols)|indent(width = 2) }}
-  restart: always
+  {{ dm.restart_policy() }}

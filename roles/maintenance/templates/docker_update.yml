@@ -1,4 +1,5 @@
 {%- import 'docker_volumes.jinja2' as dv with context -%}
+{% import "docker_misc.jinja2" as dm with context -%}
 
 ouroboros:
   container_name: ouroboros
@@ -10,8 +11,7 @@ ouroboros:
     - LOG_LEVEL=info
     - SELF_UPDATE=true
     - IGNORE=openvpn
-
-  restart: always
   volumes:
     - /var/run/docker.sock:/var/run/docker.sock
     {{ dv.datetime_mapping()|indent(width = 4) }}
+  {{ dm.restart_policy() }}

@@ -7,7 +7,7 @@
   ignore_errors: yes
   register: uname_result
   changed_when: False
-  
+
 - shell: uname -m
   ignore_errors: yes
   register: arch_raw
