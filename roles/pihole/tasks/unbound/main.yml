@@ -9,15 +9,15 @@
     owner: "{{ unbound.user }}"
     group: "{{ user }}"
   loop:
-    - "{{ volumes.unbound.main.local_folder }}"
-    - "{{ volumes.unbound.main.local_folder }}/var"
+    - "{{ unbound.volumes.main.local_folder }}"
+    - "{{ unbound.volumes.main.local_folder }}/var"
   loop_control:
     loop_var: folder
 
 - name: Copy config files
   template:
     src: "unbound/{{ file }}"
-    dest: "{{ volumes.unbound.main.local_folder }}/{{ file }}"
+    dest: "{{ unbound.volumes.main.local_folder }}/{{ file }}"
     owner: "{{ unbound.user }}"
     group: "{{ user }}"
   loop:
@@ -37,7 +37,7 @@
 - name: Download root.hints
   get_url:
     url: https://www.internic.net/domain/named.root
-    dest: "{{ volumes.unbound.main.local_folder }}/var/root.hints"
+    dest: "{{ unbound.volumes.main.local_folder }}/var/root.hints"
     owner: "{{ unbound.user }}"
     group: "{{ user }}"
 

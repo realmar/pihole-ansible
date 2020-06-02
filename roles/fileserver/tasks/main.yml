@@ -21,24 +21,24 @@
 - name: Create samba user
   include_tasks: create_user.yml
   vars:
-    item: { name: "{{ share_user }}", create_home: yes, groups: sambashare  }
+    item: { name: "{{ fileserver_share_user }}", create_home: yes, groups: sambashare  }
 
 - name: Set permissions on share
   file:
-    path: "{{ share_path }}"
-    owner: "{{ share_user }}"
+    path: "{{ fileserver_share_path }}"
+    owner: "{{ fileserver_share_user }}"
     group: sambashare
     recurse: yes
 
 - name: Create share directory
   file:
-    path: "{{ share_path }}"
+    path: "{{ fileserver_share_path }}"
     state: directory
-    owner: "{{ share_user }}"
+    owner: "{{ fileserver_share_user }}"
     group: sambashare
 
 - name: Create samba user
-  shell: "echo '{{ lookup('template', 'standard_pw_gen.jinja2', template_vars=dict(name=share_user)) }}' > smbpasswd -a {{ share_user }}"
+  shell: "echo '{{ lookup('template', 'standard_pw_gen.jinja2', template_vars=dict(name=fileserver_share_user)) }}' > smbpasswd -a {{ fileserver_share_user }}"
 
 - name: start and enable smbd and nmbd services
   service:

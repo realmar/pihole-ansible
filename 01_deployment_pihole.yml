@@ -14,17 +14,6 @@
     - { role: rss, tags: rss }
 
   post_tasks:
-    # big hackkus, permissions should be set on deploy
-    - name: Fix permissions
-      file:
-        path: "{{ item.volume.local_folder }}"
-        owner: "{{ item.container.user }}"
-        group: "{{ user }}"
-        recurse: yes
-      with_items: "{{ flat_volumes) }}"
-      when: item.container.user is defined
-      tags: permissions
-
     # I really don't want to install docker-compose via pip just to make the
     # docker_container module work. This is because pip install docker-compose
     # needs to compile a ton of C code and massively slows down the deployment

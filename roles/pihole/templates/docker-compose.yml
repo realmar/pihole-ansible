@@ -54,22 +54,22 @@ services:
     # OPENVPN_PASSWORD=${OPENVPN_PASSWORD}
     # LOCAL_NETWORK=192.168.0.0/24
       OPENVPN_OPTS: --inactive 3600 --ping 10 --ping-exit 60 -–log-driver json-file --log-opt max-size=10m
-    {{ dv.volumes_section_complete([ volumes.vpn.config ])|indent(width = 4) }}
+    {{ dv.volumes_section_complete([ openvpn.volumes.config ])|indent(width = 4) }}
     restart: always
 {% if openvpn.use_host_net %}
     network_mode: host
 {% else %}
     networks:
-      {{ networks.vpn.name }}:
+      {{ openvpn.networks.name }}:
         ipv4_address: {{ openvpn.ipv4 }}
-{%   if networks.vpn.v6.enable %}
+{%   if openvpn.networks.v6.enable %}
         ipv6_address: {{ openvpn.ipv6 }}
 {%   endif %}
 {%   if pihole.use_host_net == false %}
-      {{ networks.pihole.name }}:
+      {{ pihole.networks.name }}:
 {%   endif %}
 {% endif %}
-{% if networks.vpn.v6.enable %}
+{% if openvpn.networks.v6.enable %}
     privileged: yes
 {% endif %}
     cap_add:
@@ -108,7 +108,7 @@ services:
 {%   if pihole.use_host_net %}
       IPv6: "True"
       ServerIPv6: {{ host.ipv6 }}
-{%   elif networks.pihole.v6.enable %}
+{%   elif pihole.networks.v6.enable %}
       IPv6: "True"
       ServerIPv6: {{ pihole_ipam.ipam.ipv6 }}
 {%   endif %}
@@ -117,8 +117,8 @@ services:
       DNSMASQ_USER: {{ pihole.user }}
     {{ dv.volumes_section_complete(
       [
-        volumes.pihole.main ,
-        volumes.pihole.dnsmasq
+        pihole.volumes.main ,
+        pihole.volumes.dnsmasq
       ]
     )|indent(width = 4) }}
     restart: always
@@ -126,12 +126,12 @@ services:
     network_mode: host
 {% else %}
     networks:
-      {{ networks.pihole.name }}:
+      {{ pihole.networks.name }}:
         ipv4_address: {{ pihole_ipam.ipam.ipv4 }}
-{%      if networks.pihole.v6.enable %}
+{%      if pihole.networks.v6.enable %}
         ipv6_address: {{ pihole_ipam.ipam.ipv6 }}
 {%      endif %}
-      {{ networks.unbound.name }}:
+      {{ unbound.networks.name }}:
 {% endif %}
     cap_add:
       - CAP_NET_BIND_SERVICE
@@ -148,27 +148,27 @@ services:
     # Note: make sure the image supports arm (the image on the latest tag does not)
     image: {{ 'mvance/unbound-rpi:latest' if 'development' not in group_names else 'mvance/unbound:latest' }}
 {% set vols = [
-  volumes.unbound.main
+  unbound.volumes.main
 ] %}
     {{ dv.volumes_mapping_full(vols)|indent }}
     networks:
-      {{ networks.unbound.name }}:
+      {{ unbound.networks.name }}:
         ipv4_address: {{ unbound.ipv4 }}
     restart: always
-{% set nets = [ networks.unbound ] %}
+{% set nets = [ unbound.networks ] %}
 {% if pihole.use_host_net == false %}
-{{   nets.append(networks.pihole) }}
+{{   nets.append(pihole.networks) }}
 {% endif %}
 {% if openvpn.use_host_net == false %}
-{{   nets.append(networks.vpn) }}
+{{   nets.append(openvpn.networks) }}
 {% endif %}
 # docker network create --ipv6 --driver=bridge --subnet=172.16.0.1/24 --gateway=172.16.0.1 --subnet=2002:ac10:0001::/64 --gateway=2002:ac10:0001::1 vpn-net
 {{ dn.networks_declaration(nets) }}
 
 {% set vols = [
-  volumes.pihole.main,
-  volumes.pihole.dnsmasq,
-  volumes.vpn.config,
-  volumes.unbound.main
+  pihole.volumes.main,
+  pihole.volumes.dnsmasq,
+  openvpn.volumes.config,
+  unbound.volumes.main
 ] %}
 {{ dv.volumes_declaration(vols) }}

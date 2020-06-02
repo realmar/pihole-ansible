@@ -1,9 +1,25 @@
-volumes2:
-  rss:
-    name: rss_config
-    local_folder: "{{ root_dirs.rss }}/rss-config"
-    mount: /config
-  db:
-    name: db_data
-    local_folder: "{{ root_dirs.rss }}/db-data"
-    mount: /var/lib/postgresql/data
+freshrss:
+  user: "{{ user }}"
+  volumes:
+    config:
+      name: rss_config
+      local_folder: "{{ root_dirs.rss }}/rss-config"
+      mount: /config
+
+rss_db:
+  user: "{{ user }}"
+  volumes:
+    data:
+      name: db_data
+      local_folder: "{{ root_dirs.rss }}/db-data"
+      mount: /var/lib/postgresql/data
+
+__tmp: |
+  {% set vols = [] %}
+  {% for c in [ freshrss, rss_db ] %}
+    {% for k, vol in c.volumes.items() %}
+      {% set x = vols.append({'folder': vol.local_folder, 'user': c.user}) %}
+    {% endfor %}
+  {% endfor %}
+  {{ vols|to_json }}
+rss_folders_permissions: "{{ __tmp|from_json }}"

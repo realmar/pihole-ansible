@@ -1,0 +1,18 @@
+#
+# IN
+#     items: list[
+#                    {
+#                         folder: string
+#                         user: string
+#                    }
+#                ]
+#
+
+# big hackkus, permissions should be set on deploy
+- name: Fix permissions
+  file:
+    path: "{{ item.folder }}"
+    owner: "{{ item.user }}"
+    group: "{{ user }}"
+    recurse: yes
+  with_items: "{{ items }}"

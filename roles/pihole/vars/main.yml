@@ -1,0 +1,108 @@
+pihole:
+  user: pihole
+  name: pihole
+  ipv4: 172.16.1.20
+  ipv6: 2a02:120b:2c06:57df::20
+  use_host_net: yes
+
+  volumes:
+    main:
+      name: main_config
+      local_folder: "{{ root_dirs.pihole }}/etc-pihole"
+      mount: /etc/pihole/
+    dnsmasq:
+      name: dnsmasq_config
+      local_folder: "{{ root_dirs.pihole }}/etc-dnsmasq.d"
+      mount: /etc/dnsmasq.d/
+
+  networks:
+    v4:
+      subnet: 172.16.1.0/24
+      netaddress: 172.16.1.0
+      netmask: 255.255.255.0
+      gateway: 172.16.1.1
+    v6:
+      enable: "{{ host.supports_v6 }}"
+      subnet: 2a02:120b:2c06:57df::/64
+      netmask: 64
+      gateway: 2a02:120b:2c06:57d0:7eb7:33ff:fed0:41a6
+    name: pihole_net
+
+unbound:
+  name: unbound
+  user: pi
+  ipv4: 172.16.3.20
+  port: 25353
+  use_host_net: no
+
+  volumes:
+    main:
+      name: unbound_config
+      local_folder: "{{ root_dirs.pihole }}/etc-unbound"
+      mount: /opt/unbound/etc/unbound
+
+  networks:
+    v4:
+      subnet: 172.16.3.0/24
+      netaddress: 172.16.3.0
+      netmask: 255.255.255.0
+      gateway: 172.16.3.1
+    name: unbound_net
+
+openvpn:
+  name: openvpn
+  user: "{{ user }}"
+  ipv4: 172.16.2.20
+  ipv6: 2a02:120b:2c06:57de::20
+  use_host_net: yes
+  autoupdate: no
+  tun_device_name: tun0
+
+  conf:
+    dns: vpn.realmar.net
+
+    ca_cert_bits: 4096
+    tls_cipher: TLS-ECDHE-ECDSA-WITH-AES-256-GCM-SHA384
+    cipher: AES-256-GCM
+    auth: SHA512
+
+    server:
+      file: openvpn.conf
+      v4:
+        subnet: 192.168.255.0/24
+        netaddress: 192.168.255.0
+        netmask: 255.255.255.0
+      v6:
+        netaddress: "2a02:120b:2c06:57dc::"
+        netmask: 64
+    client:
+      only_dns_over_vpn: yes
+
+  volumes:
+    config:
+      name: ovpn_config
+      local_folder: "{{ root_dirs.pihole }}/etc-openvpn"
+      mount: /etc/openvpn
+
+  networks:
+    v4:
+      subnet: 172.16.2.0/24
+      netaddress: 172.16.2.0
+      netmask: 255.255.255.0
+      gateway: 172.16.2.1
+    v6:
+      enable: "{{ host.supports_v6 }}"
+      subnet: 2a02:120b:2c06:57de::/64
+      netmask: 64
+      gateway: 2a02:120b:2c06:57d0:7eb7:33ff:fed0:41a6
+    name: vpn_net
+
+__tmp: |
+  {% set vols = [] %}
+  {% for c in [ pihole, openvpn, unbound ] %}
+    {% for k, vol in c.volumes.items() %}
+      {% set x = vols.append({'folder': vol.local_folder, 'user': c.user}) %}
+    {% endfor %}
+  {% endfor %}
+  {{ vols|to_json }}
+pihole_folders_permissions: "{{ __tmp|from_json }}"

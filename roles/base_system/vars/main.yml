@@ -1,2 +1,3 @@
-unattended_upgrades:
-  mail: anastassios.martakos@outlook.com
+base_system:
+  unattended_upgrades:
+    mail: anastassios.martakos@outlook.com

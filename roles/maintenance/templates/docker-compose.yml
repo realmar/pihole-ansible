@@ -14,4 +14,9 @@ services:
   {{ utils.include(service)|indent(width = 2) }}
 {% endfor %}
 
-{{ dv.volumes_declaration(stacks.maintenance.volumes) }}
+{% set vols = [
+  duplicati.volumes.config,
+  duplicati.volumes.backup_target,
+  portainer.volumes.data
+] %}
+{{ dv.volumes_declaration(vols) }}

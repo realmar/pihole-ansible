@@ -12,7 +12,7 @@ services:
       PUID: 1000
       PGID: 1000
       TZ: {{ timezone }}
-    {{ dv.volumes_section_complete([ volumes2.rss ])|indent(width = 4) }}
+    {{ dv.volumes_section_complete([ freshrss.volumes.config ])|indent(width = 4) }}
     {{ dn.map_ports([ (9090, 80) ])|indent(width = 4) }}
     depends_on:
       - db
@@ -24,11 +24,11 @@ services:
       POSTGRES_PASSWORD: '{{ gen.pw("freshrss_db") }}'
       POSTGRES_DB: na_default
       TZ: {{ timezone }}
-    {{ dv.volumes_section_complete([ volumes2.db ])|indent(width = 4) }}
+    {{ dv.volumes_section_complete([ rss_db.volumes.data ])|indent(width = 4) }}
     {{ dm.restart_policy() }}
 
 {% set vols = [
-  volumes2.rss,
-  volumes2.db
+  freshrss.volumes.config,
+  rss_db.volumes.data
 ] %}
 {{ dv.volumes_declaration(vols) }}

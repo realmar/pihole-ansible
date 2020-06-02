@@ -1,7 +1,16 @@
 - block:
-  - include_tasks: standard_service.yml
-    vars:
-      usr: "{{ user }}"
-      root_dir: "{{ root_dirs.maintenance }}"
-      dirs: "{{ stacks.maintenance.local_folders }}"
+    - include_tasks: standard_service.yml
+      vars:
+        usr: "{{ user }}"
+        root_dir: "{{ root_dirs.maintenance }}"
+        dirs:
+          - "{{ duplicati.volumes.config.local_folder }}"
+          - "{{ duplicati.volumes.backup_target.local_folder }}"
+          - "{{ portainer.volumes.data.local_folder }}"
   tags: compose_file
+
+- block:
+    - include_tasks: fix_permissions.yml
+      vars:
+        items: "{{ maintenance_folders_permissions }}"
+  tags: fix_permissions

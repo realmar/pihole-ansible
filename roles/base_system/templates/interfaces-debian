@@ -6,7 +6,7 @@
 # Include files from /etc/network/interfaces.d:
 source-directory /etc/network/interfaces.d
 
-{% set default_route_ipv6 = 'default via ' + networks.host.v6.gateway + ' dev eth0 metric 1024 onlink pref medium' %}
+{% set default_route_ipv6 = 'default via ' + host_net.v6.gateway + ' dev eth0 metric 1024 onlink pref medium' %}
 
 # The loopback network interface
 auto lo
@@ -22,14 +22,14 @@ auto {{ host.public_interface }}
 
 iface {{ host.public_interface }} inet static
     address {{ host.ipv4 }}
-    netmask {{ networks.host.v4.netmask }}
-    gateway {{ networks.host.v4.gateway }}
+    netmask {{ host_net.v4.netmask }}
+    gateway {{ host_net.v4.gateway }}
 
 {% if host.supports_v6 %}
 iface {{ host.public_interface }} inet6 static
     address {{ host.ipv6 }}
-    netmask {{ networks.host.v6.netmask }}
-    gateway {{ networks.host.v6.gateway }}
+    netmask {{ host_net.v6.netmask }}
+    gateway {{ host_net.v6.gateway }}
     pre-up modprobe ipv6
     up ip -6 r add {{ default_route_ipv6 }}
     down ip -6 r del {{ default_route_ipv6 }}

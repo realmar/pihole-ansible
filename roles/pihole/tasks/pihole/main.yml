@@ -13,8 +13,8 @@
     owner: "{{ pihole.user }}"
     group: "{{ user }}"
   loop:
-    - "{{ volumes.pihole.main }}"
-    - "{{ volumes.pihole.dnsmasq }}"
+    - "{{ pihole.volumes.main }}"
+    - "{{ pihole.volumes.dnsmasq }}"
   loop_control:
     loop_var: folder
   tags: pihole_conf
@@ -22,7 +22,7 @@
 - name: Copy dnsmaq config extension
   template:
     src: pihole/10-custom-dns.conf
-    dest: "{{ volumes.pihole.dnsmasq.local_folder }}/10-custom-dns.conf"
+    dest: "{{ pihole.volumes.dnsmasq.local_folder }}/10-custom-dns.conf"
     owner: "{{ pihole.user }}"
     group: "{{ user }}"
     mode: 0644
@@ -31,7 +31,7 @@
 - name: Copy pihole-FTL.conf file
   template:
     src: pihole/pihole-FTL.conf
-    dest: "{{ volumes.pihole.main.local_folder }}/pihole-FTL.conf"
+    dest: "{{ pihole.volumes.main.local_folder }}/pihole-FTL.conf"
     owner: "{{ pihole.user }}"
     group: "{{ user }}"
     mode: 0644

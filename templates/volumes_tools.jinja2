@@ -1,0 +1,21 @@
+{#
+  containers: {
+                user: string,
+                volumes:
+                {
+                  [string]:
+                  {
+                    local_folder: string
+                  }
+                }
+              }[]
+#}
+{% macro convert_to_permission_struct(containers) %}
+{% set vols = [] %}
+{% for c in containers %}
+  {% for k, vol in c.volumes.items() %}
+    {% set x = vols.append({'folder': vol.local_folder, 'user': c.user}) %}
+  {% endfor %}
+{% endfor %}
+{{ vols|to_json }}
+{% endmacro %}

@@ -1,9 +1,15 @@
 - block:
-  - include_tasks: standard_service.yml
-    vars:
-      usr: "{{ user }}"
-      root_dir: "{{ root_dirs.rss }}"
-      dirs:
-        - "{{ volumes2.rss.local_folder }}"
-        - "{{ volumes2.db.local_folder }}"
+    - include_tasks: standard_service.yml
+      vars:
+        usr: "{{ user }}"
+        root_dir: "{{ root_dirs.rss }}"
+        dirs:
+          - "{{ freshrss.volumes.config.local_folder }}"
+          - "{{ rss_db.volumes.data.local_folder }}"
   tags: compose_file
+
+- block:
+    - include_tasks: fix_permissions.yml
+      vars:
+        items: "{{ rss_folders_permissions }}"
+  tags: fix_permissions

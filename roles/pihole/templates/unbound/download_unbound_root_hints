@@ -1,1 +1,1 @@
-0 0 1 */6 1 root /usr/bin/wget -O {{ volumes.unbound.main.local_folder }}/var/root.hints https://www.internic.net/domain/named.root
+0 0 1 */6 1 root /usr/bin/wget -O {{ unbound.volumes.main.local_folder }}/var/root.hints https://www.internic.net/domain/named.root

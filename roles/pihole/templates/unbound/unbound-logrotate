@@ -1,4 +1,4 @@
-{% set log_file = volumes.unbound.main.local_folder + '/var/unbound.log' %}
+{% set log_file = unbound.volumes.main.local_folder + '/var/unbound.log' %}
 {{ log_file }} {
   rotate 2
   weekly

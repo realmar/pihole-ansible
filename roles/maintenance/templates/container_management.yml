@@ -6,6 +6,6 @@ portainer:
   image: portainer/portainer:latest
   ports:
     - 9000:9000
-  {{ dv.volumes_section_complete([ volumes.portainer.data ])|indent(width = 2) }}
+  {{ dv.volumes_section_complete([ portainer.volumes.data ])|indent(width = 2) }}
     - /var/run/docker.sock:/var/run/docker.sock
   restart: always

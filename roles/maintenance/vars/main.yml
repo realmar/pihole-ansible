@@ -1,0 +1,33 @@
+netdata:
+  name: netdata
+  user: netdata
+
+duplicati:
+  user: "{{ user }}"
+  volumes:
+    config:
+      name: duplicati_config
+      local_folder: "{{ root_dirs.maintenance }}/duplicati_config"
+      mount: /config
+    backup_target:
+      name: duplicati_backup_target
+      local_folder: "/home/{{ user }}"
+      mount: "/source"
+
+portainer:
+  user: "{{ user }}"
+  volumes:
+    data:
+      name: portainer_data
+      local_folder: "{{ root_dirs.maintenance }}/portainer_config"
+      mount: /data
+
+__tmp: |
+  {% set vols = [] %}
+  {% for c in [ duplicati, portainer ] %}
+    {% for k, vol in c.volumes.items() %}
+      {% set x = vols.append({'folder': vol.local_folder, 'user': c.user}) %}
+    {% endfor %}
+  {% endfor %}
+  {{ vols|to_json }}
+maintenance_folders_permissions: "{{ __tmp|from_json }}"

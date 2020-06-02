@@ -9,7 +9,7 @@
 #     }
 #
 
-- name: "Create {{ item.name }} user with uid"
+- name: "Create user with uid"
   user:
     name: "{{ item.name }}"
     state: present
@@ -21,7 +21,7 @@
     update_password: on_create
   when: item.uid is defined
 
-- name: "Create {{ item.name }} user without uid"
+- name: "Create user without uid"
   user:
     name: "{{ item.name }}"
     state: present

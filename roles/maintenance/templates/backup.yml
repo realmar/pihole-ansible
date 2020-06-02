@@ -3,8 +3,8 @@
 {% import 'docker_volumes.jinja2' as dv with context -%}
 
 {%- set vols = [
-  volumes.duplicati.config,
-  volumes.duplicati.backup_target
+  duplicati.volumes.config,
+  duplicati.volumes.backup_target
 ] -%}
 
 duplicati:

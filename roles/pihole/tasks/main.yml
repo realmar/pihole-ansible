@@ -4,3 +4,9 @@
     - openvpn/main.yml
     - unbound/main.yml
   tags: compose_file
+
+- block:
+    - include_tasks: fix_permissions.yml
+      vars:
+        items: "{{ pihole_folders_permissions }}"
+  tags: fix_permissions

@@ -8,8 +8,8 @@ Type=oneshot
 User=root
 Group=root
 
-ExecStart={{ volumes.vpn.config.local_folder }}/up-route_lan.py
-ExecStop={{ volumes.vpn.config.local_folder }}/down-route_lan.py
+ExecStart={{ openvpn.volumes.config.local_folder }}/up-route_lan.py
+ExecStop={{ openvpn.volumes.config.local_folder }}/down-route_lan.py
 
 RemainAfterExit=true
 StandardOutput=journal
