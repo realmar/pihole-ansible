@@ -1,12 +1,16 @@
-{%- import 'docker_volumes.jinja2' as dv with context -%}
+{% import 'docker_volumes.jinja2' as dv with context -%}
 {% import 'docker_network.jinja2' as dn with context -%}
-{% import "docker_misc.jinja2" as dm with context -%}
+{% import 'docker_misc.jinja2' as dm with context -%}
+{% import 'http_traefik.jinja2' as traefik with context -%}
 
 portainer:
   container_name: portainer
   hostname: portainer
   image: portainer/portainer:latest
-  {{ dn.map_ports([ (9000, 9000) ])|indent(width = 2) }}
+
+  {{ traefik.declare_labels_mount_path("portainer", "/portainer")|indent(width = 2) }}
+  {{ dn.map_ports([ (9000,) ])|indent(width = 2) }}
   {{ dv.volumes_section_complete([ portainer.volumes.data ])|indent(width = 2) }}
     - /var/run/docker.sock:/var/run/docker.sock
+  {{ dn.discovery_network_section()|indent(width = 2) }}
   {{ dm.restart_policy() }}

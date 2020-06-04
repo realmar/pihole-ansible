@@ -1,10 +1,14 @@
 freshrss:
   user: "{{ user }}"
   volumes:
-    config:
-      name: rss_config
-      local_folder: "{{ root_dirs.rss }}/rss-config"
-      mount: /config
+    data:
+      name: rss_data
+      local_folder: "{{ root_dirs.rss }}/rss-data"
+      mount: /var/www/FreshRSS/data
+    extensions:
+      name: rss_extensions
+      local_folder: "{{ root_dirs.rss }}/rss-extensions"
+      mount: /var/www/FreshRSS/extensions
 
 rss_db:
   user: "{{ user }}"

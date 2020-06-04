@@ -1,0 +1,34 @@
+{% import 'docker_volumes.jinja2' as dv with context -%}
+{% import 'docker_network.jinja2' as dn with context -%}
+{% import "docker_misc.jinja2" as dm with context -%}
+
+version: "3.3"
+services:
+  traefik:
+    image: {{ 'traefik:latest' if is_dev else 'traefik:arm' }}
+    container_name: "traefik"
+    command:
+      - "--log.level={{ 'INFO' if is_dev else  'WARN' }}"
+      - "--accesslog=true"
+
+      - "--providers.docker=true"
+      - "--providers.docker.network={{ discovery_network.name }}"
+      - "--providers.docker.exposedbydefault=false"
+
+      - "--api.insecure=true"
+      - "--api.dashboard=true"
+
+      - "--entrypoints.web.address=:80"
+    {{ dn.map_ports([ (80,), (443,), (8080,) ])|indent(width = 4) }}
+    volumes:
+      {{ dv.datetime_mapping()|indent(width = 6) }}
+      {{ dv.mount_docker_socket() }}
+    {{ dm.restart_policy() }}
+    networks:
+      - default
+      - {{ discovery_network.name }}
+    extra_hosts:
+      # https://docs.traefik.io/providers/docker/#host-networking
+      - "host.docker.internal:172.17.0.1"
+
+{{ dn.networks_declaration([ discovery_network ]) }}

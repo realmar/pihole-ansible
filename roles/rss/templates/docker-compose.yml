@@ -2,21 +2,31 @@
 {% import "docker_volumes.jinja2" as dv with context -%}
 {% import "docker_network.jinja2" as dn with context -%}
 {% import "docker_misc.jinja2" as dm with context -%}
+{% import "http_traefik.jinja2" as traefik with context -%}
+
+{% set vols_rss = [
+  freshrss.volumes.data,
+  freshrss.volumes.extensions
+] %}
 
 version: "3"
 services:
   rss:
-    image: linuxserver/freshrss
+    image: {{ 'freshrss/freshrss:latest' if is_dev else 'freshrss/freshrss:arm' }}
     container_name: freshrss
+    labels:
+      {{ traefik.mount_path("rss", "/rss")|indent(width = 6) }}
     environment:
-      PUID: 1000
-      PGID: 1000
+      CRON_MIN: 4,34
       TZ: {{ timezone }}
-    {{ dv.volumes_section_complete([ freshrss.volumes.config ])|indent(width = 4) }}
+    {{ dv.volumes_section_complete(vols_rss)|indent(width = 4) }}
     {{ dn.map_ports([ (9090, 80) ])|indent(width = 4) }}
+    {{ dn.discovery_network_section()|indent(width = 4) }}
+      default:
     depends_on:
       - db
     {{ dm.restart_policy() }}
+
   db:
     image: postgres
     environment:
@@ -27,8 +37,9 @@ services:
     {{ dv.volumes_section_complete([ rss_db.volumes.data ])|indent(width = 4) }}
     {{ dm.restart_policy() }}
 
-{% set vols = [
-  freshrss.volumes.config,
+{{ dn.discovery_networks_declaration() }}
+
+{% set vols_db = [
   rss_db.volumes.data
 ] %}
-{{ dv.volumes_declaration(vols) }}
+{{ dv.volumes_declaration(vols_rss + vols_db) }}

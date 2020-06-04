@@ -1,12 +1,12 @@
-{%- import 'docker_volumes.jinja2' as dv with context -%}
+{% import 'docker_volumes.jinja2' as dv with context -%}
 {% import 'docker_network.jinja2' as dn with context -%}
-{% import "docker_misc.jinja2" as dm with context -%}
+{% import 'docker_misc.jinja2' as dm with context -%}
+{% import 'http_traefik.jinja2' as traefik with context -%}
 
 netdata:
   container_name: {{ netdata.name }}
   image: netdata/netdata:latest
   hostname: pihole.home
-  {{ dn.map_ports([ (19999, 19999) ])|indent(width = 2) }}
   cap_add:
     - SYS_PTRACE
   security_opt:
@@ -17,4 +17,8 @@ netdata:
     - /proc:/host/proc:ro
     - /sys:/host/sys:ro
     {{ dv.datetime_mapping()|indent(width = 4) }}
+
+  {{ dn.map_ports([ (19999,) ])|indent(width = 2) }}
+  {{ traefik.declare_labels_mount_path("netdata", "/netdata")|indent(width = 2) }}
+  {{ dn.discovery_network_section()|indent(width = 2) }}
   {{ dm.restart_policy() }}

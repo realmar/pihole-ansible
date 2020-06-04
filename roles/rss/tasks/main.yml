@@ -4,7 +4,8 @@
         usr: "{{ user }}"
         root_dir: "{{ root_dirs.rss }}"
         dirs:
-          - "{{ freshrss.volumes.config.local_folder }}"
+          - "{{ freshrss.volumes.data.local_folder }}"
+          - "{{ freshrss.volumes.extensions.local_folder }}"
           - "{{ rss_db.volumes.data.local_folder }}"
   tags: compose_file
 

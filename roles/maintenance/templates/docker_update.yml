@@ -1,5 +1,6 @@
-{%- import 'docker_volumes.jinja2' as dv with context -%}
-{% import "docker_misc.jinja2" as dm with context -%}
+{% import 'docker_network.jinja2' as dn with context -%}
+{% import 'docker_volumes.jinja2' as dv with context -%}
+{% import 'docker_misc.jinja2' as dm with context -%}
 
 ouroboros:
   container_name: ouroboros
@@ -14,4 +15,5 @@ ouroboros:
   volumes:
     - /var/run/docker.sock:/var/run/docker.sock
     {{ dv.datetime_mapping()|indent(width = 4) }}
+  {{ dn.discovery_network_section()|indent(width = 2) }}
   {{ dm.restart_policy() }}

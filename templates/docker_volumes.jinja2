@@ -26,6 +26,10 @@ volumes:
 - /etc/timezone:/etc/timezone:ro
 {% endmacro %}
 
+{% macro mount_docker_socket() %}
+- /var/run/docker.sock:/var/run/docker.sock:ro
+{% endmacro %}
+
 {% macro volumes_section_complete(vols) %}
 {{ volumes_mapping_full(vols) }}
   {{ datetime_mapping()|indent(width = 2) -}}

@@ -1,0 +1,34 @@
+{% macro enable(name) %}
+- "traefik.enable=true"
+- "traefik.http.routers.{{ name }}.entrypoints=web"
+- "traefik.docker.network={{ discovery_network.name }}"
+{% endmacro %}
+
+{% macro route_path(name, path) %}
+- "traefik.http.routers.{{ name }}.rule=PathPrefix(`{{ path }}`)"
+- "traefik.http.routers.{{ name }}.middlewares={{ name }}-add-trailing-slash@docker,{{ name }}-strip-prefix@docker"
+
+- "traefik.http.middlewares.{{ name }}-add-trailing-slash.redirectregex.regex=^(https?://[^/]+/[a-z0-9_]+)$$"
+- "traefik.http.middlewares.{{ name }}-add-trailing-slash.redirectregex.replacement=$${1}/"
+- "traefik.http.middlewares.{{ name }}-add-trailing-slash.redirectregex.permanent=true"
+
+- "traefik.http.middlewares.{{ name }}-strip-prefix.stripprefix.prefixes={{ path }}"
+- "traefik.http.middlewares.{{ name }}-strip-prefix.stripprefix.forceslash=true"
+{% endmacro %}
+
+{% macro service_port(name, port) %}
+- "traefik.http.services.{{ name }}.loadbalancer.server.port={{ port }}"
+{% endmacro %}
+
+{% macro mount_path(name, path, port) %}
+{{ enable(name) }}
+{{ route_path(name, path) }}
+{% if port is defined %}
+{{ service_port(name, port) }}
+{% endif %}
+{% endmacro %}
+
+{% macro declare_labels_mount_path(name, path, port) %}
+labels:
+  {{ mount_path(name, path, port)|indent(width = 2) }}
+{% endmacro %}

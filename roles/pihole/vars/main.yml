@@ -3,7 +3,11 @@ pihole:
   name: pihole
   ipv4: 172.16.1.20
   ipv6: 2a02:120b:2c06:57df::20
-  use_host_net: yes
+  use_host_net: no
+
+  discovery_ipv4: 172.16.20.20
+  web_bind_address: 172.16.20.20
+  web_admin_port: 80
 
   volumes:
     main:

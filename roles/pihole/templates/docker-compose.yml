@@ -35,6 +35,7 @@ version: '3'
 {% import 'docker_volumes.jinja2' as dv with context -%}
 {% import 'docker_network.jinja2' as dn with context -%}
 {% import "docker_misc.jinja2" as dm with context -%}
+{% import "http_traefik.jinja2" as traefik with context -%}
 
 services:
   openvpn:
@@ -59,6 +60,7 @@ services:
     network_mode: host
 {% else %}
     networks:
+      {{ discovery_network.name }}:
       {{ openvpn.networks.name }}:
         ipv4_address: {{ openvpn.ipv4 }}
 {%   if openvpn.networks.v6.enable %}
@@ -82,6 +84,8 @@ services:
   pihole:
     image: pihole/pihole:latest
     container_name: {{ pihole.name }}
+    labels:
+      {{ traefik.mount_path("pihole", "/pihole", pihole.web_admin_port)|indent(width = 6) }}
     dns:
       - 127.0.0.1
       - 1.1.1.1
@@ -90,10 +94,10 @@ services:
       - openvpn
 {% if pihole.use_host_net == false %}
     {{ dn.map_ports([
-      (53, 53, "udp"), (53, 53, "tcp"),
-      (67, 67, "udp"),
-      (80, 80),
-      (443, 443) ])|indent(width = 4) }}
+      (53, "udp"), (53, "tcp"),
+      (67, "udp"),
+      (8282, pihole.web_admin_port)
+       ])|indent(width = 4) }}
 {% endif %}
     environment:
 {#                 We need to escape $-sign with two $$-signs #}
@@ -101,13 +105,13 @@ services:
       TZ: {{ timezone }}
       DNS1: {{ unbound.ipv4 }}#53
       DNS2: "no"
-      ServerIP: {{ pihole_ipam.ipam.ipv4 }}
+      WEB_PORT: {{ pihole.web_admin_port }}
+      ServerIP: {{ pihole.web_bind_address }} # {{ pihole_ipam.ipam.ipv4 }}
+      IPv6: "True"
 {% if host.supports_v6 %}
 {%   if pihole.use_host_net %}
-      IPv6: "True"
       ServerIPv6: {{ host.ipv6 }}
 {%   elif pihole.networks.v6.enable %}
-      IPv6: "True"
       ServerIPv6: {{ pihole_ipam.ipam.ipv6 }}
 {%   endif %}
 {% endif %}
@@ -124,6 +128,8 @@ services:
     network_mode: host
 {% else %}
     networks:
+      {{ discovery_network.name }}:
+        ipv4_address: {{ pihole.discovery_ipv4 }}
       {{ pihole.networks.name }}:
         ipv4_address: {{ pihole_ipam.ipam.ipv4 }}
 {%      if pihole.networks.v6.enable %}
@@ -153,7 +159,7 @@ services:
       {{ unbound.networks.name }}:
         ipv4_address: {{ unbound.ipv4 }}
     {{ dm.restart_policy() }}
-{% set nets = [ unbound.networks ] %}
+{% set nets = [ discovery_network, unbound.networks ] %}
 {% if pihole.use_host_net == false %}
 {{   nets.append(pihole.networks) }}
 {% endif %}

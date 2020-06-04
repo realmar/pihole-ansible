@@ -3,4 +3,9 @@ host:
   public_interface: eth0
   ipv4: 192.168.1.128
   ipv6: 2a02:120b:2c06:57d0::abcf
-  supports_v6: yes
+  # my swisscom router supports SLAAC only, meaning that if you turn on IPv6
+  # you are forced to use SLAAC, no other configurations are possible. There is
+  # no point in doing IPv6 at this time... For example I want to assign an IPv6
+  # subnet to my VPN clients. However, this would mean that I need to configure
+  # a static IPv6 route, which is not possible with that swisscom device.
+  supports_v6: no

@@ -2,6 +2,10 @@
 {% set use_v6 = network.v6 is defined and network.v6.enable %}
 networks:
 {% for network in networks %}
+{% if network.v4 is not defined %}
+  {{ network.name }}:
+    external: true
+{% else %}
   {{ network.name }}:
     driver: bridge
 {%  if use_v6 %}
@@ -15,16 +19,35 @@ networks:
 {%    if use_v6 %}
         - subnet: "{{ network.v6.subnet }}"
 {%    endif %}
+{% endif %}
 {% endfor %}
 {% endmacro %}
 
+{% macro discovery_networks_declaration() %}
+{{ networks_declaration([ discovery_network ]) }}
+{% endmacro %}
+
+{% macro discovery_network_section() %}
+networks:
+  {{ discovery_network.name }}:
+{% endmacro %}
+
 {#
-  ports: (host: int, container: int, protocol: "udp" | "tcp")[]
+  ports: (host: int, container?: int, protocol?: "udp" | "tcp")[]
 #}
 {% macro map_ports(ports) %}
 ports:
 {% for data in ports %}
-  - {{ data[0] }}:{{ data[1] }}{% if data|length > 2 %}/{{ data[2] }}{% endif %}
-
+{% if data|length == 1 %}
+  - {{ data[0] }}:{{ data[0] }}
+{% elif data|length == 2 and "str" in data[1].__class__.__name__ %}
+  - {{ data[0] }}:{{ data[0] }}/{{ data[1] }}
+{% elif data|length == 2 and "int" in data[1].__class__.__name__ %}
+  - {{ data[0] }}:{{ data[1] }}
+{% elif data|length == 3 %}
+  - {{ data[0] }}:{{ data[1] }}/{{ data[2] }}
+{% else %}
+{{ "TODO: Write plugin to throw exceptions"/0 }}
+{% endif %}
 {% endfor %}
 {% endmacro %}
