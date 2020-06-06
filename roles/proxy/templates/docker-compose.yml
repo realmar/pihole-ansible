@@ -5,8 +5,8 @@
 version: "3.3"
 services:
   traefik:
-    image: {{ 'traefik:latest' if is_dev else 'traefik:arm' }}
-    container_name: "traefik"
+    image: traefik:latest
+    container_name: traefik
     command:
       - "--log.level={{ 'INFO' if is_dev else  'WARN' }}"
       - "--accesslog=true"

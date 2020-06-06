@@ -1,5 +1,5 @@
 freshrss:
-  user: "{{ user }}"
+  user: 33
   volumes:
     data:
       name: rss_data
