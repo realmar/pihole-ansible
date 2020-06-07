@@ -3,3 +3,7 @@
 {% if pihole.use_host_net == false %}
 dhcp-option=option:dns-server,{{ pihole_ipam.ipam.ipv4 }}
 {% endif %}
+
+# https://www.efficientip.com/glossary/dhcp-option/
+# DHCP option 6: which DNS (Domain Name Server) to include in the IP configuration for name resolution
+dhcp-option=6, {{ host.ipv4 }}
