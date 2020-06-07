@@ -22,14 +22,14 @@ auto {{ host.public_interface }}
 
 iface {{ host.public_interface }} inet static
     address {{ host.ipv4 }}
-    netmask {{ host_net.v4.netmask }}
-    gateway {{ host_net.v4.gateway }}
+    netmask {{ host.networks.v4.netmask }}
+    gateway {{ host.networks.v4.gateway }}
 
 {% if host.supports_v6 %}
 iface {{ host.public_interface }} inet6 static
     address {{ host.ipv6 }}
-    netmask {{ host_net.v6.netmask }}
-    gateway {{ host_net.v6.gateway }}
+    netmask {{ host.networks.v6.netmask }}
+    gateway {{ host.networks.v6.gateway }}
     pre-up modprobe ipv6
     up ip -6 r add {{ default_route_ipv6 }}
     down ip -6 r del {{ default_route_ipv6 }}

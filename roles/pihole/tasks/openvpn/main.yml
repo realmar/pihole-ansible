@@ -43,5 +43,4 @@
 - include_tasks: deploy_ca_cert.yml
 
 - include_tasks: route_lan.yml
-  when: openvpn.use_host_net
   tags: vpn_route_lan

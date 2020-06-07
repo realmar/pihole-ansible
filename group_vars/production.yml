@@ -9,3 +9,15 @@ host:
   # subnet to my VPN clients. However, this would mean that I need to configure
   # a static IPv6 route, which is not possible with that swisscom device.
   supports_v6: no
+
+  networks:
+    v4:
+      subnet: 192.168.1.0/24
+      netaddress: 192.168.1.0
+      netmask: 255.255.255.0
+      netmask_short: 24
+      gateway: 192.168.1.1
+    v6:
+      subnet: 2a02:120b:2c06:57d0::/64
+      netmask: 64
+      gateway: 2a02:120b:2c06:57d0:7eb7:33ff:fed0:41a6

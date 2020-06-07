@@ -1,10 +1,10 @@
 - include_tasks: create_user.yml
   vars:
-    item: { name: "{{ pihole.user }}", uid: 999, create_home: no, groups: "{{ user }}" }
+    item: { name: "{{ pihole.dnsmasq_user }}", uid: 999, create_home: no, groups: "{{ user }}" }
 
 - name: Create pihole directory
   file:
     path: "{{ root_dirs.pihole }}"
     state: directory
-    owner: "{{ pihole.user }}"
+    owner: "{{ pihole.dnsmasq_user }}"
     group: "{{ user }}"

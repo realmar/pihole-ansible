@@ -4,6 +4,7 @@
 #                    {
 #                         folder: string
 #                         user: string
+#                         group: string
 #                    }
 #                ]
 #
@@ -13,6 +14,6 @@
   file:
     path: "{{ item.folder }}"
     owner: "{{ item.user }}"
-    group: "{{ user }}"
+    group: "{{ item.group if item.group is defined else item.user }}"
     recurse: yes
   with_items: "{{ items }}"

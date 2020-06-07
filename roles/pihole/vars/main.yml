@@ -1,5 +1,9 @@
 pihole:
-  user: pihole
+  user: 999
+  group: 1000
+
+  dnsmasq_user: pihole
+
   name: pihole
   ipv4: 172.16.1.20
   ipv6: 2a02:120b:2c06:57df::20
@@ -34,7 +38,10 @@ pihole:
 
 unbound:
   name: unbound
-  user: pi
+
+  user: "{{ user }}"
+  group: "{{ user }}"
+
   ipv4: 172.16.3.20
   port: 25353
   use_host_net: no
@@ -55,10 +62,13 @@ unbound:
 
 openvpn:
   name: openvpn
+
   user: "{{ user }}"
+  group: "{{ user }}"
+
   ipv4: 172.16.2.20
   ipv6: 2a02:120b:2c06:57de::20
-  use_host_net: yes
+  use_host_net: no
   autoupdate: no
   tun_device_name: tun0
 
@@ -105,7 +115,7 @@ __tmp: |
   {% set vols = [] %}
   {% for c in [ pihole, openvpn, unbound ] %}
     {% for k, vol in c.volumes.items() %}
-      {% set x = vols.append({'folder': vol.local_folder, 'user': c.user}) %}
+      {% set x = vols.append({'folder': vol.local_folder, 'user': c.user, 'group': c.group}) %}
     {% endfor %}
   {% endfor %}
   {{ vols|to_json }}

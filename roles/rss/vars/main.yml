@@ -11,7 +11,7 @@ freshrss:
       mount: /var/www/FreshRSS/extensions
 
 rss_db:
-  user: "{{ user }}"
+  user: 999
   volumes:
     data:
       name: db_data

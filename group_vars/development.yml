@@ -4,3 +4,15 @@ host:
   ipv4: 192.168.250.102
   ipv6: 2a02:120b:2c06:57d0:ae81:e76b:ea6f:6cff
   supports_v6: no
+
+  networks:
+    v4:
+      subnet: 192.168.250.0/24
+      netaddress: 192.168.250.0
+      netmask: 255.255.255.0
+      netmask_short: 24
+      gateway: 192.168.250.1
+    v6:
+      subnet: 2a02:120b:2c06:57d0::/64
+      netmask: 64
+      gateway: 2a02:120b:2c06:57d0:7eb7:33ff:fed0:41a6

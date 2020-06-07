@@ -15,17 +15,32 @@
   loop:
     - "{{ pihole.volumes.main }}"
     - "{{ pihole.volumes.dnsmasq }}"
+    - local_folder: "{{ root_dirs.pihole }}/dhcp-helper"
   loop_control:
     loop_var: folder
   tags: pihole_conf
 
-- name: Copy dnsmaq config extension
+- name: Copy dhcp-helper files
   template:
-    src: pihole/10-custom-dns.conf
-    dest: "{{ pihole.volumes.dnsmasq.local_folder }}/10-custom-dns.conf"
+    src: "pihole/dhcp-helper/Dockerfile"
+    dest: "{{ root_dirs.pihole }}/dhcp-helper/Dockerfile"
     owner: "{{ pihole.user }}"
     group: "{{ user }}"
     mode: 0644
+  tags:
+    - pihole_conf
+    - compose_file
+
+- name: Copy dnsmaq config extension
+  template:
+    src: "pihole/{{ item }}"
+    dest: "{{ pihole.volumes.dnsmasq.local_folder }}/{{ item }}"
+    owner: "{{ pihole.user }}"
+    group: "{{ user }}"
+    mode: 0644
+  with_items:
+    - 10-custom-dns.conf
+    - 07-dhcp-options
   tags: pihole_conf
 
 - name: Copy pihole-FTL.conf file

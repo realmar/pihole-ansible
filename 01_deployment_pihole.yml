@@ -1,4 +1,4 @@
-- hosts: development
+- hosts: production
   gather_facts: yes
   remote_user: root
   debugger: on_failed
@@ -13,6 +13,7 @@
     - { role: maintenance, tags: maintenance }
     - { role: fileserver, tags: fileserver }
     - { role: rss, tags: rss }
+    # - { role: jupyter, tags: jupyter }
 
   post_tasks:
     # I really don't want to install docker-compose via pip just to make the

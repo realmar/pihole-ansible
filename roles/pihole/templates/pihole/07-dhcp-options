@@ -1,0 +1,5 @@
+{% import "pihole_ipam.jinja2" as pihole_ipam with context -%}
+
+{% if pihole.use_host_net == false %}
+dhcp-option=option:dns-server,{{ pihole_ipam.ipam.ipv4 }}
+{% endif %}

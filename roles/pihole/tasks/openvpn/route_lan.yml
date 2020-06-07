@@ -24,9 +24,18 @@
     dest: /etc/systemd/system/configure_vpn_iptables.service
     mode: 0644
 
-- name: Configure iptables for vpn using systemd
+- name: Configure iptables for vpn using systemd (started, enabled)
   systemd:
     name: configure_vpn_iptables
     state: started
     enabled: yes
     daemon_reload: yes
+  when: openvpn.use_host_net
+
+- name: Configure iptables for vpn using systemd (stopped, disabled)
+  systemd:
+    name: configure_vpn_iptables
+    state: stopped
+    enabled: no
+    daemon_reload: yes
+  when: not openvpn.use_host_net

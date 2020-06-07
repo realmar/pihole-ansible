@@ -22,12 +22,8 @@ portainer:
       local_folder: "{{ root_dirs.maintenance }}/portainer_config"
       mount: /data
 
-__tmp: |
-  {% set vols = [] %}
-  {% for c in [ duplicati, portainer ] %}
-    {% for k, vol in c.volumes.items() %}
-      {% set x = vols.append({'folder': vol.local_folder, 'user': c.user}) %}
-    {% endfor %}
-  {% endfor %}
-  {{ vols|to_json }}
-maintenance_folders_permissions: "{{ __tmp|from_json }}"
+maintenance_folders_permissions:
+  - folder: "{{ duplicati.volumes.config }}"
+    user: "{{ duplicati.user }}"
+  - folder: "{{ portainer.volumes.data }}"
+    user: "{{ portainer.user }}"

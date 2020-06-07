@@ -9,17 +9,17 @@ network:
       dhcp6: false
 {% endif %}
       addresses:
-        - {{ host.ipv4 }}/{{ host_net.v4.netmask_short }}
+        - {{ host.ipv4 }}/{{ host.networks.v4.netmask_short }}
 {% if host.supports_v6 %}
-        - "{{ host.ipv6 }}/{{ host_net.v6.netmask }}"
-      gateway6: "{{ host_net.v6.gateway }}"
+        - "{{ host.ipv6 }}/{{ host.networks.v6.netmask }}"
+      gateway6: "{{ host.networks.v6.gateway }}"
       # routes:
       #   - to: "::/0"
-      #     via: "{{ host_net.v6.gateway }}"
+      #     via: "{{ host.networks.v6.gateway }}"
       #     on-link: true
       #     metric: 1024
 {% endif %}
-      gateway4: {{ host_net.v4.gateway }}
+      gateway4: {{ host.networks.v4.gateway }}
       nameservers:
         addresses:
           - 127.0.0.1

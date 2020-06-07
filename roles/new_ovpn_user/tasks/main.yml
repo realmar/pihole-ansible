@@ -1,3 +1,7 @@
+- name: Import pihole vars
+  include_vars:
+    file: ../../pihole/vars/main.yml
+
 - name: Get VPN CA Cert password
   set_fact:
     ca_cert_pw: "{{ lookup('template', 'standard_pw_gen.jinja2', template_vars=dict(name='vpn_ca_cert')) }}"
@@ -8,7 +12,7 @@
 
 - name: Create VPN user
   expect:
-    command: "docker run -e EASYRSA_KEY_SIZE={{ openvpn.conf.ca_cert_bits }} -v {{ volumes.vpn.config.local_folder }}:{{ volumes.vpn.config.mount }} --rm -it kylemanna/openvpn easyrsa build-client-full {{ vpn_username }}"
+    command: "docker run -e EASYRSA_KEY_SIZE={{ openvpn.conf.ca_cert_bits }} -v {{ openvpn.volumes.config.local_folder }}:{{ openvpn.volumes.config.mount }} --rm -it kylemanna/openvpn easyrsa build-client-full {{ vpn_username }}"
     responses:
       'Enter PEM pass phrase:': "{{ user_cert_pw }}"
       'Enter pass phrase for \/etc\/openvpn\/pki\/private\/ca\.key:': "{{ ca_cert_pw }}"
@@ -20,7 +24,7 @@
     ovpn_path: "{{ root_dirs.pihole }}/{{ ovpn_name }}"
 
 - name: Store OVPN profile in config directory
-  shell: "docker run -v {{ volumes.vpn.config.local_folder }}:{{ volumes.vpn.config.mount }} --rm kylemanna/openvpn ovpn_getclient {{ vpn_username }} > {{ ovpn_path }}"
+  shell: "docker run -v {{ openvpn.volumes.config.local_folder }}:{{ openvpn.volumes.config.mount }} --rm kylemanna/openvpn ovpn_getclient {{ vpn_username }} > {{ ovpn_path }}"
 
 - name: Only route DNS through VPN
   lineinfile:
@@ -34,7 +38,7 @@
     path: "{{ ovpn_path }}"
     line: "tun-ipv6"
     state: present
-  when: networks.vpn.v6.enable
+  when: openvpn.networks.v6.enable
 
 - name: Copy OVPN profile to host
   fetch:
