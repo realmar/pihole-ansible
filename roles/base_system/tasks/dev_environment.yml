@@ -1,0 +1,32 @@
+- name: Install packages
+  apt:
+    name: "{{ packages }}"
+    state: latest
+  vars:
+    packages:
+      - firefox
+      - xorg
+
+- name: Setup /etc/hosts
+  template:
+    src: dev/hosts
+    dest: /etc/hosts
+
+- name: Set correct DISPLAY variable
+  lineinfile:
+    dest: /root/.bashrc
+    regexp: '^export DISPLAY'
+    line: 'export DISPLAY=localhost:10.0'
+    create: true
+
+- stat:
+    path: /root/.Xauthority
+  register: xauth_file
+
+- name:
+  shell: touch /root/.Xauthority
+  when: xauth_file.stat.exists == False
+
+- name:
+  shell: xauth add :0 . `mcookie`
+  when: xauth_file.stat.exists == False

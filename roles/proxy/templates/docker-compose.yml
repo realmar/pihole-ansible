@@ -1,6 +1,17 @@
 {% import 'docker_volumes.jinja2' as dv with context -%}
 {% import 'docker_network.jinja2' as dn with context -%}
-{% import "docker_misc.jinja2" as dm with context -%}
+{% import 'docker_misc.jinja2' as dm with context -%}
+{% import 'http_traefik.jinja2' as tf with context -%}
+
+{% set vols_traefik = [
+  traefik.volumes.dynamic_conf,
+  traefik.volumes.self_signed_certs
+] %}
+
+{% set vols_authelia = [
+  authelia.volumes.config,
+  authelia.volumes.data
+] %}
 
 version: "3.3"
 services:
@@ -14,14 +25,17 @@ services:
       - "--providers.docker=true"
       - "--providers.docker.network={{ discovery_network.name }}"
       - "--providers.docker.exposedbydefault=false"
+      - "--providers.file.directory={{ traefik.volumes.dynamic_conf.mount }}"
 
       - "--api.insecure=true"
       - "--api.dashboard=true"
 
       - "--entrypoints.web.address=:80"
+      - "--entrypoints.websecure.address=:443"
+      - "--entrypoints.web.http.redirections.entryPoint.to=websecure"
+      - "--entrypoints.web.http.redirections.entryPoint.scheme=https"
     {{ dn.map_ports([ (80,), (443,), (8080,) ])|indent(width = 4) }}
-    volumes:
-      {{ dv.datetime_mapping()|indent(width = 6) }}
+    {{ dv.volumes_section_complete(vols_traefik)|indent(width = 4) }}
       {{ dv.mount_docker_socket() }}
     {{ dm.restart_policy() }}
     networks:
@@ -31,4 +45,23 @@ services:
       # https://docs.traefik.io/providers/docker/#host-networking
       - "host.docker.internal:172.17.0.1"
 
+  authelia:
+    image: authelia/authelia
+    {{ dv.volumes_section_complete(vols_authelia)|indent(width = 4) }}
+    environment:
+      TZ: {{ timezone }}
+    labels:
+      {{ tf.enable("authelia")|indent(width = 6) }}
+      {{ tf.service_port("authelia", 9091) }}
+      - "traefik.http.routers.authelia.rule=Host(`{{ sub_dns.login }}`)"
+
+      - "traefik.http.middlewares.authelia.forwardauth.address=http://{{ sso_auth.ipv4 }}:9091/api/verify?rd=https://{{ sub_dns.login }}/"
+      - "traefik.http.middlewares.authelia.forwardauth.trustForwardHeader=true"
+      - "traefik.http.middlewares.authelia.forwardauth.authResponseHeaders=Remote-User, Remote-Groups, X-Forwarded-User"
+    networks:
+      {{ discovery_network.name }}:
+        ipv4_address: {{ sso_auth.ipv4 }}
+
 {{ dn.networks_declaration([ discovery_network ]) }}
+
+{{ dv.volumes_declaration(vols_traefik + vols_authelia) }}

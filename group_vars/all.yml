@@ -9,3 +9,14 @@ root_dirs:
 
 discovery_network:
   name: discovery
+
+sso_auth:
+  ipv4: 172.16.20.80
+
+dns_root: realmar.net
+sub_dns:
+  login: "login.{{ dns_root }}"
+
+all_dns:
+  - "{{ dns_root }}"
+  - "{{ sub_dns.login }}"

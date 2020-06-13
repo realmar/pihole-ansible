@@ -1,0 +1,23 @@
+- name: Install dependencies
+  apt:
+    name: "{{ packages }}"
+    state: latest
+  vars:
+    packages:
+      - openssl
+
+- name: Generate a Self Signed OpenSSL certificate
+  block:
+    - openssl_privatekey:
+        path: "{{ tls.self_signed.private_key_dir }}"
+        size: 2048
+
+    - openssl_csr:
+        path: "{{ tls.self_signed.cert_request_dir }}"
+        privatekey_path: "{{ tls.self_signed.private_key_dir }}"
+
+    - openssl_certificate:
+        path: "{{ tls.self_signed.cert_dir }}"
+        privatekey_path: "{{ tls.self_signed.private_key_dir }}"
+        csr_path: "{{ tls.self_signed.cert_request_dir }}"
+        provider: selfsigned

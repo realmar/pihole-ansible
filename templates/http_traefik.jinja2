@@ -1,12 +1,13 @@
 {% macro enable(name) %}
 - "traefik.enable=true"
-- "traefik.http.routers.{{ name }}.entrypoints=web"
 - "traefik.docker.network={{ discovery_network.name }}"
+- "traefik.http.routers.{{ name }}.entrypoints=websecure"
+- "traefik.http.routers.{{ name }}.tls=true"
 {% endmacro %}
 
 {% macro route_path(name, path) %}
-- "traefik.http.routers.{{ name }}.rule=PathPrefix(`{{ path }}`)"
-- "traefik.http.routers.{{ name }}.middlewares={{ name }}-add-trailing-slash@docker,{{ name }}-strip-prefix@docker"
+- "traefik.http.routers.{{ name }}.rule=Host(`{{ dns_root }}`) && PathPrefix(`{{ path }}`)"
+- "traefik.http.routers.{{ name }}.middlewares=authelia@docker,{{ name }}-add-trailing-slash@docker,{{ name }}-strip-prefix@docker"
 
 - "traefik.http.middlewares.{{ name }}-add-trailing-slash.redirectregex.regex=^(https?://[^/]+/[a-z0-9_]+)$$"
 - "traefik.http.middlewares.{{ name }}-add-trailing-slash.redirectregex.replacement=$${1}/"

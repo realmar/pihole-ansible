@@ -97,3 +97,9 @@
     src: resolv.conf
     dest: /etc/resolv.conf
     mode: 0644
+
+- block:
+    - name: Setup dev environment
+      include_tasks: dev_environment.yml
+  when: is_dev
+  tags: setup_dev

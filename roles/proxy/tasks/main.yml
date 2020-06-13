@@ -8,8 +8,39 @@
     vars:
       usr: "{{ user }}"
       root_dir: "{{ root_dirs.proxy }}"
-      dirs: []
+      dirs:
+        - "{{ traefik.volumes.dynamic_conf.local_folder }}"
+        - "{{ traefik.volumes.self_signed_certs.local_folder }}"
+        - "{{ authelia.volumes.config.local_folder }}"
+        - "{{ authelia.volumes.data.local_folder }}"
   tags: compose_file
+
+- name: Copy traefik config
+  template:
+    src: tls_conf.yml
+    dest: "{{ traefik.volumes.dynamic_conf.local_folder }}/tls_conf.yml"
+    owner: "{{ user }}"
+    group: "{{ user }}"
+    mode: 0644
+
+- name: Copy authelia config
+  template:
+    src: "authelia/{{ item }}"
+    dest: "{{ authelia.volumes.config.local_folder }}/{{ item }}"
+    owner: "{{ user }}"
+    group: "{{ user }}"
+    mode: 0644
+  with_items:
+    - configuration.yml
+    - users_database.yml
+
+- block:
+  - include_tasks: tls/self_signed.yml
+    # uncomment when you have setup letsencrypt
+    # when: is_dev
+  tags:
+    - tls
+    - ssl
 
 # - block:
 #   - include_tasks: fix_permissions.yml
