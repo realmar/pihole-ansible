@@ -5,31 +5,106 @@
 - "traefik.http.routers.{{ name }}.tls=true"
 {% endmacro %}
 
-{% macro route_path(name, path) %}
+{% macro add_route(name, path) %}
 - "traefik.http.routers.{{ name }}.rule=Host(`{{ dns_root }}`) && PathPrefix(`{{ path }}`)"
-- "traefik.http.routers.{{ name }}.middlewares=authelia@docker,{{ name }}-add-trailing-slash@docker,{{ name }}-strip-prefix@docker"
-
-- "traefik.http.middlewares.{{ name }}-add-trailing-slash.redirectregex.regex=^(https?://[^/]+/[a-z0-9_]+)$$"
-- "traefik.http.middlewares.{{ name }}-add-trailing-slash.redirectregex.replacement=$${1}/"
-- "traefik.http.middlewares.{{ name }}-add-trailing-slash.redirectregex.permanent=true"
-
-- "traefik.http.middlewares.{{ name }}-strip-prefix.stripprefix.prefixes={{ path }}"
-- "traefik.http.middlewares.{{ name }}-strip-prefix.stripprefix.forceslash=true"
 {% endmacro %}
 
 {% macro service_port(name, port) %}
 - "traefik.http.services.{{ name }}.loadbalancer.server.port={{ port }}"
 {% endmacro %}
 
-{% macro mount_path(name, path, port) %}
-{{ enable(name) }}
-{{ route_path(name, path) }}
+{% macro get_fqdn_mw_name(service_name, mw_name) %}{{ service_name }}-{{ mw_name }}{% endmacro %}
+
+{# ########################################################################## #}
+{# ########################################################################## #}
+
+{% set auth = { 'absolute_name': 'authelia' } %}
+
+{% macro add_trailing_slash_f(name, args) %}
+- "traefik.http.middlewares.{{ name }}.redirectregex.regex=^(https?://[^/]+/[a-z0-9_]+)$$"
+- "traefik.http.middlewares.{{ name }}.redirectregex.replacement=$${1}/"
+- "traefik.http.middlewares.{{ name }}.redirectregex.permanent=true"
+{% endmacro %}
+{% set trailing_slash = { 'name': 'add-trailing-slash', 'f': add_trailing_slash_f } %}
+
+{% macro strip_path_f(name, args) %}
+- "traefik.http.middlewares.{{ name }}.stripprefix.prefixes={{ args.path }}"
+- "traefik.http.middlewares.{{ name }}.stripprefix.forceslash=true"
+{% endmacro %}
+{% set strip_path = { 'name': 'strip-path', 'f': strip_path_f } %}
+
+{% macro add_redirect_f(name, args) %}
+- "traefik.http.middlewares.{{ name }}.redirectregex.regex=^(.*){{ args.old_path }}/?$$"
+- "traefik.http.middlewares.{{ name }}.redirectregex.replacement=$${1}{{ args.new_path }}"
+- "traefik.http.middlewares.{{ name }}.redirectregex.permanent=true"
+{% endmacro %}
+{% set redirect = { 'name': 'redirect', 'f': add_redirect_f } %}
+
+{% macro fix_wss_f(name, args) %}
+- "traefik.http.middlewares.{{ name }}.headers.customrequestheaders.X-Forwarded-Proto=https"
+{% endmacro %}
+{% set fix_wss = { 'name': 'fix-wss', 'f': fix_wss_f } %}
+
+{# ########################################################################## #}
+{# ########################################################################## #}
+
+{#
+    IN:
+        service_name: string,
+        items: {
+          mw: {
+            name: string,
+            f: (name: string, args: any) => string
+          },
+          args: any
+        }[]
+#}
+{% macro add_middlewares(service_name, items) %}
+{% set mw_strs = [] %}
+{% for item in items %}
+{##}{% if item.mw.absolute_name is defined %}
+{####}{% set x = mw_strs.append(item.mw.absolute_name + '@docker') %}
+{##}{% else %}
+{####}{% set x = mw_strs.append(service_name + '-' + item.mw.name + '@docker') %}
+{####}{{ item.mw.f(get_fqdn_mw_name(service_name, item.mw.name), item.args) }}
+{##}{% endif %}
+{% endfor %}
+- "traefik.http.routers.{{ service_name }}.middlewares={{ mw_strs|join(',') }}"
+{% endmacro %}
+
+{# ########################################################################## #}
+{# ########################################################################## #}
+
+{% macro route_path(service_name, path) %}
+{{ add_route(service_name, path) }}
+{{ add_middlewares(service_name, [
+  {
+    'mw': auth
+  },
+  {
+    'mw': trailing_slash,
+    'args': {}
+  },
+  {
+    'mw': strip_path,
+    'args': { 'path': path }
+  },
+  {
+    'mw': fix_wss,
+    'args': {}
+  }
+]) }}
+{% endmacro %}
+
+{% macro mount_path(service_name, path, port) %}
+{{ enable(service_name) }}
+{{ route_path(service_name, path) }}
 {% if port is defined %}
-{{ service_port(name, port) }}
+{{ service_port(service_name, port) }}
 {% endif %}
 {% endmacro %}
 
-{% macro declare_labels_mount_path(name, path, port) %}
+{% macro declare_labels_mount_path(service_name, path, port) %}
 labels:
-  {{ mount_path(name, path, port)|indent(width = 2) }}
+  {{ mount_path(service_name, path, port)|indent(width = 2) }}
 {% endmacro %}

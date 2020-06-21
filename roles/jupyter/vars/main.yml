@@ -1,0 +1,22 @@
+jupyter:
+  user: "{{ user }}"
+
+  container_user: pi
+  uid: 1000
+  home: /home/pi
+
+  volumes:
+    data:
+      name: jupyter
+      local_folder: "{{ root_dirs.jupyter }}/jupyter-data"
+      mount: /home/pi/data
+
+__tmp: |
+  {% set vols = [] %}
+  {% for c in [ jupyter ] %}
+    {% for k, vol in c.volumes.items() %}
+      {% set x = vols.append({'folder': vol.local_folder, 'user': 1000}) %}
+    {% endfor %}
+  {% endfor %}
+  {{ vols|to_json }}
+jupyter_folders_permissions: "{{ __tmp|from_json }}"

@@ -24,11 +24,11 @@ authelia:
     config:
       name:         authelia_config
       local_folder: "{{ root_dirs.proxy }}/authelia-config"
-      mount:        /etc/authelia
+      mount:        /config
     data:
       name:         authelia_data
       local_folder: "{{ root_dirs.proxy }}/authelia-data"
-      mount:        /usr/app/data
+      mount:        /app/data
 
 tls:
   self_signed:

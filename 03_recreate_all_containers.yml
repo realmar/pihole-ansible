@@ -1,0 +1,16 @@
+- hosts: development
+  gather_facts: no
+  remote_user: root
+  debugger: on_failed
+
+  tasks:
+    - name: Recreate containers
+      shell: "docker-compose stop && docker-compose rm -f && docker-compose up -d"
+      args:
+        chdir: "{{ item }}"
+      with_items:
+        - "{{ root_dirs.pihole }}"
+        - "{{ root_dirs.maintenance }}"
+        - "{{ root_dirs.rss }}"
+        - "{{ root_dirs.jupyter }}"
+        - "{{ root_dirs.proxy }}"

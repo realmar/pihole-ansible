@@ -1,0 +1,44 @@
+{% import "docker_volumes.jinja2" as dv with context -%}
+{% import "docker_network.jinja2" as dn with context -%}
+{% import "docker_misc.jinja2" as dm with context -%}
+{% import "http_traefik.jinja2" as traefik with context -%}
+
+{% set service_name = "jupyter" %}
+{% set vols = [ jupyter.volumes.data ] %}
+
+version: "3"
+services:
+  jupyter:
+    build: .
+    command:
+      - "--ip=0.0.0.0"
+      - "--port=8888"
+      - "--NotebookApp.token=''"
+      - "--NotebookApp.password=''"
+      - "--NotebookApp.base_url='/jupyter/'"
+    labels:
+      {{ traefik.enable(service_name)|indent(width = 6) }}
+      {{ traefik.add_route(service_name, "/jupyter")|indent(width = 6) }}
+      {{ traefik.add_middlewares(service_name, [
+        {
+          "mw": traefik.auth
+        },
+        {
+          "mw": traefik.redirect,
+          "args": { "old_path": "/jupyter", "new_path": "/jupyter/lab/" }
+        },
+        {
+          'mw': traefik.fix_wss,
+          'args': {}
+        }
+      ])|indent(width = 6) }}
+
+    {{ dv.volumes_section_complete(vols)|indent(width = 4) }}
+    {{ dn.map_ports([ (8888,) ])|indent(width = 4) }}
+    networks:
+      {{ discovery_network.name }}:
+    {{ dm.restart_policy() }}
+
+{{ dn.networks_declaration([ discovery_network ]) }}
+
+{{ dv.volumes_declaration(vols) }}

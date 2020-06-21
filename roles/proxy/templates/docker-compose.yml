@@ -57,7 +57,7 @@ services:
 
       - "traefik.http.middlewares.authelia.forwardauth.address=http://{{ sso_auth.ipv4 }}:9091/api/verify?rd=https://{{ sub_dns.login }}/"
       - "traefik.http.middlewares.authelia.forwardauth.trustForwardHeader=true"
-      - "traefik.http.middlewares.authelia.forwardauth.authResponseHeaders=Remote-User, Remote-Groups, X-Forwarded-User"
+      - "traefik.http.middlewares.authelia.forwardauth.authResponseHeaders=Remote-User,Remote-Groups,X-Forwarded-User"
     networks:
       {{ discovery_network.name }}:
         ipv4_address: {{ sso_auth.ipv4 }}

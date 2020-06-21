@@ -59,7 +59,7 @@ authentication_backend:
   # more than one instance.
   #
   file:
-    path: /etc/authelia/users_database.yml
+    path: {{ authelia.volumes.config.mount }}/users_database.yml
 
 # Access Control
 #
