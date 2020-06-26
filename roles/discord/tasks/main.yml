@@ -27,7 +27,18 @@
   with_items:
     - Dockerfile
     - config/config.txt
-    - config/serversettings.json
+  tags:
+    - compose_file
+    - docker_file
+    - asdf
+
+- name: Create empty serversettings.json file
+  file:
+    path: "{{ root_dirs.discord }}/config/serversettings.json"
+    owner: "{{ discord_music_bot.uid }}"
+    group: "{{ discord_music_bot.uid }}"
+    mode: 0644
+    state: touch
   tags:
     - compose_file
     - docker_file
@@ -36,4 +47,6 @@
     - include_tasks: fix_permissions.yml
       vars:
         items: "{{ discord_folders_permissions }}"
-  tags: fix_permissions
+  tags:
+    - fix_permissions
+    - adsf
