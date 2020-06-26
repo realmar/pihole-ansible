@@ -6,6 +6,7 @@ root_dirs:
   rss: /home/pi/rss
   proxy: /home/pi/proxy
   jupyter: /home/pi/jupyter
+  discord: /home/pi/discord
 
 discovery_network:
   name: discovery

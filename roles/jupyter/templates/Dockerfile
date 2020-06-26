@@ -1,54 +1,30 @@
-{% set apt_install = 'apt-get install -y -q --no-install-recommends' %}
-
-{% macro install(packages) %}
-USER root
-RUN {{ apt_install }} {{ packages|join(' ') }}
-USER $USER
-{% endmacro %}
+3{% import 'docker_file.jinja2' as df with context -%}
 
 ################################################################################
 # INIT
 ################################################################################
 
-FROM ubuntu:20.04
+{{ df.init(
+  'ubuntu:20.04',
+  jupyter.container_user,
+  jupyter.uid,
+  jupyter.home
+) }}
 
-ENV HOME {{ jupyter.home }}
-ENV UID {{ jupyter.uid }}
-ENV USER {{ jupyter.container_user }}
-ENV TZ {{ timezone }}
+RUN mkdir -p $HOME/data
 
-USER root
-
-RUN rm /bin/sh && ln -s /bin/bash /bin/sh
-RUN echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selections
-
-RUN apt-get update
-{{ install([
-  'apt-transport-https',
+{{ df.install([
   'build-essential',
-  'ca-certificates',
-  'curl',
-  'git',
-  'libssl-dev',
-  'wget',
-  'sudo'
+  'libssl-dev'
 ]) }}
 
-USER root
-
-RUN echo "pi ALL=(ALL:ALL) NOPASSWD: /usr/bin/apt" >> /etc/sudoers
-RUN useradd -m -s /bin/bash -N -u $UID $USER
-RUN mkdir -p $HOME \
-      && touch $HOME/.bashrc \
-      && mkdir -p $HOME/data
-
-RUN chown $USER $HOME -R
+{{ df.allow_sudo('/usr/bin/apt') }}
 
 ################################################################################
 # JUPYTERLAB
 ################################################################################
 
-{{ install([
+{{ df.install([
     'python3',
     'python3-dev',
     'python3-pip',
@@ -57,11 +33,7 @@ RUN chown $USER $HOME -R
     'cmake'
 ]) }}
 
-USER root
-
-RUN pip3 install jupyterlab
-
-USER $USER
+{{ df.run_as_root('pip3 install jupyterlab') }}
 
 ################################################################################
 # DOTNET CORE - C# - F# - POWERSHELL
@@ -70,7 +42,7 @@ USER $USER
 RUN mkdir -p $HOME/dotnet-sdk
 WORKDIR $HOME/dotnet-sdk
 
-ENV PATH        $HOME/dotnet-sdk:$HOME/.dotnet/tools:$PATH
+{{ df.add_to_path('$HOME/dotnet-sdk:$HOME/.dotnet/tools') }}
 ENV DOTNET_ROOT $HOME/dotnet-sdk
 ENV DOTNET_SYSTEM_GLOBALIZATION_INVARIANT 1
 
@@ -89,16 +61,8 @@ RUN dotnet interactive jupyter install
 # NODEJS - JAVASCRIPT - TYPESCRIPT
 ################################################################################
 
-WORKDIR $HOME
+{{ df.install_nodejs() }}
 
-{{ install([ 'nodejs', 'npm' ]) }}
-
-ENV NPM_PACKAGES "$HOME/.npm-packages"
-ENV PATH $NPM_PACKAGES/bin:$PATH
-ENV MANPATH $NPM_PACKAGES/share/man:$MANPATH
-
-RUN mkdir "$NPM_PACKAGES"
-RUN npm config set prefix "$NPM_PACKAGES"
 RUN npm install -g tslab
 RUN tslab install --python=python3
 
@@ -107,7 +71,7 @@ RUN tslab install --python=python3
 ################################################################################
 
 RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
-ENV PATH $HOME/.cargo/bin:$PATH
+{{ df.add_to_path('$HOME/.cargo/bin') }}
 RUN cargo install evcxr_jupyter
 RUN evcxr_jupyter --install
 
@@ -115,16 +79,14 @@ RUN evcxr_jupyter --install
 # JAVA
 ################################################################################
 
-{{ install([ 'openjdk-14-jdk-headless', 'unzip' ]) }}
+{{ df.install([ 'openjdk-14-jdk-headless', 'unzip' ]) }}
 
 RUN mkdir IJava
 WORKDIR $HOME/IJava
 RUN wget https://github.com/SpencerPark/IJava/releases/download/v1.3.0/ijava-1.3.0.zip
 RUN unzip ijava-1.3.0.zip
 
-USER root
-RUN python3 install.py --sys-prefix
-USER $USER
+{{ df.run_as_root('python3 install.py --sys-prefix') }}
 
 {#
 ################################################################################
@@ -133,7 +95,7 @@ USER $USER
 
 WORKDIR $HOME
 
-{{ install([
+{{ df.install([
     'python3-pip',
     'git',
     'libtinfo-dev',
@@ -145,12 +107,8 @@ WORKDIR $HOME
     'liblapack-dev'
  ]) }}
 
-USER root
-
-RUN curl -sSL https://get.haskellstack.org/ | sh
-ENV PATH /home/pi/.local/bin:$PATH
-
-USER $USER
+{{ df.run_as_root('curl -sSL https://get.haskellstack.org/ | sh') }}
+{{ df.add_to_path('/home/pi/.local/bin') }}
 
 RUN git clone https://github.com/gibiansky/IHaskell
 
@@ -160,8 +118,7 @@ RUN pip3 install -r requirements.txt
 RUN stack install --fast
 RUN ihaskell install --stack
 
-# USER root
-# RUN jupyter labextension install jupyterlab-ihaskell
+# {{ df.run_as_root('jupyter labextension install jupyterlab-ihaskell') }}
 #}
 
 ################################################################################
@@ -170,7 +127,7 @@ RUN ihaskell install --stack
 
 USER $USER
 WORKDIR $HOME/data
-VOLUME [ "$HOME/data" ]
+VOLUME [ '$HOME/data' ]
 
 EXPOSE 8888
-ENTRYPOINT [ "jupyter", "notebook" ]
+ENTRYPOINT [ 'jupyter', 'notebook' ]

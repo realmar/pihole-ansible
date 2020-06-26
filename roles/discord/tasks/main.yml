@@ -1,0 +1,39 @@
+- block:
+    - include_tasks: standard_service.yml
+      vars:
+        usr: "{{ discord_music_bot.user }}"
+        root_dir: "{{ root_dirs.discord }}"
+        dirs: []
+  tags: compose_file
+
+- name: Create config folder
+  file:
+    path: "{{ root_dirs.discord }}/config"
+    state: directory
+    recurse: yes
+    owner: "{{ discord_music_bot.user }}"
+    group: "{{ discord_music_bot.user }}"
+  tags:
+    - compose_file
+    - docker_file
+
+- name: Copy docker files
+  template:
+    src: "{{ item }}"
+    dest: "{{ root_dirs.discord }}/{{ item }}"
+    owner: "{{ discord_music_bot.user }}"
+    group: "{{ discord_music_bot.user }}"
+    mode: 0644
+  with_items:
+    - Dockerfile
+    - config/config.txt
+    - config/serversettings.json
+  tags:
+    - compose_file
+    - docker_file
+
+- block:
+    - include_tasks: fix_permissions.yml
+      vars:
+        items: "{{ discord_folders_permissions }}"
+  tags: fix_permissions

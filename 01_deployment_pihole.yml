@@ -14,6 +14,7 @@
     - { role: fileserver, tags: fileserver }
     - { role: rss, tags: rss }
     - { role: jupyter, tags: jupyter }
+    - { role: discord, tags: discord }
 
   post_tasks:
     # I really don't want to install docker-compose via pip just to make the

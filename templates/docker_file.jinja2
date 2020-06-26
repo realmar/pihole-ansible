@@ -1,0 +1,68 @@
+{% macro run_as_root(command) %}
+USER root
+RUN {{ command }}
+USER $USER
+{% endmacro %}
+
+{% set apt_install = 'apt-get install -y -q --no-install-recommends' %}
+
+{% macro install(packages) %}
+USER root
+RUN {{ apt_install }} {{ packages|join(' ') }}
+USER $USER
+{% endmacro %}
+
+{% macro init(base, user, uid, home) %}
+FROM {{ base }}
+
+ENV HOME {{ home }}
+ENV UID {{ uid }}
+ENV USER {{ user }}
+ENV TZ {{ timezone }}
+
+USER root
+
+RUN rm /bin/sh && ln -s /bin/bash /bin/sh
+RUN echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selections
+RUN apt-get update
+{{ install([
+  'apt-transport-https',
+  'ca-certificates',
+  'curl',
+  'git',
+  'wget',
+  'sudo'
+]) }}
+
+USER root
+
+RUN useradd -m -s /bin/bash -N -u $UID $USER
+RUN mkdir -p $HOME \
+      && touch $HOME/.bashrc
+RUN chown $USER $HOME -R
+
+USER $USER
+{% endmacro %}
+
+{% macro add_to_path(item) %}
+ENV PATH {{ item }}:$PATH
+{% endmacro %}
+
+{% macro allow_sudo(command) %}
+USER root
+RUN echo "pi ALL=(ALL:ALL) NOPASSWD: {{ command }}" >> /etc/sudoers
+USER $USER
+{% endmacro %}
+
+{% macro install_nodejs() %}
+WORKDIR $HOME
+
+{{ install([ 'nodejs', 'npm' ]) }}
+
+ENV NPM_PACKAGES "$HOME/.npm-packages"
+{{ add_to_path('$NPM_PACKAGES') }}
+ENV MANPATH $NPM_PACKAGES/share/man:$MANPATH
+
+RUN mkdir "$NPM_PACKAGES"
+RUN npm config set prefix "$NPM_PACKAGES"
+{% endmacro %}
