@@ -5,6 +5,8 @@ jupyter:
   uid: 1000
   home: /home/pi
 
+  idle_timeout: 600
+
   volumes:
     data:
       name: jupyter

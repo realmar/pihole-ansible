@@ -16,6 +16,7 @@ services:
       - "--NotebookApp.token=''"
       - "--NotebookApp.password=''"
       - "--NotebookApp.base_url='/jupyter/'"
+      - "--MappingKernelManager.cull_idle_timeout={{ jupyter.idle_timeout }}"
     labels:
       {{ traefik.enable(service_name)|indent(width = 6) }}
       {{ traefik.add_route(service_name, "/jupyter")|indent(width = 6) }}
