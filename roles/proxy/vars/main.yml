@@ -20,6 +20,12 @@ traefik:
 authelia:
   ipv4: "{{ sso_auth.ipv4 }}"
 
+  protected_domains:
+    - "{{ dns.public.root }}"
+    - "{{ dns.internal.root }}"
+    - "*.{{ dns.public.root }}"
+    - "*.{{ dns.internal.root }}"
+
   volumes:
     config:
       name:         authelia_config

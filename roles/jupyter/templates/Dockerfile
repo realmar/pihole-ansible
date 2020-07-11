@@ -1,4 +1,4 @@
-3{% import 'docker_file.jinja2' as df with context -%}
+{% import 'docker_file.jinja2' as df with context -%}
 
 ################################################################################
 # INIT
@@ -127,7 +127,7 @@ RUN ihaskell install --stack
 
 USER $USER
 WORKDIR $HOME/data
-VOLUME [ '$HOME/data' ]
+VOLUME [ "$HOME/data" ]
 
 EXPOSE 8888
-ENTRYPOINT [ 'jupyter', 'notebook' ]
+ENTRYPOINT [ "jupyter", "notebook" ]

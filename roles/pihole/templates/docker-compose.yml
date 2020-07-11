@@ -83,8 +83,7 @@ services:
   pihole:
     image: pihole/pihole:latest
     container_name: {{ pihole.name }}
-    labels:
-      {{ traefik.mount_path("pihole", "/pihole", pihole.web_admin_port)|indent(width = 6) }}
+    {{ traefik.declare_labels_mount_path_internal("pihole", "/pihole", pihole.web_admin_port)|indent(width = 4) }}
     dns:
       - 127.0.0.1
       - 1.1.1.1

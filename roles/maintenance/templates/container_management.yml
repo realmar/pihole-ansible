@@ -8,7 +8,7 @@ portainer:
   hostname: portainer
   image: portainer/portainer:latest
 
-  {{ traefik.declare_labels_mount_path("portainer", "/portainer")|indent(width = 2) }}
+  {{ traefik.declare_labels_mount_path_internal("portainer", "/portainer")|indent(width = 2) }}
   {{ dn.map_ports([ (9000,) ])|indent(width = 2) }}
   {{ dv.volumes_section_complete([ portainer.volumes.data ])|indent(width = 2) }}
     - /var/run/docker.sock:/var/run/docker.sock

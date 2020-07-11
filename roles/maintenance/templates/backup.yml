@@ -20,7 +20,7 @@ duplicati:
     TZ: {{ timezone }}
     CLI_ARGS: --restore-permissions=true
 
-  {{ traefik.declare_labels_mount_path("backup", "/backup")|indent(width = 2) }}
+  {{ traefik.declare_labels_mount_path_internal("backup", "/backup")|indent(width = 2) }}
   {{ dn.map_ports([ (8200,) ])|indent(width = 2) }}
   {{ dv.volumes_section_complete(vols)|indent(width = 2) }}
   {{ dn.discovery_network_section()|indent(width = 2) }}

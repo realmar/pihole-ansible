@@ -1,3 +1,7 @@
+{#
+    IN:
+        name: string
+#}
 {% macro enable(name) %}
 - "traefik.enable=true"
 - "traefik.docker.network={{ discovery_network.name }}"
@@ -5,45 +9,56 @@
 - "traefik.http.routers.{{ name }}.tls=true"
 {% endmacro %}
 
-{% macro add_route(name, path) %}
-- "traefik.http.routers.{{ name }}.rule=Host(`{{ dns_root }}`) && PathPrefix(`{{ path }}`)"
+{#
+    IN:
+        host: string
+        name: string
+        path: string
+#}
+{% macro add_route(host, name, path) %}
+- "traefik.http.routers.{{ name }}.rule=Host(`{{ host }}`) && PathPrefix(`{{ path }}`)"
 {% endmacro %}
 
+{#
+    IN:
+        name: string
+        port: number
+#}
 {% macro service_port(name, port) %}
 - "traefik.http.services.{{ name }}.loadbalancer.server.port={{ port }}"
 {% endmacro %}
 
-{% macro get_fqdn_mw_name(service_name, mw_name) %}{{ service_name }}-{{ mw_name }}{% endmacro %}
+{% macro __get_fqdn_mw_name(service_name, mw_name) %}{{ service_name }}-{{ mw_name }}{% endmacro %}
 
 {# ########################################################################## #}
 {# ########################################################################## #}
 
 {% set auth = { 'absolute_name': 'authelia' } %}
 
-{% macro add_trailing_slash_f(name, args) %}
+{% macro __add_trailing_slash_f(name, args) %}
 - "traefik.http.middlewares.{{ name }}.redirectregex.regex=^(https?://[^/]+/[a-z0-9_]+)$$"
 - "traefik.http.middlewares.{{ name }}.redirectregex.replacement=$${1}/"
 - "traefik.http.middlewares.{{ name }}.redirectregex.permanent=true"
 {% endmacro %}
-{% set trailing_slash = { 'name': 'add-trailing-slash', 'f': add_trailing_slash_f } %}
+{% set trailing_slash = { 'name': 'add-trailing-slash', 'f': __add_trailing_slash_f } %}
 
-{% macro strip_path_f(name, args) %}
+{% macro __strip_path_f(name, args) %}
 - "traefik.http.middlewares.{{ name }}.stripprefix.prefixes={{ args.path }}"
 - "traefik.http.middlewares.{{ name }}.stripprefix.forceslash=true"
 {% endmacro %}
-{% set strip_path = { 'name': 'strip-path', 'f': strip_path_f } %}
+{% set strip_path = { 'name': 'strip-path', 'f': __strip_path_f } %}
 
-{% macro add_redirect_f(name, args) %}
+{% macro __add_redirect_f(name, args) %}
 - "traefik.http.middlewares.{{ name }}.redirectregex.regex=^(.*){{ args.old_path }}/?$$"
 - "traefik.http.middlewares.{{ name }}.redirectregex.replacement=$${1}{{ args.new_path }}"
 - "traefik.http.middlewares.{{ name }}.redirectregex.permanent=true"
 {% endmacro %}
-{% set redirect = { 'name': 'redirect', 'f': add_redirect_f } %}
+{% set redirect = { 'name': 'redirect', 'f': __add_redirect_f } %}
 
-{% macro fix_wss_f(name, args) %}
+{% macro __fix_wss_f(name, args) %}
 - "traefik.http.middlewares.{{ name }}.headers.customrequestheaders.X-Forwarded-Proto=https"
 {% endmacro %}
-{% set fix_wss = { 'name': 'fix-wss', 'f': fix_wss_f } %}
+{% set fix_wss = { 'name': 'fix-wss', 'f': __fix_wss_f } %}
 
 {# ########################################################################## #}
 {# ########################################################################## #}
@@ -66,7 +81,7 @@
 {####}{% set x = mw_strs.append(item.mw.absolute_name + '@docker') %}
 {##}{% else %}
 {####}{% set x = mw_strs.append(service_name + '-' + item.mw.name + '@docker') %}
-{####}{{ item.mw.f(get_fqdn_mw_name(service_name, item.mw.name), item.args) }}
+{####}{{ item.mw.f(__get_fqdn_mw_name(service_name, item.mw.name), item.args) }}
 {##}{% endif %}
 {% endfor %}
 - "traefik.http.routers.{{ service_name }}.middlewares={{ mw_strs|join(',') }}"
@@ -75,8 +90,14 @@
 {# ########################################################################## #}
 {# ########################################################################## #}
 
-{% macro route_path(service_name, path) %}
-{{ add_route(service_name, path) }}
+{#
+    IN:
+        host: string
+        service_name: string
+        path: string
+#}
+{% macro route_path(host, service_name, path) %}
+{{ add_route(host, service_name, path) }}
 {{ add_middlewares(service_name, [
   {
     'mw': auth
@@ -96,15 +117,49 @@
 ]) }}
 {% endmacro %}
 
-{% macro mount_path(service_name, path, port) %}
+{#
+    IN:
+        host: string
+        service_name: string
+        path: string
+        port: number
+#}
+{% macro mount_path(host, service_name, path, port) %}
 {{ enable(service_name) }}
-{{ route_path(service_name, path) }}
 {% if port is defined %}
-{{ service_port(service_name, port) }}
+{##}{{ service_port(service_name, port) }}
 {% endif %}
+{{ route_path(host, service_name, path) }}
 {% endmacro %}
 
-{% macro declare_labels_mount_path(service_name, path, port) %}
+{#
+    IN:
+        service_name: string
+        path: string
+        port: number
+#}
+{% macro declare_labels_mount_path_internal(service_name, path, port) %}
+{{ declare_labels_mount_path(dns.internal.root, service_name, path, port) }}
+{% endmacro %}
+
+{#
+    IN:
+        service_name: string
+        path: string
+        port: number
+#}
+{% macro declare_labels_mount_path_public(service_name, path, port) %}
+{{ declare_labels_mount_path(dns.public.root, service_name, path, port) }}
+{% endmacro %}
+
+{#
+    IN:
+        host: string
+        service_name: string
+        path: string
+        port: number
+#}
+{% macro declare_labels_mount_path(host, service_name, path, port) %}
 labels:
-  {{ mount_path(service_name, path, port)|indent(width = 2) }}
+  {{ mount_path(host, service_name, path, port)|indent(width = 2) }}
 {% endmacro %}

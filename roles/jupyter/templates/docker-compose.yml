@@ -19,7 +19,7 @@ services:
       - "--MappingKernelManager.cull_idle_timeout={{ jupyter.idle_timeout }}"
     labels:
       {{ traefik.enable(service_name)|indent(width = 6) }}
-      {{ traefik.add_route(service_name, "/jupyter")|indent(width = 6) }}
+      {{ traefik.add_route(dns.public.root, service_name, "/jupyter")|indent(width = 6) }}
       {{ traefik.add_middlewares(service_name, [
         {
           "mw": traefik.auth

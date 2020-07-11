@@ -21,3 +21,5 @@ host:
       subnet: 2a02:120b:2c06:57d0::/64
       netmask: 64
       gateway: 2a02:120b:2c06:57d0:7eb7:33ff:fed0:41a6
+
+dns_tld: "net"

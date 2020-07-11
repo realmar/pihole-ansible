@@ -25,7 +25,7 @@ jwt_secret: '{{ gen.pw("authelia_jwt_secret") | replace("$", "$$") }}'
 #
 # Note: this parameter is optional. If not provided, user won't
 # be redirected upon successful authentication.
-default_redirection_url: https://{{ dns_root }}/
+default_redirection_url: https://{{ dns.public.root }}/
 
 # TOTP Issuer Name
 #
@@ -104,11 +104,10 @@ access_control:
   rules:
     # Rules applied to everyone
 
-    - domain: "{{ dns_root }}"
+{% for domain in authelia.protected_domains %}
+    - domain: "{{ domain }}"
       policy: one_factor
-
-    - domain: "*.{{ dns_root }}"
-      policy: one_factor
+{% endfor %}
 
 # Configuration of session cookies
 #
@@ -129,7 +128,7 @@ session:
   # The domain to protect.
   # Note: the authenticator must also be in that domain. If empty, the cookie
   # is restricted to the subdomain of the issuer.
-  domain: {{ dns_root }}
+  domain: {{ dns.public.root }}
 
 # Configuration of the authentication regulation mechanism.
 #

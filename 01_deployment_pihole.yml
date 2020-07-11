@@ -29,6 +29,7 @@
         - "{{ root_dirs.maintenance }}"
         - "{{ root_dirs.rss }}"
         - "{{ root_dirs.proxy }}"
+        - "{{ root_dirs.jupyter }}"
       register: cli_result
       changed_when:
         - '"up-to-date" not in cli_result.stderr'

@@ -14,10 +14,16 @@ discovery_network:
 sso_auth:
   ipv4: 172.16.20.80
 
-dns_root: realmar.net
-sub_dns:
-  login: "login.{{ dns_root }}"
+dns:
+  public:
+    root: "realmar.net"
+  internal:
+    root: "internal.realmar.net"
+
+dns_sub_domains:
+  login: "login.{{ dns.public.root }}"
 
 all_dns:
-  - "{{ dns_root }}"
-  - "{{ sub_dns.login }}"
+  - "{{ dns.public.root }}"
+  - "{{ dns.internal.root }}"
+  - "{{ dns_sub_domains.login }}"

@@ -45,17 +45,18 @@ services:
       # https://docs.traefik.io/providers/docker/#host-networking
       - "host.docker.internal:172.17.0.1"
 
+{% set service_name = "authelia" %}
   authelia:
     image: authelia/authelia
     {{ dv.volumes_section_complete(vols_authelia)|indent(width = 4) }}
     environment:
       TZ: {{ timezone }}
     labels:
-      {{ tf.enable("authelia")|indent(width = 6) }}
-      {{ tf.service_port("authelia", 9091) }}
-      - "traefik.http.routers.authelia.rule=Host(`{{ sub_dns.login }}`)"
+      {{ tf.enable(service_name)|indent(width = 6) }}
+      {{ tf.service_port(service_name, 9091) }}
+      - "traefik.http.routers.authelia.rule=Host(`{{ dns_sub_domains.login }}`)"
 
-      - "traefik.http.middlewares.authelia.forwardauth.address=http://{{ sso_auth.ipv4 }}:9091/api/verify?rd=https://{{ sub_dns.login }}/"
+      - "traefik.http.middlewares.authelia.forwardauth.address=http://{{ sso_auth.ipv4 }}:9091/api/verify?rd=https://{{ dns_sub_domains.login }}/"
       - "traefik.http.middlewares.authelia.forwardauth.trustForwardHeader=true"
       - "traefik.http.middlewares.authelia.forwardauth.authResponseHeaders=Remote-User,Remote-Groups,X-Forwarded-User"
     networks:
