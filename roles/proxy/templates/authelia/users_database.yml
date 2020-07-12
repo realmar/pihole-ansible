@@ -1,8 +1,21 @@
+{% import "password_gen.jinja2" as gen with context -%}
+
 users:
-  testuser: ## I have set the password below to 'test' for you
-    displayname: "Test User"
+{% if is_dev %}
+  # password: test
+  testuser:
+    displayname: 'Test User'
     password: '{CRYPT}$6$rounds=500000$Bui4ldW5hXOI9qwJ$IUHQPCusUKpTs/OrfE9UuGb1Giqaa5OZA.mqIpH.Hh8RGFsEBHViCwQDx6DfkGUiF60pqNubFBugfTvCJIDNw1'
     email: your@email.address
+    groups:
+      - admins
+      - dev
+{% endif %}
+
+  realmar:
+    displayname: 'Realmar'
+    password: '{{ gen.read_from_file("realmar_authelia") }}'
+    email: anastassios.martakos@outlook.com
     groups:
       - admins
       - dev

@@ -1,11 +1,18 @@
 - hosts: development
-  gather_facts: no
+  gather_facts: yes
   remote_user: root
   debugger: on_failed
 
+  vars:
+    restart_command: "docker-compose stop && docker-compose rm -f && docker-compose up -d"
+
+  pre_tasks:
+    - include: tasks/collect_system_data.yml
+      tags: always
+
   tasks:
     - name: Recreate containers
-      shell: "docker-compose stop && docker-compose rm -f && docker-compose up -d"
+      shell: "{{ restart_command }}"
       args:
         chdir: "{{ item }}"
       with_items:
@@ -14,3 +21,11 @@
         - "{{ root_dirs.rss }}"
         - "{{ root_dirs.jupyter }}"
         - "{{ root_dirs.proxy }}"
+
+    - name: Recreate containers
+      shell: "{{ restart_command }}"
+      args:
+        chdir: "{{ item }}"
+      with_items:
+        - "{{ root_dirs.discord }}"
+      when: not is_dev

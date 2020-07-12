@@ -27,3 +27,5 @@ all_dns:
   - "{{ dns.public.root }}"
   - "{{ dns.internal.root }}"
   - "{{ dns_sub_domains.login }}"
+
+letsencrypt_resolver_name: lets_encrypt

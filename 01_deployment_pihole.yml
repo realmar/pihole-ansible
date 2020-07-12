@@ -16,25 +16,25 @@
     - { role: jupyter, tags: jupyter }
     - { role: discord, tags: discord }
 
-  post_tasks:
-    # I really don't want to install docker-compose via pip just to make the
-    # docker_container module work. This is because pip install docker-compose
-    # needs to compile a ton of C code and massively slows down the deployment
-    - name: Start docker containers
-      shell: "docker-compose up -d"
-      args:
-        chdir: "{{ item }}"
-      with_items:
-        - "{{ root_dirs.pihole }}"
-        - "{{ root_dirs.maintenance }}"
-        - "{{ root_dirs.rss }}"
-        - "{{ root_dirs.proxy }}"
-        - "{{ root_dirs.jupyter }}"
-      register: cli_result
-      changed_when:
-        - '"up-to-date" not in cli_result.stderr'
-      tags:
-        - initialize
+  #post_tasks:
+  #  # I really don't want to install docker-compose via pip just to make the
+  #  # docker_container module work. This is because pip install docker-compose
+  #  # needs to compile a ton of C code and massively slows down the deployment
+  #  - name: Start docker containers
+  #    shell: "docker-compose up -d"
+  #    args:
+  #      chdir: "{{ item }}"
+  #    with_items:
+  #      - "{{ root_dirs.pihole }}"
+  #      - "{{ root_dirs.maintenance }}"
+  #      - "{{ root_dirs.rss }}"
+  #      - "{{ root_dirs.proxy }}"
+  #      - "{{ root_dirs.jupyter }}"
+  #    register: cli_result
+  #    changed_when:
+  #      - '"up-to-date" not in cli_result.stderr'
+  #    tags:
+  #      - initialize
 
   handlers:
     - import_tasks: handlers/services.yml

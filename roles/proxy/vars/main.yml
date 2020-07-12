@@ -1,13 +1,17 @@
 traefik:
+  lets_encrypt:
+    resolver_name: "{{ letsencrypt_resolver_name }}"
+    email: anastassios.martakos@outlook.com
+
   volumes:
     dynamic_conf:
       name:         traefik_dynamic_conf
       local_folder: "{{ root_dirs.proxy }}/traefik-dynamic-conf-data"
       mount:        /etc/traefik/dynamic_conf
-    self_signed_certs:
-      name:         traefik_self_signed_certs
-      local_folder: "{{ root_dirs.proxy }}/traefik-self-signed-certs"
-      mount:        /self_signed_certs
+    certificates:
+      name:         traefik_certificates
+      local_folder: "{{ root_dirs.proxy }}/traefik-certificates"
+      mount:        /etc/traefik/certs
 
   networks:
     v4:
@@ -39,9 +43,9 @@ authelia:
 tls:
   self_signed:
     cert:         realmar.net.crt
-    private_key:  realmar.net.key
+    private_key:  realmar.net.pem
     cert_request: realmar.net.csr
 
-    cert_dir:         "{{ traefik.volumes.self_signed_certs.local_folder }}/realmar.net.crt"
-    private_key_dir:  "{{ traefik.volumes.self_signed_certs.local_folder }}/realmar.net.key"
-    cert_request_dir: "{{ traefik.volumes.self_signed_certs.local_folder }}/realmar.net.csr"
+    cert_dir:         "{{ traefik.volumes.certificates.local_folder }}/realmar.net.crt"
+    private_key_dir:  "{{ traefik.volumes.certificates.local_folder }}/realmar.net.pem"
+    cert_request_dir: "{{ traefik.volumes.certificates.local_folder }}/realmar.net.csr"

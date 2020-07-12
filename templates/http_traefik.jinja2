@@ -11,6 +11,16 @@
 
 {#
     IN:
+        name: string
+#}
+{% macro use_letsencrypt(name) %}
+{% if not is_dev %}
+{##}- "traefik.http.routers.{{ name }}.tls.certresolver={{ letsencrypt_resolver_name }}"
+{% endif %}
+{% endmacro %}
+
+{#
+    IN:
         host: string
         name: string
         path: string
@@ -28,10 +38,19 @@
 - "traefik.http.services.{{ name }}.loadbalancer.server.port={{ port }}"
 {% endmacro %}
 
-{% macro __get_fqdn_mw_name(service_name, mw_name) %}{{ service_name }}-{{ mw_name }}{% endmacro %}
+{#
+    IN:
+        name: string
+        ips: string[]
+#}
+{% macro whitelist_ip_range(name, ips)%}
+- "traefik.http.middlewares.{{ name }}.ipwhitelist.sourcerange={{ ips|join(',') }}"
+{% endmacro %}
 
 {# ########################################################################## #}
 {# ########################################################################## #}
+
+{% macro __get_fqdn_mw_name(service_name, mw_name) %}{{ service_name }}-{{ mw_name }}{% endmacro %}
 
 {% set auth = { 'absolute_name': 'authelia' } %}
 
@@ -90,13 +109,39 @@
 {# ########################################################################## #}
 {# ########################################################################## #}
 
+{######## PUBLIC API ########}
+
+{#
+    IN:
+        service_name: string
+        path: string
+        port: number
+#}
+{% macro declare_labels_mount_path_internal(service_name, path, port) %}
+{{ __declare_labels_mount_path(dns.internal.root, service_name, path, port) }}
+  {{ whitelist_ip_range(service_name, [ '10.0.0.0/8', '172.16.0.0/12', '192.168.0.0/16' ]) }}
+{% endmacro %}
+
+{#
+    IN:
+        service_name: string
+        path: string
+        port: number
+#}
+{% macro declare_labels_mount_path_public(service_name, path, port) %}
+{{ __declare_labels_mount_path(dns.public.root, service_name, path, port) }}
+  {{ use_letsencrypt(service_name) }}
+{% endmacro %}
+
+{######## PRIVATE API ########}
+
 {#
     IN:
         host: string
         service_name: string
         path: string
 #}
-{% macro route_path(host, service_name, path) %}
+{% macro __route_path(host, service_name, path) %}
 {{ add_route(host, service_name, path) }}
 {{ add_middlewares(service_name, [
   {
@@ -124,32 +169,12 @@
         path: string
         port: number
 #}
-{% macro mount_path(host, service_name, path, port) %}
+{% macro __mount_path(host, service_name, path, port) %}
 {{ enable(service_name) }}
 {% if port is defined %}
 {##}{{ service_port(service_name, port) }}
 {% endif %}
-{{ route_path(host, service_name, path) }}
-{% endmacro %}
-
-{#
-    IN:
-        service_name: string
-        path: string
-        port: number
-#}
-{% macro declare_labels_mount_path_internal(service_name, path, port) %}
-{{ declare_labels_mount_path(dns.internal.root, service_name, path, port) }}
-{% endmacro %}
-
-{#
-    IN:
-        service_name: string
-        path: string
-        port: number
-#}
-{% macro declare_labels_mount_path_public(service_name, path, port) %}
-{{ declare_labels_mount_path(dns.public.root, service_name, path, port) }}
+{{ __route_path(host, service_name, path) }}
 {% endmacro %}
 
 {#
@@ -159,7 +184,7 @@
         path: string
         port: number
 #}
-{% macro declare_labels_mount_path(host, service_name, path, port) %}
+{% macro __declare_labels_mount_path(host, service_name, path, port) %}
 labels:
-  {{ mount_path(host, service_name, path, port)|indent(width = 2) }}
+  {{ __mount_path(host, service_name, path, port)|indent(width = 2) }}
 {% endmacro %}

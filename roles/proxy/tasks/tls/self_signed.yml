@@ -10,7 +10,8 @@
   block:
     - openssl_privatekey:
         path: "{{ tls.self_signed.private_key_dir }}"
-        size: 2048
+        type: RSA
+        size: 8192
 
     - openssl_csr:
         path: "{{ tls.self_signed.cert_request_dir }}"

@@ -5,7 +5,7 @@
 
 {% set vols_traefik = [
   traefik.volumes.dynamic_conf,
-  traefik.volumes.self_signed_certs
+  traefik.volumes.certificates
 ] %}
 
 {% set vols_authelia = [
@@ -34,6 +34,23 @@ services:
       - "--entrypoints.websecure.address=:443"
       - "--entrypoints.web.http.redirections.entryPoint.to=websecure"
       - "--entrypoints.web.http.redirections.entryPoint.scheme=https"
+
+{% if not is_dev %}
+      # Let's Encrypt
+      # https://docs.traefik.io/https/acme/
+      - "--certificatesresolvers.{{ traefik.lets_encrypt.resolver_name }}.acme.email={{ traefik.lets_encrypt.email }}"
+      - "--certificatesresolvers.{{ traefik.lets_encrypt.resolver_name }}.acme.storage={{ traefik.volumes.certificates.mount }}/acme.json"
+
+      # https://docs.traefik.io/https/acme/#httpchallenge
+      - "--certificatesresolvers.{{ traefik.lets_encrypt.resolver_name }}.acme.httpchallenge.entrypoint=web"
+{#
+
+      # https://docs.traefik.io/https/acme/#dnschallenge
+      # if noip implements this, I can switch
+      - "--certificatesresolvers.{{ traefik.lets_encrypt.resolver_name }}.acme.dnschallenge.provider=digitalocean"
+      - "--certificatesresolvers.{{ traefik.lets_encrypt.resolver_name }}.acme.dnschallenge.delaybeforecheck=0"
+#}
+{% endif %}
     {{ dn.map_ports([ (80,), (443,), (8080,) ])|indent(width = 4) }}
     {{ dv.volumes_section_complete(vols_traefik)|indent(width = 4) }}
       {{ dv.mount_docker_socket() }}
@@ -53,6 +70,7 @@ services:
       TZ: {{ timezone }}
     labels:
       {{ tf.enable(service_name)|indent(width = 6) }}
+      {{ tf.use_letsencrypt(service_name) }}
       {{ tf.service_port(service_name, 9091) }}
       - "traefik.http.routers.authelia.rule=Host(`{{ dns_sub_domains.login }}`)"
 
