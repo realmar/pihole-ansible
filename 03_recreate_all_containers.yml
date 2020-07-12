@@ -21,6 +21,7 @@
         - "{{ root_dirs.rss }}"
         - "{{ root_dirs.jupyter }}"
         - "{{ root_dirs.proxy }}"
+        - "{{ root_dirs.personal_website }}"
 
     - name: Recreate containers
       shell: "{{ restart_command }}"

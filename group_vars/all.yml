@@ -7,6 +7,7 @@ root_dirs:
   proxy: /home/pi/proxy
   jupyter: /home/pi/jupyter
   discord: /home/pi/discord
+  personal_website: /home/pi/realmar.net
 
 discovery_network:
   name: discovery

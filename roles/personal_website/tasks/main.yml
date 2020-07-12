@@ -1,0 +1,23 @@
+- block:
+    - include_tasks: standard_service.yml
+      vars:
+        usr: "{{ user }}"
+        root_dir: "{{ root_dirs.personal_website }}"
+  tags: compose_file
+
+- name: Copy Dockerfile
+  template:
+    src: "Dockerfile"
+    dest: "{{ root_dirs.personal_website }}/{{ item }}"
+    owner: "{{ user }}"
+    group: "{{ user }}"
+    mode: 0644
+  with_items:
+    - Dockerfile
+  tags: copy_app
+
+- name: Copy app
+  synchronize:
+    src: "realmar"
+    dest: "{{ root_dirs.personal_website }}"
+  tags: copy_app
