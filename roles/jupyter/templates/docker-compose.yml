@@ -36,7 +36,7 @@ services:
       ])|indent(width = 6) }}
 
     {{ dv.volumes_section_complete(vols)|indent(width = 4) }}
-    {{ dn.map_ports([ (8888,) ])|indent(width = 4) }}
+{#  {{ dn.map_ports([ (8888,) ])|indent(width = 4) }} #}
     networks:
       {{ discovery_network.name }}:
     {{ dm.restart_policy() }}

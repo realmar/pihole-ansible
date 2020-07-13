@@ -7,9 +7,11 @@ portainer:
   container_name: portainer
   hostname: portainer
   image: portainer/portainer:latest
+  command:
+    - "--no-auth"
 
   {{ traefik.declare_labels_mount_path_internal("portainer", "/portainer")|indent(width = 2) }}
-  {{ dn.map_ports([ (9000,) ])|indent(width = 2) }}
+{#{{ dn.map_ports([ (9000,) ])|indent(width = 2) }} #}
   {{ dv.volumes_section_complete([ portainer.volumes.data ])|indent(width = 2) }}
     - /var/run/docker.sock:/var/run/docker.sock
   {{ dn.discovery_network_section()|indent(width = 2) }}

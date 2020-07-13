@@ -94,9 +94,9 @@ services:
 {% endif %}
       - openvpn
 {% if pihole.use_host_net == false %}
+{#    (8282, pihole.web_admin_port) #}
     {{ dn.map_ports([
-      (53, "udp"), (53, "tcp"),
-      (8282, pihole.web_admin_port)
+      (53, "udp"), (53, "tcp")
        ])|indent(width = 4) }}
 {% endif %}
     environment:
