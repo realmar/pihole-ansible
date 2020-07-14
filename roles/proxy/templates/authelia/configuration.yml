@@ -104,6 +104,11 @@ access_control:
   rules:
     # Rules applied to everyone
 
+    - domain: "realmar.net"
+      resources:
+        - "^/rss/api/.*$"
+      policy: bypass
+
 {% for domain in authelia.protected_domains %}
     - domain: "{{ domain }}"
       policy: one_factor

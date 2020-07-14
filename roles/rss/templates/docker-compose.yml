@@ -14,7 +14,14 @@ services:
   rss:
     image: {{ 'freshrss/freshrss:latest' if is_dev else 'freshrss/freshrss:arm' }}
     container_name: freshrss
-    {{ traefik.declare_labels_mount_path_public("rss", "/rss")|indent(width = 4) }}
+    {{ traefik.declare_labels_mount_path_public(
+      "rss", "/rss", None,
+      [
+        {
+          "mw": traefik.redirect,
+          "args": { "old_path": "/rss/api", "new_path": "/rss/api/" }
+        },
+      ])|indent(width = 4) }}
     environment:
       CRON_MIN: 4,34
       TZ: {{ timezone }}

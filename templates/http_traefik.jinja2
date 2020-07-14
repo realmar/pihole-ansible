@@ -117,8 +117,8 @@
         path: string
         port: number
 #}
-{% macro declare_labels_mount_path_internal(service_name, path, port) %}
-{{ __declare_labels_mount_path(dns.internal.root, service_name, path, port) }}
+{% macro declare_labels_mount_path_internal(service_name, path, port, middlewares) %}
+{{ __declare_labels_mount_path(dns.internal.root, service_name, path, port, middlewares) }}
   {{ whitelist_ip_range(service_name, [ '10.0.0.0/8', '172.16.0.0/12', '192.168.0.0/16' ]) }}
 {% endmacro %}
 
@@ -128,40 +128,11 @@
         path: string
         port: number
 #}
-{% macro declare_labels_mount_path_public(service_name, path, port) %}
-{{ __declare_labels_mount_path(dns.public.root, service_name, path, port) }}
+{% macro declare_labels_mount_path_public(service_name, path, port, middlewares) %}
+{{ __declare_labels_mount_path(dns.public.root, service_name, path, port, middlewares) }}
   {{ use_letsencrypt(service_name) }}
 {% endmacro %}
 
-{######## PRIVATE API ########}
-
-{#
-    IN:
-        host: string
-        service_name: string
-        path: string
-#}
-{% macro __route_path(host, service_name, path) %}
-{{ add_route(host, service_name, path) }}
-{{ add_middlewares(service_name, [
-  {
-    'mw': auth
-  },
-  {
-    'mw': trailing_slash,
-    'args': {}
-  },
-  {
-    'mw': strip_path,
-    'args': { 'path': path }
-  },
-  {
-    'mw': fix_wss,
-    'args': {}
-  }
-]) }}
-{% endmacro %}
-
 {#
     IN:
         host: string
@@ -169,22 +140,32 @@
         path: string
         port: number
 #}
-{% macro __mount_path(host, service_name, path, port) %}
-{{ enable(service_name) }}
-{% if port is defined %}
-{##}{{ service_port(service_name, port) }}
+{% macro __declare_labels_mount_path(host, service_name, path, port, middlewares) %}
+{% if middlewares is not defined %}
+{% set middlewares = [] %}
 {% endif %}
-{{ __route_path(host, service_name, path) }}
-{% endmacro %}
 
-{#
-    IN:
-        host: string
-        service_name: string
-        path: string
-        port: number
-#}
-{% macro __declare_labels_mount_path(host, service_name, path, port) %}
 labels:
-  {{ __mount_path(host, service_name, path, port)|indent(width = 2) }}
+  {{ enable(service_name)|indent(width = 2) }}
+{% if port is defined %}
+  {{ service_port(service_name, port)|indent(width = 2) }}
+{% endif %}
+  {{ add_route(host, service_name, path)|indent(width = 2) }}
+  {{ add_middlewares(service_name, middlewares + [
+    {
+      'mw': auth
+    },
+    {
+      'mw': trailing_slash,
+      'args': {}
+    },
+    {
+      'mw': strip_path,
+      'args': { 'path': path }
+    },
+    {
+      'mw': fix_wss,
+      'args': {}
+    }
+  ])|indent(width = 2) }}
 {% endmacro %}
