@@ -1,4 +1,4 @@
-{% import 'docker_file.jinja2' as df with context -%}
+{% import 'docker/file.jinja2' as df with context -%}
 
 {{ df.init(
   'ubuntu:20.04',

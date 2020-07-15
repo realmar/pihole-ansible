@@ -1,6 +1,6 @@
-{% import 'docker_network.jinja2' as dn with context -%}
-{% import 'docker_volumes.jinja2' as dv with context -%}
-{% import 'docker_misc.jinja2' as dm with context -%}
+{% import 'docker/network.jinja2' as dn with context -%}
+{% import 'docker/volumes.jinja2' as dv with context -%}
+{% import 'docker/misc.jinja2' as dm with context -%}
 
 ouroboros:
   container_name: ouroboros

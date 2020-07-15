@@ -1,10 +1,11 @@
+{% import "traefik/common.jinja2" as common with context -%}
+
 {#
     IN:
         name: string
 #}
 {% macro enable(name) %}
-- "traefik.enable=true"
-- "traefik.docker.network={{ discovery_network.name }}"
+{{ common.enable(name) }}
 - "traefik.http.routers.{{ name }}.entrypoints=websecure"
 - "traefik.http.routers.{{ name }}.tls=true"
 {% endmacro %}

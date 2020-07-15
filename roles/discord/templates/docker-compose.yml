@@ -1,4 +1,4 @@
-{% import "docker_misc.jinja2" as dm with context -%}
+{% import "docker/misc.jinja2" as dm with context -%}
 
 version: "3"
 services:

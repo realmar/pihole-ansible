@@ -1,0 +1,15 @@
+{% import "traefik/common.jinja2" as common with context -%}
+
+{#
+    IN:
+        host: string
+        endpoint: string
+        port: number
+#}
+{% macro declare_labels_udp(name, endpoint, port) %}
+labels:
+  {{ common.enable(name)|indent(width = 2) }}
+  - "traefik.udp.routers.{{ name }}.entrypoints={{ endpoint }}"
+  - "traefik.udp.routers.{{ name }}.service={{ name }}"
+  - "traefik.udp.services.{{ name }}.loadbalancer.server.port={{ port }}"
+{% endmacro %}

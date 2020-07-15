@@ -1,6 +1,6 @@
 {% import 'utils.jinja2' as utils with context -%}
-{% import 'docker_volumes.jinja2' as dv with context -%}
-{% import 'docker_network.jinja2' as dn with context -%}
+{% import 'docker/volumes.jinja2' as dv with context -%}
+{% import 'docker/network.jinja2' as dn with context -%}
 
 {% set services = [
   'docker_update.yml',

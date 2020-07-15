@@ -1,0 +1,4 @@
+{% macro enable(name) %}
+- "traefik.enable=true"
+- "traefik.docker.network={{ discovery_network.name }}"
+{% endmacro %}
