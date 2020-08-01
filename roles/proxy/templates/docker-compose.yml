@@ -80,6 +80,7 @@ services:
     networks:
       {{ discovery_network.name }}:
         ipv4_address: {{ sso_auth.ipv4 }}
+    {{ dm.restart_policy() }}
 
 {{ dn.networks_declaration([ discovery_network ]) }}
 
