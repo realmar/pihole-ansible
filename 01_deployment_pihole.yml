@@ -16,6 +16,7 @@
     - { role: jupyter, tags: jupyter }
     - { role: discord, tags: discord }
     - { role: personal_website, tags: realmar_net }
+    - { role: home_automation, tags: home_automation }
 
   #post_tasks:
   #  # I really don't want to install docker-compose via pip just to make the

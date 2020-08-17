@@ -1,7 +1,7 @@
 {% macro networks_declaration(networks) %}
-{% set use_v6 = network.v6 is defined and network.v6.enable %}
 networks:
 {% for network in networks %}
+{% set use_v6 = network.v6 is defined and network.v6.enable %}
 {% if network.v4 is not defined %}
   {{ network.name }}:
     external: true

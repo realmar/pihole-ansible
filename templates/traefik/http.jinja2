@@ -119,7 +119,7 @@
         port: number
 #}
 {% macro declare_labels_mount_path_internal(service_name, path, port, middlewares) %}
-{{ __declare_labels_mount_path(dns.internal.root, service_name, path, port, middlewares) }}
+{{ declare_labels_mount_path(dns.internal.root, service_name, path, port, middlewares) }}
   {{ whitelist_ip_range(service_name, [ '10.0.0.0/8', '172.16.0.0/12', '192.168.0.0/16' ]) }}
 {% endmacro %}
 
@@ -130,7 +130,7 @@
         port: number
 #}
 {% macro declare_labels_mount_path_public(service_name, path, port, middlewares) %}
-{{ __declare_labels_mount_path(dns.public.root, service_name, path, port, middlewares) }}
+{{ declare_labels_mount_path(dns.public.root, service_name, path, port, middlewares) }}
   {{ use_letsencrypt(service_name) }}
 {% endmacro %}
 
@@ -141,7 +141,7 @@
         path: string
         port: number
 #}
-{% macro __declare_labels_mount_path(host, service_name, path, port, middlewares) %}
+{% macro declare_labels_mount_path(host, service_name, path, port, middlewares) %}
 {% if middlewares is not defined %}
 {% set middlewares = [] %}
 {% endif %}

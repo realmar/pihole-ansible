@@ -8,6 +8,7 @@ root_dirs:
   jupyter: /home/pi/jupyter
   discord: /home/pi/discord
   personal_website: /home/pi/realmar.net
+  home_automation: /home/pi/home_automation
 
 discovery_network:
   name: discovery
@@ -23,10 +24,12 @@ dns:
 
 dns_sub_domains:
   login: "login.{{ dns.public.root }}"
+  smarthome: "smarthome.{{ dns.public.root }}"
 
 all_dns:
   - "{{ dns.public.root }}"
   - "{{ dns.internal.root }}"
   - "{{ dns_sub_domains.login }}"
+  - "{{ dns_sub_domains.smarthome }}"
 
 letsencrypt_resolver_name: lets_encrypt

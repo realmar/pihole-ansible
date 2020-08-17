@@ -1,0 +1,29 @@
+- block:
+  - include_tasks: standard_service.yml
+    vars:
+      usr: "{{ user }}"
+      root_dir: "{{ root_dirs.home_automation }}"
+      dirs:
+        - "{{ zigbee2mqtt.volumes.config.local_folder }}"
+        - "{{ mosquitto.volumes.data.local_folder }}"
+        - "{{ mosquitto.volumes.log.local_folder }}"
+        - "{{ home_assistant.volumes.config.local_folder }}"
+  tags: compose_file
+
+- name: Copy zigbee2mqtt configuration
+  template:
+    src: "configuration.yaml"
+    dest: "{{ zigbee2mqtt.volumes.config.local_folder }}"
+    owner: "{{ user }}"
+    group: "{{ user }}"
+    mode: 0644
+  tags: zigbee
+
+- name: Copy eclipse-mosquitto configuration
+  template:
+    src: "mosquitto.conf"
+    dest: "{{ root_dirs.home_automation }}/mosquitto.conf"
+    owner: "{{ user }}"
+    group: "{{ user }}"
+    mode: 0644
+  tags: mosquitto
