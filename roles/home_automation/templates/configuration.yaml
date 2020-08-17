@@ -21,3 +21,6 @@ mqtt:
 serial:
   # Location of CC2531 USB sniffer
   port: /dev/ttyACM0
+
+advanced:
+  channel: 26
