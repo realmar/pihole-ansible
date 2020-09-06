@@ -9,6 +9,7 @@
 
   roles:
     - { role: proxy, tags: proxy }
+    - { role: datastore, tags: datastore }
     - { role: pihole, tags: pihole }
     - { role: maintenance, tags: maintenance }
     - { role: fileserver, tags: fileserver }

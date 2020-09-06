@@ -110,7 +110,22 @@
 {# ########################################################################## #}
 {# ########################################################################## #}
 
-{######## PUBLIC API ########}
+{% set minimal_middlewares = [
+    {
+      'mw': auth
+    },
+    {
+      'mw': trailing_slash,
+      'args': {}
+    },
+    {
+      'mw': fix_wss,
+      'args': {}
+    }
+] %}
+
+{# ########################################################################## #}
+{# ########################################################################## #}
 
 {#
     IN:
@@ -143,7 +158,15 @@
 #}
 {% macro declare_labels_mount_path(host, service_name, path, port, middlewares) %}
 {% if middlewares is not defined %}
-{% set middlewares = [] %}
+{% set middlewares =
+    minimal_middlewares
+      + [
+          {
+            'mw': strip_path,
+            'args': { 'path': path }
+          },
+        ]
+%}
 {% endif %}
 
 labels:
@@ -152,21 +175,5 @@ labels:
   {{ service_port(service_name, port)|indent(width = 2) }}
 {% endif %}
   {{ add_route(host, service_name, path)|indent(width = 2) }}
-  {{ add_middlewares(service_name, middlewares + [
-    {
-      'mw': auth
-    },
-    {
-      'mw': trailing_slash,
-      'args': {}
-    },
-    {
-      'mw': strip_path,
-      'args': { 'path': path }
-    },
-    {
-      'mw': fix_wss,
-      'args': {}
-    }
-  ])|indent(width = 2) }}
+  {{ add_middlewares(service_name, middlewares)|indent(width = 2) }}
 {% endmacro %}

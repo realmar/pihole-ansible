@@ -10,4 +10,11 @@
 - include_tasks: debian_platforms.yml
   when: is_debian and ansible_distribution_major_version|int > 9 or is_ubuntu
 
+- name: Copy daemon.json config
+  template:
+    src: daemon.json
+    dest: /etc/docker/daemon.json
+    mode: 0644
+  notify: restart docker
+
 - meta: flush_handlers

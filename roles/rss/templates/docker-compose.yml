@@ -16,7 +16,11 @@ services:
     container_name: freshrss
     {{ traefik.declare_labels_mount_path_public(
       "rss", "/rss", None,
-      [
+      traefik.minimal_middlewares + [
+        {
+          'mw': traefik.strip_path,
+          'args': { 'path': '/rss' }
+        },
         {
           "mw": traefik.redirect,
           "args": { "old_path": "/rss/api", "new_path": "/rss/api/" }
@@ -31,7 +35,7 @@ services:
       default:
     depends_on:
       - db
-    {{ dm.restart_policy() }}
+    {{ dm.common()|indent(width = 4) }}
 
   db:
     image: postgres
@@ -41,7 +45,7 @@ services:
       POSTGRES_DB: na_default
       TZ: {{ timezone }}
     {{ dv.volumes_section_complete([ rss_db.volumes.data ])|indent(width = 4) }}
-    {{ dm.restart_policy() }}
+    {{ dm.common()|indent(width = 4) }}
 
 {{ dn.discovery_networks_declaration() }}
 

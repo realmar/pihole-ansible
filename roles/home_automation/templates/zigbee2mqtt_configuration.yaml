@@ -24,3 +24,7 @@ serial:
 
 advanced:
   channel: 26
+
+devices:
+  '0x00158d0004445436':
+    friendly_name: 'aqara-temperature-humidity-sensor-01'

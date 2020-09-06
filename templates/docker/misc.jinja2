@@ -1,3 +1,60 @@
-{% macro restart_policy() %}
+{% macro common() %}
+{% raw %}
 restart: always
+{% endraw %}
+{% endmacro %}
+
+{#
+logging:
+  driver: "syslog"
+  options:
+    syslog-address: "udp://127.0.0.1:6514"
+    syslog-format: "rfc5424"
+    tag: "{{.Name}}/{{.ID}}"
+#}
+
+{% macro disable_auto_update_section() %}
+labels:
+  {{ disable_auto_update() }}
+{% endmacro %}
+
+{% macro disable_auto_update() %}
+- "com.centurylinklabs.watchtower.enable=false"
+{% endmacro %}
+
+{% macro local_logging() %}
+logging:
+  driver: local
+  options:
+    max-size: 10m
+{% endmacro %}
+
+{% macro json_logging() %}
+logging:
+  driver: json-file
+  options:
+    max-size: 10m
+    max-file: "3"
+{% endmacro %}
+
+{% macro local_syslog_logging() %}
+logging:
+  driver: syslog
+  options:
+    syslog-facility: daemon
+    syslog-format: rfc3164
+    syslog-address: unixgram:///dev/log
+{% raw %}
+    tag: "{{.Name}}/{{.ID}}"
+{% endraw %}
+{% endmacro %}
+
+
+{% macro journald_logging() %}
+logging:
+  driver: journald
+  options:
+{% raw %}
+    tag: "{{.Name}}/{{.ID}}"
+{% endraw %}
 {% endmacro %}

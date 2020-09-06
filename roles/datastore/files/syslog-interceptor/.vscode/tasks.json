@@ -1,0 +1,17 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "buildall",
+      "type": "shell",
+      "command": "cargo build",
+      "options": {
+        "cwd": "${workspaceRoot}"
+      },
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      }
+    },
+  ]
+}

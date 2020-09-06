@@ -4,7 +4,7 @@
   debugger: on_failed
 
   vars:
-    restart_command: "docker-compose stop && docker-compose rm -f && docker-compose up -d"
+    restart_command: "docker-compose stop && docker-compose rm -f && docker-compose up -d --remove-orphans"
 
   pre_tasks:
     - include: tasks/collect_system_data.yml
@@ -16,11 +16,13 @@
       args:
         chdir: "{{ item }}"
       with_items:
-        - "{{ root_dirs.pihole }}"
+        - "{{ root_dirs.datastore }}"
+        - "{{ root_dirs.proxy }}"
         - "{{ root_dirs.maintenance }}"
+        - "{{ root_dirs.pihole }}"
+        - "{{ root_dirs.home_automation }}"
         - "{{ root_dirs.rss }}"
         - "{{ root_dirs.jupyter }}"
-        - "{{ root_dirs.proxy }}"
         - "{{ root_dirs.personal_website }}"
 
     - name: Recreate containers

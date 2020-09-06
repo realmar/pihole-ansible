@@ -17,7 +17,7 @@ services:
     networks:
       {{ mosquitto.networks.name }}:
     {{ dv.volumes_section_complete(zigbee2mqtt_vols)|indent(width = 4) }}
-    {{ dm.restart_policy() }}
+    {{ dm.common()|indent(width = 4) }}
 
   mosquitto:
     image: eclipse-mosquitto
@@ -27,19 +27,20 @@ services:
     {{ dv.volumes_section_complete(mosquitto_vols)|indent(width = 4) }}
       - "{{ root_dirs.home_automation }}/mosquitto.conf:/mosquitto/config/mosquitto.conf"
     {{ dn.map_ports([ (1883,), (9001,) ])|indent(width = 4) }}
-    {{ dm.restart_policy() }}
+    {{ dm.common()|indent(width = 4) }}
 
   home_assistant:
     image: homeassistant/home-assistant:stable
     {{ traefik.declare_labels_mount_path(dns_sub_domains.smarthome, "smarthome", "/", 8123)|indent(width = 4) }}
       {{ traefik.use_letsencrypt("smarthome") }}
     networks:
-      {{ discovery_network.name }}:
+      {{ network_names.discovery }}:
+      {{ network_names.datastore }}:
       {{ mosquitto.networks.name }}:
     {{ dn.map_ports([ (8123,) ])|indent(width = 4) }}
     {{ dv.volumes_section_complete(home_assistant_vols)|indent(width = 4) }}
-    {{ dm.restart_policy() }}
+    {{ dm.common()|indent(width = 4) }}
 
-{{ dn.networks_declaration([ discovery_network, mosquitto.networks ]) }}
+{{ dn.networks_declaration([ discovery_network, datastore_network, mosquitto.networks ]) }}
 
 {{ dv.volumes_declaration(zigbee2mqtt_vols + mosquitto_vols + home_assistant_vols) }}

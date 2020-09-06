@@ -1,0 +1,80 @@
+- name: Create datastore network
+  include_tasks: docker/network/add_docker_network.yml
+  vars:
+    network: "{{ datastore.networks }}"
+
+- block:
+    - include_tasks: standard_service.yml
+      vars:
+        usr: "{{ user }}"
+        root_dir: "{{ root_dirs.datastore }}"
+        dirs:
+          - "{{ influxdb.volumes.data.local_folder }}"
+          - "{{ chronograf.volumes.data.local_folder }}"
+          - "{{ kapacitor.volumes.data.local_folder }}"
+          - "{{ grafana.volumes.data.local_folder }}"
+  tags:
+    - compose_file
+    - datastore_compose_file
+
+- name: Send rsyslog logs to telegraf
+  template:
+    src: "80-telegraf.conf"
+    dest: "/etc/rsyslog.d/80-telegraf.conf"
+    mode: 0644
+  notify: restart rsyslog
+
+- name: Copy configs
+  template:
+    src: "{{ item }}"
+    dest: "{{ root_dirs.datastore }}/{{ item }}"
+    owner: "{{ user }}"
+    group: "{{ user }}"
+    mode: 0644
+
+    block_start_string: "|%"
+    block_end_string: "%|"
+
+    variable_start_string: "||"
+    variable_end_string: "||"
+
+  with_items:
+    - telegraf.conf
+    - influxdb.conf
+    - kapacitor.conf
+    - grafana.ini
+  tags: datastore_config
+
+- name: Install packages
+  apt:
+    name: "{{ packages }}"
+    state: latest
+    update_cache: no
+  vars:
+    packages:
+      - lm-sensors
+
+- block:
+    - include_tasks: syslog-interceptor.yml
+  tags: syslog_interceptor
+
+- block:
+  - name: Install ansible dependencies
+    pip:
+      name: [ "influxdb", "requests" ]
+      state: latest
+      executable: pip
+
+  - include_tasks: docker/start_stack.yml
+    vars:
+      dir: "{{ root_dirs.datastore }}"
+
+  - name: Create influxdb databases
+    influxdb_database:
+      hostname: 127.0.0.1
+      database_name: "{{ item }}"
+      state: present
+    with_items:
+      - home_assistant
+      - graphite
+  tags: influxdb_init

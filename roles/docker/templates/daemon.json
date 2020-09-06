@@ -1,0 +1,15 @@
+{#
+ # https://docs.docker.com/config/containers/logging/syslog/
+ # https://docs.docker.com/config/containers/logging/configure/
+ #}
+{
+  "log-driver": "syslog",
+  "log-opts": {
+    "syslog-address": "udp://127.0.0.1:6514",
+    "syslog-format": "rfc5424",
+{#  "syslog-facility": "daemon", #}
+{% raw %}
+    "tag": "{{.Name}}/{{.ID}}"
+{% endraw %}
+  }
+}

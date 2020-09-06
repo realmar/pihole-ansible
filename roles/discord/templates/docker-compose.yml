@@ -7,4 +7,5 @@ services:
     volumes:
       - "{{ root_dirs.discord }}/config/config.txt:{{ discord_music_bot.home }}/config.txt:ro"
       - "{{ root_dirs.discord }}/config/serversettings.json:{{ discord_music_bot.home }}/serversettings.json:rw"
-    {{ dm.restart_policy() }}
+    {{ dm.disable_auto_update_section()|indent(width = 4) }}
+    {{ dm.common()|indent(width = 4) }}

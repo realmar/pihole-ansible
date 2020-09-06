@@ -7,7 +7,20 @@
           - "{{ duplicati.volumes.config.local_folder }}"
           - "{{ duplicati.volumes.backup_target.local_folder }}"
           - "{{ portainer.volumes.data.local_folder }}"
-  tags: compose_file
+  tags:
+    - compose_file
+    - maintenance_compose_file
+
+- name: Copy configs
+  template:
+    src: "{{ item }}"
+    dest: "{{ root_dirs.maintenance }}/{{ item }}"
+    owner: "{{ user }}"
+    group: "{{ user }}"
+    mode: 0644
+  with_items:
+    - netdata.conf
+  tags: maintenance_config
 
 - block:
     - include_tasks: fix_permissions.yml

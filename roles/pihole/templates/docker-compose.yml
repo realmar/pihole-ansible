@@ -41,6 +41,7 @@ services:
   openvpn:
     container_name: {{ openvpn.name }}
     image: kylemanna/openvpn
+    {{ dm.disable_auto_update_section()|indent(width = 4) }}
 {% if openvpn.use_host_net == false %}
     {{ dn.map_ports([ (1194, 1194, "udp"), (1194, 1194, "tcp") ])|indent(width = 4) }}
 {% endif %}
@@ -55,7 +56,7 @@ services:
     # LOCAL_NETWORK=192.168.0.0/24
       OPENVPN_OPTS: --inactive 3600 --ping 10 --ping-exit 60 -–log-driver json-file --log-opt max-size=10m
     {{ dv.volumes_section_complete([ openvpn.volumes.config ])|indent(width = 4) }}
-    {{ dm.restart_policy() }}
+    {{ dm.common()|indent(width = 4) }}
 {% if openvpn.use_host_net %}
     network_mode: host
 {% else %}
@@ -74,11 +75,6 @@ services:
 {% endif %}
     cap_add:
       - NET_ADMIN
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "10m"
-        max-file: "3"
 
   pihole:
     image: pihole/pihole:latest
@@ -123,12 +119,13 @@ services:
         pihole.volumes.dnsmasq
       ]
     )|indent(width = 4) }}
-    {{ dm.restart_policy() }}
+    {{ dm.common()|indent(width = 4) }}
 {% if pihole.use_host_net %}
     network_mode: host
 {% else %}
     networks:
-      {{ discovery_network.name }}:
+      {{ network_names.datastore }}:
+      {{ network_names.discovery }}:
         ipv4_address: {{ pihole.discovery_ipv4 }}
       {{ pihole.networks.name }}:
         ipv4_address: {{ pihole_ipam.ipam.ipv4 }}
@@ -148,11 +145,6 @@ services:
       - CAP_NET_ADMIN
       # Needed for DHCP and IPv6 RA
       - NET_ADMIN
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "5m"
-        max-file: "3"
 
 {% if pihole.use_host_net == false %}
   # https://docs.pi-hole.net/docker/dhcp/
@@ -163,7 +155,8 @@ services:
     command: -s {{ pihole_ipam.ipam.ipv4 }}
     cap_add:
       - NET_ADMIN
-    {{ dm.restart_policy() }}
+    {{ dm.disable_auto_update_section()|indent(width = 4) }}
+    {{ dm.common()|indent(width = 4) }}
 {% endif %}
 
   unbound:
@@ -177,8 +170,9 @@ services:
     networks:
       {{ unbound.networks.name }}:
         ipv4_address: {{ unbound.ipv4 }}
-    {{ dm.restart_policy() }}
-{% set nets = [ discovery_network, unbound.networks ] %}
+      {{ network_names.datastore }}:
+    {{ dm.common()|indent(width = 4) }}
+{% set nets = [ discovery_network, datastore_network, unbound.networks ] %}
 {% if pihole.use_host_net == false %}
 {{   nets.append(pihole.networks) }}
 {% endif %}

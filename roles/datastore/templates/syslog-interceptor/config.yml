@@ -1,0 +1,32 @@
+---
+  internal:
+    log_level: INFO
+    log_socket: /dev/log
+
+  syslog:
+    server_address: "0.0.0.0:6514"
+    forward_address: "telegraf:6514"
+    pattern_prefix: "(=|:|\\s)(?i)"
+    pattern_postfix: "(\\W|^\\d)"
+    patterns:
+      - regex: emerg
+        severity: 0
+      - regex: alert
+        severity: 1
+      - regex: crit
+        severity: 2
+      - regex: (error|(?-i)err)
+        severity: 3
+      - regex: (warn|warning)
+        severity: 4
+      - regex: notice
+        severity: 5
+      - regex: info
+        severity: 6
+      - regex: debug
+        severity: 7
+
+  web:
+    server_address: "0.0.0.0:8080"
+    duplicati:
+      forward_address: "http://telegraf:8080/telegraf"

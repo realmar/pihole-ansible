@@ -12,13 +12,14 @@ netdata:
   security_opt:
     - apparmor:unconfined
   volumes:
+    - {{ root_dirs.maintenance }}/netdata.conf:/etc/netdata/netdata.conf:ro
     - /etc/passwd:/host/etc/passwd:ro
     - /etc/group:/host/etc/group:ro
     - /proc:/host/proc:ro
     - /sys:/host/sys:ro
     {{ dv.datetime_mapping()|indent(width = 4) }}
 
-{#{{ dn.map_ports([ (19999,) ])|indent(width = 2) }} #}
   {{ traefik.declare_labels_mount_path_internal("netdata", "/netdata")|indent(width = 2) }}
   {{ dn.discovery_network_section()|indent(width = 2) }}
-  {{ dm.restart_policy() }}
+    {{ network_names.datastore }}:
+  {{ dm.common()|indent(width = 2) }}

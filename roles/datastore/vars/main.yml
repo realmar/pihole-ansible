@@ -1,0 +1,41 @@
+datastore:
+  networks:
+    v4:
+      subnet:     172.16.80.0/24
+      netaddress: 172.16.80.0
+      netmask:    255.255.255.0
+      gateway:    172.16.80.1
+    name: "{{ network_names.datastore }}"
+
+influxdb:
+  volumes:
+    data:
+      name:         influxdb_data
+      local_folder: "{{ root_dirs.datastore }}/influxdb-data"
+      mount:        /var/lib/influxdb
+
+chronograf:
+  volumes:
+    data:
+      name:         chronograf_data
+      local_folder: "{{ root_dirs.datastore }}/chronograf-data"
+      mount:        /var/lib/chronograf
+
+kapacitor:
+  volumes:
+    data:
+      name:         kapacitor_data
+      local_folder: "{{ root_dirs.datastore }}/kapacitor-data"
+      mount:        /var/lib/kapacitor
+
+grafana:
+  volumes:
+    data:
+      name:         grafana_data
+      local_folder: "{{ root_dirs.datastore }}/grafana-data"
+      mount:        /var/lib/grafana
+
+syslog_interceptor:
+  container_user: interceptor
+  container_home: /home/interceptor
+  container_app_dir: /home/interceptor/app

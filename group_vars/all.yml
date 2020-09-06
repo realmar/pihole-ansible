@@ -9,12 +9,17 @@ root_dirs:
   discord: /home/pi/discord
   personal_website: /home/pi/realmar.net
   home_automation: /home/pi/home_automation
+  datastore: /home/pi/datastore
+
+network_names:
+  discovery: discovery
+  datastore: datastore
 
 discovery_network:
-  name: discovery
+  name: "{{ network_names.discovery }}"
 
-sso_auth:
-  ipv4: 172.16.20.80
+datastore_network:
+  name: "{{ network_names.datastore }}"
 
 dns:
   public:

@@ -1,0 +1,27 @@
+- name: Copy project
+  synchronize:
+    src: "syslog-interceptor"
+    dest: "{{ root_dirs.datastore }}"
+    owner: no
+    perms: no
+    recursive: yes
+    delete: yes
+    compress: no
+    rsync_opts:
+      - "--exclude=target"
+
+- name: Copy Dockerfile
+  template:
+    src: syslog-interceptor/Dockerfile
+    dest: "{{ root_dirs.datastore }}/syslog-interceptor/Dockerfile"
+    owner: "{{ user }}"
+    group: "{{ user }}"
+    mode: 0644
+
+- name: Copy syslog-interceptor config
+  template:
+    src: syslog-interceptor/config.yml
+    dest: "{{ root_dirs.datastore }}/syslog-interceptor-config.yml"
+    owner: "{{ user }}"
+    group: "{{ user }}"
+    mode: 0644

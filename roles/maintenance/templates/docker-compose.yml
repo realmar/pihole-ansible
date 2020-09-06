@@ -15,7 +15,7 @@ services:
   {{ utils.include(service)|indent(width = 2) }}
 {% endfor %}
 
-{{ dn.discovery_networks_declaration() }}
+{{ dn.networks_declaration([ discovery_network, datastore_network ]) }}
 
 {% set vols = [
   duplicati.volumes.config,

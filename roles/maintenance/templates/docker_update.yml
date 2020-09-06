@@ -2,18 +2,18 @@
 {% import 'docker/volumes.jinja2' as dv with context -%}
 {% import 'docker/misc.jinja2' as dm with context -%}
 
-ouroboros:
-  container_name: ouroboros
-  hostname: ouroboros
-  image: pyouroboros/ouroboros:latest
+updater:
+  container_name: watchtower
+  hostname: watchtower
+  image: containrrr/watchtower:latest
   environment:
-    - CLEANUP=true
-    - INTERVAL=3600
-    - LOG_LEVEL=info
-    - SELF_UPDATE=true
-    - IGNORE=openvpn
-  volumes:
-    - /var/run/docker.sock:/var/run/docker.sock
-    {{ dv.datetime_mapping()|indent(width = 4) }}
+    WATCHTOWER_LABEL_ENABLE: "true"
+    WATCHTOWER_CLEANUP: "true"
+    WATCHTOWER_INCLUDE_STOPPED: "true"
+    WATCHTOWER_REVIVE_STOPPED: "true"
+    WATCHTOWER_POLL_INTERVAL: 3600
+    WATCHTOWER_DEBUG: "true"
+  {{ dv.volumes_section_complete()|indent(width = 2) }}
+    {{ dv.mount_docker_socket() }}
   {{ dn.discovery_network_section()|indent(width = 2) }}
-  {{ dm.restart_policy() }}
+  {{ dm.common()|indent(width = 2) }}

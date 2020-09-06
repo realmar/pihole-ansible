@@ -11,7 +11,8 @@ services:
       {{ tf.enable(service_name)|indent(width = 6) }}
       {{ tf.use_letsencrypt(service_name) }}
       - "traefik.http.routers.{{ service_name }}.rule=Host(`{{ dns.public.root }}`)"
+      {{ dm.disable_auto_update()|indent(width = 4) }}
     {{ dn.discovery_network_section()|indent(width = 4) }}
-    {{ dm.restart_policy() }}
+    {{ dm.common()|indent(width = 4) }}
 
 {{ dn.discovery_networks_declaration() }}

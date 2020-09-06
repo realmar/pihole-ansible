@@ -19,11 +19,9 @@ traefik:
       netaddress: 172.16.20.0
       netmask:    255.255.255.0
       gateway:    172.16.20.1
-    name: "{{ discovery_network.name }}"
+    name: "{{ network_names.discovery }}"
 
 authelia:
-  ipv4: "{{ sso_auth.ipv4 }}"
-
   protected_domains:
     - "{{ dns.public.root }}"
     - "{{ dns.internal.root }}"

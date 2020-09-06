@@ -12,7 +12,7 @@ RUN {{ apt_install }} {{ packages|join(' ') }}
 USER $USER
 {% endmacro %}
 
-{% macro init(base, user, uid, home) %}
+{% macro minimal_init(base, user, uid, home) %}
 FROM {{ base }}
 
 ENV HOME {{ home }}
@@ -22,9 +22,19 @@ ENV TZ {{ timezone }}
 
 USER root
 
-RUN rm /bin/sh && ln -s /bin/bash /bin/sh
-RUN echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selections
-RUN apt-get update
+RUN rm /bin/sh && ln -s /bin/bash /bin/sh \
+      && echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selections \
+      && apt update \
+      && useradd -m -s /bin/bash -N -u $UID $USER \
+      && mkdir -p $HOME \
+      && touch $HOME/.bashrc \
+      && chown $USER $HOME -R
+
+USER $USER
+{% endmacro %}
+
+{% macro init(base, user, uid, home) %}
+{{ minimal_init(base, user, uid, home) }}
 {{ install([
   'apt-transport-https',
   'ca-certificates',
@@ -33,15 +43,6 @@ RUN apt-get update
   'wget',
   'sudo'
 ]) }}
-
-USER root
-
-RUN useradd -m -s /bin/bash -N -u $UID $USER
-RUN mkdir -p $HOME \
-      && touch $HOME/.bashrc
-RUN chown $USER $HOME -R
-
-USER $USER
 {% endmacro %}
 
 {% macro add_to_path(item) %}

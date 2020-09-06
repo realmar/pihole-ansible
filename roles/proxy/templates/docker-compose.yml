@@ -23,7 +23,7 @@ services:
       - "--accesslog=true"
 
       - "--providers.docker=true"
-      - "--providers.docker.network={{ discovery_network.name }}"
+      - "--providers.docker.network={{ network_names.discovery }}"
       - "--providers.docker.exposedbydefault=false"
       - "--providers.file.directory={{ traefik.volumes.dynamic_conf.mount }}"
 
@@ -54,10 +54,10 @@ services:
     {{ dn.map_ports([ (80,), (443,), (8080,) ])|indent(width = 4) }}
     {{ dv.volumes_section_complete(vols_traefik)|indent(width = 4) }}
       {{ dv.mount_docker_socket() }}
-    {{ dm.restart_policy() }}
+    {{ dm.common()|indent(width = 4) }}
     networks:
       - default
-      - {{ discovery_network.name }}
+      - {{ network_names.discovery }}
     extra_hosts:
       # https://docs.traefik.io/providers/docker/#host-networking
       - "host.docker.internal:172.17.0.1"
@@ -74,13 +74,12 @@ services:
       {{ tf.service_port(service_name, 9091) }}
       - "traefik.http.routers.{{ service_name }}.rule=Host(`{{ dns_sub_domains.login }}`)"
 
-      - "traefik.http.middlewares.{{ service_name }}.forwardauth.address=http://{{ sso_auth.ipv4 }}:9091/api/verify?rd=https://{{ dns_sub_domains.login }}/"
+      - "traefik.http.middlewares.{{ service_name }}.forwardauth.address=http://authelia:9091/api/verify?rd=https://{{ dns_sub_domains.login }}/"
       - "traefik.http.middlewares.{{ service_name }}.forwardauth.trustForwardHeader=true"
       - "traefik.http.middlewares.{{ service_name }}.forwardauth.authResponseHeaders=Remote-User,Remote-Groups,X-Forwarded-User"
     networks:
-      {{ discovery_network.name }}:
-        ipv4_address: {{ sso_auth.ipv4 }}
-    {{ dm.restart_policy() }}
+      {{ network_names.discovery }}:
+    {{ dm.common()|indent(width = 4) }}
 
 {{ dn.networks_declaration([ discovery_network ]) }}
 

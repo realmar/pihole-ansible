@@ -67,7 +67,9 @@
     group: "{{ user }}"
     mode: 0644
   # notify: restart pihole project
-  tags: compose_file
+  tags:
+    - compose_file
+    - pihole_compose_file
 
 - name: stop and disable systemd-resolved (conflicts with dnsmasq)
   service:

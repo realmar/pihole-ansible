@@ -12,12 +12,12 @@
 
 - name: Copy zigbee2mqtt configuration
   template:
-    src: "configuration.yaml"
-    dest: "{{ zigbee2mqtt.volumes.config.local_folder }}"
+    src: "zigbee2mqtt_configuration.yaml"
+    dest: "{{ zigbee2mqtt.volumes.config.local_folder }}/configuration.yaml"
     owner: "{{ user }}"
     group: "{{ user }}"
     mode: 0644
-  tags: zigbee
+  tags: ha_config
 
 - name: Copy eclipse-mosquitto configuration
   template:
@@ -26,4 +26,31 @@
     owner: "{{ user }}"
     group: "{{ user }}"
     mode: 0644
-  tags: mosquitto
+  tags: ha_config
+
+
+- name: Create default configuration
+  block:
+  - include_tasks: docker/start_stack.yml
+    vars:
+      dir: "{{ root_dirs.home_automation }}"
+
+  - name: Wait until Home Assistant has finished initializing
+    wait_for:
+      port: 8123
+      state: present
+      delay: 8
+
+  - include_tasks: docker/stop_stack.yml
+    vars:
+      dir: "{{ root_dirs.home_automation }}"
+  tags: ha_config
+
+- name: Copy home assistant configuration
+  template:
+    src: "home_assistant_configuration.yaml"
+    dest: "{{ home_assistant.volumes.config.local_folder }}/configuration.yaml"
+    owner: "{{ user }}"
+    group: "{{ user }}"
+    mode: 0644
+  tags: ha_config

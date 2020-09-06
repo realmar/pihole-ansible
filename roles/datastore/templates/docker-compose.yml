@@ -1,0 +1,111 @@
+{% import 'docker/volumes.jinja2' as dv with context -%}
+{% import 'docker/network.jinja2' as dn with context -%}
+{% import 'docker/misc.jinja2' as dm with context -%}
+{% import 'traefik/http.jinja2' as traefik with context -%}
+
+{% set vols_influxdb = [ influxdb.volumes.data ] %}
+{% set vols_chronograf = [ chronograf.volumes.data ] %}
+{% set vols_kapacitor = [ kapacitor.volumes.data ] %}
+{% set vols_grafana = [ grafana.volumes.data ] %}
+
+version: "3"
+services:
+  {#postgresql:
+    image: postgres
+    container_name: postgres
+    {{ dv.volumes_section_complete()|indent(width = 4) }}
+    {{ dn.map_ports([ (5432,) ])|indent(width = 4) }}
+    networks:
+      - {{ network_names.datastore }}
+    {{ dm.common()|indent(width = 4) }}#}
+
+################################################################################
+################################################################################
+
+  telegraf:
+    image: telegraf
+    container_name: telegraf
+    {{ dv.volumes_section_complete()|indent(width = 4) }}
+      - {{ root_dirs.datastore }}/telegraf.conf:/etc/telegraf/telegraf.conf:ro
+      {{ dv.mount_docker_socket() }}
+    # syslog
+    {{ dn.map_ports([ (6518, 6514, "udp") ])|indent(width = 4) }}
+    networks:
+      {{ network_names.datastore }}:
+    {{ dm.common()|indent(width = 4) }}
+
+  influxdb:
+    image: influxdb
+    container_name: influxdb
+    {{ dv.volumes_section_complete(vols_influxdb)|indent(width = 4) }}
+      - {{ root_dirs.datastore }}/influxdb.conf:/etc/influxdb/influxdb.conf:ro
+    {{ dn.map_ports([ (8086,) ])|indent(width = 4) }}
+    networks:
+      {{ network_names.datastore }}:
+    {{ dm.common()|indent(width = 4) }}
+
+  chronograf:
+    image: chronograf
+    container_name: chronograf
+    environment:
+      INFLUXDB_URL: http://influxdb:8086
+      KAPACITOR_URL: http://kapacitor:9092
+      BASE_PATH: /chronograf
+    {{ traefik.declare_labels_mount_path_internal("chronograf", "/chronograf", 8888, traefik.minimal_middlewares)|indent(width = 4) }}
+    {{ dv.volumes_section_complete(vols_chronograf)|indent(width = 4) }}
+{% if is_dev %}
+    {{ dn.map_ports([ (8888,) ])|indent(width = 4) }}
+{% endif %}
+    networks:
+      - {{ network_names.discovery }}
+      - {{ network_names.datastore }}
+    {{ dm.common()|indent(width = 4) }}
+
+  kapacitor:
+    image: kapacitor
+    container_name: kapacitor
+    {{ dv.volumes_section_complete(vols_kapacitor)|indent(width = 4) }}
+      - {{ root_dirs.datastore }}/kapacitor.conf:/etc/kapacitor/kapacitor.conf:ro
+    networks:
+      - {{ network_names.datastore }}
+    {{ dm.common()|indent(width = 4) }}
+
+################################################################################
+################################################################################
+
+  grafana:
+    image: grafana/grafana
+    container_name: grafana
+    {{ traefik.declare_labels_mount_path_internal("grafana", "/grafana", 3000)|indent(width = 4) }}
+    {{ dv.volumes_section_complete(vols_grafana)|indent(width = 4) }}
+      - {{ root_dirs.datastore }}/grafana.ini:/etc/grafana/grafana.ini:ro
+      - {{ root_dirs.datastore }}/syslog-interceptor-config.yml:/etc/grafana/grafana.ini:ro
+{% if is_dev %}
+    {{ dn.map_ports([ (3000,) ])|indent(width = 4) }}
+{% endif %}
+    networks:
+      - {{ network_names.discovery }}
+      - {{ network_names.datastore }}
+    {{ dm.common()|indent(width = 4) }}
+
+################################################################################
+################################################################################
+
+  syslog_interceptor:
+    build: syslog-interceptor
+    container_name: syslog_interceptor
+    {{ dm.journald_logging()|indent(width = 4) }}
+    {{ dm.disable_auto_update_section()|indent(width = 4) }}
+    {{ dv.volumes_section_complete()|indent(width = 4) }}
+      - {{ root_dirs.datastore }}/syslog-interceptor-config.yml:{{ syslog_interceptor.container_app_dir }}/config.yml:ro
+    {{ dn.map_ports([ (6514, "udp") ])|indent(width = 4) }}
+    networks:
+      - {{ network_names.datastore }}
+    {{ dm.common()|indent(width = 4) }}
+
+################################################################################
+################################################################################
+
+{{ dn.networks_declaration([ discovery_network, datastore_network ]) }}
+
+{{ dv.volumes_declaration(vols_influxdb + vols_chronograf + vols_kapacitor + vols_grafana) }}

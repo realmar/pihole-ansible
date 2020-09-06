@@ -31,6 +31,9 @@ volumes:
 {% endmacro %}
 
 {% macro volumes_section_complete(vols) %}
+{% if vols is not defined %}
+{% set vols = [] %}
+{% endif %}
 {{ volumes_mapping_full(vols) }}
   {{ datetime_mapping()|indent(width = 2) -}}
 {% endmacro %}

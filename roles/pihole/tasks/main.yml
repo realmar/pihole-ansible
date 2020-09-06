@@ -3,7 +3,9 @@
     - pihole/main.yml
     - openvpn/main.yml
     - unbound/main.yml
-  tags: compose_file
+  tags:
+    - compose_file
+    - pihole_compose_file
 
 - block:
     - include_tasks: fix_permissions.yml

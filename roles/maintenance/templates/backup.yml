@@ -24,4 +24,5 @@ duplicati:
 {#{{ dn.map_ports([ (8200,) ])|indent(width = 2) }} #}
   {{ dv.volumes_section_complete(vols)|indent(width = 2) }}
   {{ dn.discovery_network_section()|indent(width = 2) }}
-  {{ dm.restart_policy() }}
+    {{ network_names.datastore }}:
+  {{ dm.common()|indent(width = 2) }}
