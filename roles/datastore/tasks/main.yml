@@ -45,6 +45,17 @@
     - grafana.ini
   tags: datastore_config
 
+- name: Copy stats scripts
+  template:
+    src: "{{ item }}"
+    dest: "{{ root_dirs.datastore }}/{{ item }}"
+    owner: "{{ user }}"
+    group: "{{ user }}"
+    mode: 0755
+  with_items:
+    - gather_stats.sh
+  tags: datastore_config
+
 - name: Install packages
   apt:
     name: "{{ packages }}"

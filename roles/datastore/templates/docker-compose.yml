@@ -27,6 +27,7 @@ services:
     container_name: telegraf
     {{ dv.volumes_section_complete()|indent(width = 4) }}
       - {{ root_dirs.datastore }}/telegraf.conf:/etc/telegraf/telegraf.conf:ro
+      - {{ root_dirs.datastore }}/gather_stats.sh:/opt/gather_stats.sh:ro
       {{ dv.mount_docker_socket() }}
     # syslog
     {{ dn.map_ports([ (6518, 6514, "udp") ])|indent(width = 4) }}
