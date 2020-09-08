@@ -1,18 +1,23 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
 
+def setup_node(node, num)
+  node.vm.box = "ubuntu/bionic64"
+  node.vm.hostname = "pihole-dev-" + num
+  node.vm.network "private_network", ip: "192.168.250.1" + num
+  node.vm.synced_folder ".", "/vagrant", disabled: true
+end
+
 Vagrant.configure("2") do |config|
-  # config.vm.box = "debian/buster64"
-  config.vm.box = "ubuntu/bionic64"
-  config.vm.hostname = "pihole-dev"
-  # config.vm.network "public_network", :mac => "080027370D99"
-  config.vm.network "private_network", ip: "192.168.250.102"
-  config.vm.synced_folder ".", "/vagrant", disabled: true
   config.disksize.size = '50GB'
 
+  config.vm.define "node01" do |node| setup_node(node, "01") end
+  config.vm.define "node02" do |node| setup_node(node, "02") end
+  config.vm.define "node03" do |node| setup_node(node, "03") end
+
   config.vm.provider "virtualbox" do |v|
-    v.memory = 16384
-    v.cpus = 12
+    v.memory = 2048
+    v.cpus = 4
   end
 
   config.vm.provision "shell" do |s|
