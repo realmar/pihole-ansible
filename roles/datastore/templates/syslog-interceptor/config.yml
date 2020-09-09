@@ -7,7 +7,7 @@
     server_address: "0.0.0.0:6514"
     forward_address: "telegraf:6514"
     pattern_prefix: "(=|:|\\s)(?i)"
-    pattern_postfix: "(\\W|^\\d)"
+    pattern_postfix: "([a-zA-Z]|:|\\s|^\\d)"
     patterns:
       - regex: emerg
         severity: 0
