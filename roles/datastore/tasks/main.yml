@@ -85,7 +85,8 @@
       hostname: 127.0.0.1
       database_name: "{{ item }}"
       state: present
-    with_items:
+    loop:
       - home_assistant
       - graphite
+      - ouroboros
   tags: influxdb_init

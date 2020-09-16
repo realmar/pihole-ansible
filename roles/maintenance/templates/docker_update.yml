@@ -3,17 +3,26 @@
 {% import 'docker/misc.jinja2' as dm with context -%}
 
 updater:
-  container_name: watchtower
-  hostname: watchtower
-  image: containrrr/watchtower:latest
+  container_name: ouroboros
+  hostname: ouroboros
+  image: pyouroboros/ouroboros:latest
   environment:
-    WATCHTOWER_LABEL_ENABLE: "true"
-    WATCHTOWER_CLEANUP: "true"
-    WATCHTOWER_INCLUDE_STOPPED: "true"
-    WATCHTOWER_REVIVE_STOPPED: "true"
-    WATCHTOWER_POLL_INTERVAL: 3600
-    WATCHTOWER_DEBUG: "true"
+    LOG_LEVEL: info
+
+    CLEANUP: "true"
+    INTERVAL: 3600
+    SELF_UPDATE: "true"
+    LATEST: "false"
+
+    IGNORE: "{{ updater.ignore|join(' ') }}"
+
+    DATA_EXPORT: "influxdb"
+    INFLUX_URL: influxdb
+    INFLUX_DATABASE: ouroboros
+    INFLUX_USERNAME: None
+    INFLUX_PASSWORD: None
   {{ dv.volumes_section_complete()|indent(width = 2) }}
     {{ dv.mount_docker_socket() }}
   {{ dn.discovery_network_section()|indent(width = 2) }}
+    {{ network_names.datastore }}:
   {{ dm.common()|indent(width = 2) }}

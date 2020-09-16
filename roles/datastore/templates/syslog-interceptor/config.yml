@@ -13,7 +13,7 @@
         severity: 0
       - regex: alert
         severity: 1
-      - regex: crit
+      - regex: (crit|critical)
         severity: 2
       - regex: (error|(?-i)err)
         severity: 3
