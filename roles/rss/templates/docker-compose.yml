@@ -38,7 +38,7 @@ services:
     {{ dm.common()|indent(width = 4) }}
 
   db:
-    image: postgres
+    image: postgres:12
     environment:
       POSTGRES_USER: freshrss
       POSTGRES_PASSWORD: '{{ gen.pw("freshrss_db") }}'

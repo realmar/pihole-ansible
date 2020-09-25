@@ -7,7 +7,9 @@
           - "{{ freshrss.volumes.data.local_folder }}"
           - "{{ freshrss.volumes.extensions.local_folder }}"
           - "{{ rss_db.volumes.data.local_folder }}"
-  tags: compose_file
+  tags:
+    - compose_file
+    - rss_compose_file
 
 - block:
     - include_tasks: fix_permissions.yml
