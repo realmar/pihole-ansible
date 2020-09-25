@@ -1,0 +1,17 @@
+#
+# IN:
+#     src: string
+#     dest: string
+#
+
+- name: Copy project
+  synchronize:
+    src: "{{ src }}"
+    dest: "{{ dest }}"
+    owner: no
+    perms: no
+    recursive: yes
+    delete: yes
+    compress: no
+    rsync_opts:
+      - "--exclude=target"

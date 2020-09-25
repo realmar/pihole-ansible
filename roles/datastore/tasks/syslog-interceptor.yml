@@ -1,14 +1,7 @@
-- name: Copy project
-  synchronize:
+- include_tasks: rsync.yml
+  vars:
     src: "syslog-interceptor"
     dest: "{{ root_dirs.datastore }}"
-    owner: no
-    perms: no
-    recursive: yes
-    delete: yes
-    compress: no
-    rsync_opts:
-      - "--exclude=target"
 
 - name: Copy Dockerfile
   template:

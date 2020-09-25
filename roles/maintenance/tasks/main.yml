@@ -23,6 +23,10 @@
   tags: maintenance_config
 
 - block:
+  - include_tasks: backup_helper.yml
+  tags: backup_helper
+
+- block:
     - include_tasks: fix_permissions.yml
       vars:
         items: "{{ maintenance_folders_permissions }}"

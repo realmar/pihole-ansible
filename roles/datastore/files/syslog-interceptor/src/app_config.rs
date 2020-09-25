@@ -1,6 +1,6 @@
 use config;
-use serde::{Deserialize, Serialize};
 use log::LevelFilter;
+use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct PatternConfig {
@@ -30,6 +30,12 @@ pub struct WebConfig {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct RetryPolicy {
+  pub max: u64,
+  pub initial_delay: u64,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct InternalConfig {
   pub log_level: LevelFilter,
   pub log_socket: String,
@@ -37,6 +43,7 @@ pub struct InternalConfig {
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Config {
+  pub retry_policy: RetryPolicy,
   pub internal: InternalConfig,
   pub syslog: SyslogConfig,
   pub web: WebConfig,
@@ -45,6 +52,10 @@ pub struct Config {
 impl Default for Config {
   fn default() -> Config {
     Config {
+      retry_policy: RetryPolicy {
+        max: 2000,
+        initial_delay: 1000,
+      },
       internal: InternalConfig {
         log_level: LevelFilter::Warn,
         log_socket: "/dev/log".into(),

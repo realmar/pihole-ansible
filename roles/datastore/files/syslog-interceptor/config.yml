@@ -1,4 +1,8 @@
 ---
+retry_policy:
+  max: 2000
+  initial_delay: 1000
+
 internal:
   log_level: DEBUG
   log_socket: /dev/log

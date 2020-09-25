@@ -17,6 +17,7 @@ use crate::app_config::SyslogConfig;
 const BUFFER_SIZE: usize = 65507;
 
 pub struct Transformer {
+  config: SyslogConfig,
   listener: UdpSocket,
   sender: LogSender,
   buffer: [u8; BUFFER_SIZE],
@@ -28,6 +29,7 @@ impl Transformer {
     let listener = UdpSocket::bind(&config.server_address).await?;
 
     Ok(Transformer {
+      config: config.clone(),
       listener,
       sender: LogSender::new(config).await?,
       buffer: [0u8; BUFFER_SIZE],
@@ -41,6 +43,10 @@ impl Transformer {
         Ok((data_read, _)) => {
           if let Err(err) = self.parse(data_read).await {
             error!("Failed to process message: {}", err);
+            match LogSender::new(&self.config).await {
+              Ok(sender) => self.sender = sender,
+              Err(err) => error!("Failed to create new sender: {}", err),
+            }
           }
         }
         Err(err) => error!("recv_from failed: {}", err),

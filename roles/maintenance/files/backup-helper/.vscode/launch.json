@@ -1,0 +1,41 @@
+{
+  "configurations": [
+      {
+          "type": "lldb",
+          "request": "launch",
+          "name": "Debug executable 'bh'",
+          "cargo": {
+              "args": [
+                  "build",
+                  "--bin=bh",
+                  "--package=bh"
+              ],
+              "filter": {
+                  "name": "bh",
+                  "kind": "bin"
+              }
+          },
+          "args": ["stop", "-e", "realmarnet", "jupyter", "freshrss", "openvpn", "dhcphelper", "unbound", "netdata", "authelia", "traefik", "syslog_interceptor"],
+          "cwd": "${workspaceFolder}"
+      },
+      {
+          "type": "lldb",
+          "request": "launch",
+          "name": "Debug unit tests in executable 'bh'",
+          "cargo": {
+              "args": [
+                  "test",
+                  "--no-run",
+                  "--bin=bh",
+                  "--package=bh"
+              ],
+              "filter": {
+                  "name": "bh",
+                  "kind": "bin"
+              }
+          },
+          "args": [],
+          "cwd": "${workspaceFolder}"
+      }
+  ]
+}

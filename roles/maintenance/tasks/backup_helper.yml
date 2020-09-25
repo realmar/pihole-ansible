@@ -1,0 +1,44 @@
+- block:
+  - include_tasks: rsync.yml
+    vars:
+      src: "backup-helper"
+      dest: "{{ root_dirs.maintenance }}"
+
+- name: Build image
+  docker_image:
+    name: backup_helper
+    source: build
+    build:
+      path: "{{ root_dirs.maintenance }}/backup-helper"
+      nocache: yes
+      rm: yes
+      pull: yes
+  register: build
+
+- name: Copy binary
+  shell:
+    cmd: docker run --rm -v $(pwd):/mnt backup_helper:latest cp -r bh /mnt/.
+    chdir: "{{ root_dirs.maintenance }}/backup-helper"
+  when: build.changed
+
+- name: Move binary to the right place
+  copy:
+    remote_src: True
+    src: "{{ root_dirs.maintenance }}/backup-helper/bh"
+    dest: "{{ duplicati.volumes.config.local_folder }}/bh"
+    mode: "0755"
+  when: build.changed
+
+- name: Delete original binary
+  file:
+    path: "{{ root_dirs.maintenance }}/backup-helper/bh"
+    state: absent
+
+- name: Copy start and stop scripts
+  template:
+    src: "{{ item }}"
+    dest: "{{ duplicati.volumes.config.local_folder }}/{{ item }}"
+    mode: "0755"
+  with_items:
+    - start_containers.sh
+    - stop_containers.sh

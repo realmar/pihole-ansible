@@ -1,6 +1,7 @@
 #![feature(proc_macro_hygiene, decl_macro, async_closure)]
 
 mod app_config;
+mod retry;
 mod syslog_app;
 mod web_app;
 
@@ -36,7 +37,10 @@ async fn main() -> Result<()> {
 
   let result = tokio::try_join!(
     tokio::spawn(syslog_app::run(config.syslog.clone())),
-    tokio::spawn(web_app::run(config.web.clone()))
+    tokio::spawn(web_app::run(
+      config.web.clone(),
+      config.retry_policy.clone()
+    ))
   );
   match result {
     Ok(..) => Ok(()),

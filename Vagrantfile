@@ -17,6 +17,9 @@ Vagrant.configure("2") do |config|
 
   config.vm.provision "shell" do |s|
     ssh_pub_key = File.readlines("#{Dir.home}/.ssh/id_rsa.pub").first.strip
+    nopass_ssh_pub_key = File.readlines("#{Dir.home}/.ssh/id_rsa_nopassphrase.pub").first.strip
+    authorized_keys = "/root/.ssh/authorized_keys"
+
     s.inline = <<-SHELL
       apt-get update
       apt-get install -y python python-pip python3 python3-pip
@@ -24,9 +27,12 @@ Vagrant.configure("2") do |config|
       mkdir -p /root/.ssh
       chmod 700 /root/.ssh
 
-      echo #{ssh_pub_key} > /root/.ssh/authorized_keys
+      echo #{ssh_pub_key} > #{authorized_keys}
+      echo "\n" >> #{authorized_keys}
+      echo #{nopass_ssh_pub_key} >> #{authorized_keys}
+      echo "\n" >> #{authorized_keys}
 
-      chmod 600 /root/.ssh/authorized_keys
+      chmod 600 #{authorized_keys}
     SHELL
   end
 end
