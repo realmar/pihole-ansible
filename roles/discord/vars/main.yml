@@ -1,5 +1,6 @@
-discord_music_bot:
+music_bot:
   user: "{{ user }}"
+  config_folder_name: music_bot
 
   container_user: discord
   uid: 1000

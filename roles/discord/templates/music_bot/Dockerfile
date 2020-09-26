@@ -2,9 +2,9 @@
 
 {{ df.init(
   'ubuntu:20.04',
-  discord_music_bot.container_user,
-  discord_music_bot.uid,
-  discord_music_bot.home,
+  music_bot.container_user,
+  music_bot.uid,
+  music_bot.home,
 ) }}
 
 {{ df.install([ 'openjdk-8-jdk-headless', 'maven', 'git' ]) }}

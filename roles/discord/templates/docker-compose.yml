@@ -1,11 +1,19 @@
 {% import "docker/misc.jinja2" as dm with context -%}
+{% import 'docker/network.jinja2' as dn with context -%}
 
 version: "3"
 services:
-  discord_music_bot:
-    build: .
+  music_bot:
+    build: {{ music_bot.config_folder_name }}
     volumes:
-      - "{{ root_dirs.discord }}/config/config.txt:{{ discord_music_bot.home }}/config.txt:ro"
-      - "{{ root_dirs.discord }}/config/serversettings.json:{{ discord_music_bot.home }}/serversettings.json:rw"
+      - "{{ root_dirs.discord }}/{{ music_bot.config_folder_name }}/config.txt:{{ music_bot.home }}/config.txt:ro"
+      - "{{ root_dirs.discord }}/{{ music_bot.config_folder_name }}/serversettings.json:{{ music_bot.home }}/serversettings.json:rw"
     {{ dm.disable_auto_update_section()|indent(width = 4) }}
+    {{ dm.common()|indent(width = 4) }}
+  among_us_server:
+    build: Imposter
+    user: "1000"
+    {{ dn.map_ports([ (22023,'udp') ])|indent(width = 4) }}
+    {{ dm.disable_auto_update_section()|indent(width = 4) }}
+    {{ dm.journald_logging()|indent(width = 4) }}
     {{ dm.common()|indent(width = 4) }}
