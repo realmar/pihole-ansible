@@ -1,5 +1,6 @@
 {% import "docker/misc.jinja2" as dm with context -%}
 {% import 'docker/network.jinja2' as dn with context -%}
+{% import 'traefik/udp_tcp.jinja2' as traefik with context -%}
 
 version: "3"
 services:
@@ -13,7 +14,10 @@ services:
   among_us_server:
     build: Imposter
     user: "1000"
-    {{ dn.map_ports([ (22023,'udp') ])|indent(width = 4) }}
-    {{ dm.disable_auto_update_section()|indent(width = 4) }}
+    {{ traefik.declare_labels_udp('among_us', 'among_us', 22023)|indent(width = 4) }}
+      {{ dm.disable_auto_update()|indent(width = 6) }}
     {{ dm.journald_logging()|indent(width = 4) }}
+    {{ dn.discovery_network_section()|indent(width = 4) }}
     {{ dm.common()|indent(width = 4) }}
+
+{{ dn.networks_declaration([ discovery_network ]) }}

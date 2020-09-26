@@ -32,6 +32,8 @@ services:
 
       - "--entrypoints.web.address=:80"
       - "--entrypoints.websecure.address=:443"
+      - "--entryPoints.among_us.address=:22023/udp"
+
       - "--entrypoints.web.http.redirections.entryPoint.to=websecure"
       - "--entrypoints.web.http.redirections.entryPoint.scheme=https"
 
@@ -51,7 +53,7 @@ services:
       - "--certificatesresolvers.{{ traefik.lets_encrypt.resolver_name }}.acme.dnschallenge.delaybeforecheck=0"
 #}
 {% endif %}
-    {{ dn.map_ports([ (80,), (443,), (8080,) ])|indent(width = 4) }}
+    {{ dn.map_ports([ (80,), (443,), (8080,), (22023,'udp') ])|indent(width = 4) }}
     {{ dv.volumes_section_complete(vols_traefik)|indent(width = 4) }}
       {{ dv.mount_docker_socket() }}
     {{ dm.common()|indent(width = 4) }}
@@ -65,6 +67,7 @@ services:
 {% set service_name = "authelia" %}
   authelia:
     image: authelia/authelia
+    user: "1000"
     {{ dv.volumes_section_complete(vols_authelia)|indent(width = 4) }}
     environment:
       TZ: {{ timezone }}

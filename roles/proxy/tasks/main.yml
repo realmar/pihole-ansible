@@ -13,7 +13,9 @@
         - "{{ traefik.volumes.certificates.local_folder }}"
         - "{{ authelia.volumes.config.local_folder }}"
         - "{{ authelia.volumes.data.local_folder }}"
-  tags: compose_file
+  tags:
+    - compose_file
+    - proxy_compose_file
 
 - name: Copy traefik config
   template:
