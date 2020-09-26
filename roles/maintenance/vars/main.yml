@@ -50,6 +50,7 @@ backup_helper:
     - syslog_interceptor
     - discord
     - duplicati
+    - among_us
 
 maintenance_folders_permissions:
   - folder: "{{ duplicati.volumes.config }}"
