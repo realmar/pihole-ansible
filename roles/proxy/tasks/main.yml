@@ -6,7 +6,7 @@
 - block:
   - include_tasks: standard_service.yml
     vars:
-      usr: "{{ user }}"
+      usr: "1000"
       root_dir: "{{ root_dirs.proxy }}"
       dirs:
         - "{{ traefik.volumes.dynamic_conf.local_folder }}"

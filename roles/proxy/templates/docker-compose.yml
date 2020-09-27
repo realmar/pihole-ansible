@@ -37,6 +37,13 @@ services:
       - "--entrypoints.web.http.redirections.entryPoint.to=websecure"
       - "--entrypoints.web.http.redirections.entryPoint.scheme=https"
 
+      - "--metrics.influxdb=true"
+      - "--metrics.influxdb.address=influxdb:8086"
+      - "--metrics.influxdb.protocol=http"
+      - "--metrics.influxdb.database=traefik"
+      - "--metrics.influxdb.addEntryPointsLabels=true"
+      - "--metrics.influxdb.addServicesLabels=true"
+
 {% if not is_dev %}
       # Let's Encrypt
       # https://docs.traefik.io/https/acme/
@@ -60,6 +67,7 @@ services:
     networks:
       - default
       - {{ network_names.discovery }}
+      - {{ network_names.datastore }}
     extra_hosts:
       # https://docs.traefik.io/providers/docker/#host-networking
       - "host.docker.internal:172.17.0.1"
@@ -67,7 +75,7 @@ services:
 {% set service_name = "authelia" %}
   authelia:
     image: authelia/authelia
-    user: "1000"
+    user: "1000:1000"
     {{ dv.volumes_section_complete(vols_authelia)|indent(width = 4) }}
     environment:
       TZ: {{ timezone }}
@@ -84,6 +92,6 @@ services:
       {{ network_names.discovery }}:
     {{ dm.common()|indent(width = 4) }}
 
-{{ dn.networks_declaration([ discovery_network ]) }}
+{{ dn.networks_declaration([ discovery_network, datastore_network ]) }}
 
 {{ dv.volumes_declaration(vols_traefik + vols_authelia) }}
