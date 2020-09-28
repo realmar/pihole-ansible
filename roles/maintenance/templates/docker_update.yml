@@ -10,7 +10,8 @@ updater:
     LOG_LEVEL: info
 
     CLEANUP: "true"
-    INTERVAL: 3600
+    # INTERVAL: 3600
+    CRON: "*/10 4-6 * * *"
     SELF_UPDATE: "true"
     LATEST: "false"
 
