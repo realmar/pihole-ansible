@@ -1,0 +1,39 @@
+- block:
+    - include_tasks: standard_service.yml
+      vars:
+        usr: "{{ matrix_server.user }}"
+        root_dir: "{{ root_dirs.matrix_server }}"
+        dirs:
+          - "{{ matrix_server.volumes.data.local_folder }}"
+          - "{{ matrix_server_db.volumes.data.local_folder }}"
+  tags:
+    - compose_file
+    - matrix_server_compose_file
+
+- name: Copy configs
+  template:
+    src: "{{ item }}"
+    dest: "{{ matrix_server.volumes.data.local_folder }}/{{ item }}"
+    owner: "{{ matrix_server.user }}"
+    group: "{{ matrix_server.user }}"
+    mode: 0644
+
+    variable_start_string: "||"
+    variable_end_string: "||"
+
+  with_items:
+    - homeserver.yaml
+    - realmar.net.log.config
+    - realmar.net.signing.key
+  tags: matrix_server_config
+
+- name: Copy DB init scripts
+  template:
+    src: "{{ item }}"
+    dest: "{{ root_dirs.matrix_server }}/{{ item }}"
+    owner: "{{ matrix_server.user }}"
+    group: "{{ matrix_server.user }}"
+    mode: 0644
+  with_items:
+    - init_db.sql
+  tags: matrix_server_config

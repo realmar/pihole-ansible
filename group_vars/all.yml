@@ -10,6 +10,7 @@ root_dirs:
   personal_website: /home/pi/realmar.net
   home_automation: /home/pi/home_automation
   datastore: /home/pi/datastore
+  matrix_server: /home/pi/matrix_server
 
 network_names:
   discovery: discovery

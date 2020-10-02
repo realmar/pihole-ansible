@@ -1,0 +1,17 @@
+matrix_server:
+  user: 999
+  volumes:
+    data:
+      name:         matrix_server_data
+      local_folder: "{{ root_dirs.matrix_server }}/matrix_server-data"
+      mount:        /data
+
+matrix_server_db:
+  db_user: synapse
+  db_name: synapse
+
+  volumes:
+    data:
+      name:         matrix_db_data
+      local_folder: "{{ root_dirs.matrix_server }}/db-data"
+      mount:        /var/lib/postgresql/data

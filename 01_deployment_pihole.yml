@@ -18,6 +18,7 @@
     - { role: discord, tags: discord }
     - { role: personal_website, tags: realmar_net }
     - { role: home_automation, tags: home_automation }
+    - { role: matrix_server, tags: matrix_server }
 
   #post_tasks:
   #  # I really don't want to install docker-compose via pip just to make the

@@ -19,7 +19,7 @@
         severity: 1
       - regex: (crit|critical|fatal)
         severity: 2
-      - regex: (error|(?-i)err|exec\\:\\ postgres\\:\\ not\\ found)
+      - regex: (error|errors|(?-i)err|exec\\:\\ postgres\\:\\ not\\ found)
         severity: 3
       - regex: (warn|warning|core\\:warn)
         severity: 4

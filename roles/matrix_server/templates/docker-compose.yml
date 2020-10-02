@@ -1,0 +1,66 @@
+{% import "password_gen.jinja2" as gen with context -%}
+{% import 'docker/volumes.jinja2' as dv with context -%}
+{% import 'docker/network.jinja2' as dn with context -%}
+{% import 'docker/misc.jinja2' as dm with context -%}
+{% import 'traefik/http.jinja2' as traefik with context -%}
+
+{% set vols_matrix_server = [ matrix_server.volumes.data ] %}
+{% set vols_db = [ matrix_server_db.volumes.data ] %}
+{% set service_name = 'matrix_synapse' %}
+
+{#
+{% macro proxy_config() %}
+{{ traefik.enable(service_name, [ 'websecure', 'matrix_alt' ]) }}
+{{ traefik.add_custom_route(service_name, 'Host(`realmar.net`) && PathPrefix(`/_matrix/`)') }}
+{{ traefik.service_port(service_name, 8008) }}
+{{ traefik.use_letsencrypt(service_name) }}
+{% endmacro %}
+#}
+
+version: "3"
+services:
+  db:
+    image: postgres:13
+    environment:
+      POSTGRES_USER: {{ matrix_server_db.db_user }}
+      POSTGRES_PASSWORD: '{{ gen.pw("matrix_server_db") }}'
+      POSTGRES_DB: na_default
+    {{ dv.volumes_section_complete(vols_db)|indent(width = 4) }}
+      - {{ root_dirs.matrix_server }}/init_db.sql:/docker-entrypoint-initdb.d/init_db.sql:ro
+    networks:
+      matrix_server:
+    {{ dm.common()|indent(width = 4) }}
+
+  redis:
+    image: redis:latest
+    networks:
+      matrix_server:
+    {{ dm.common()|indent(width = 4) }}
+
+  server:
+    image: black0/synapse:latest
+    container_name: matrix_server
+    environment:
+      UID: '{{ matrix_server.user }}'
+      GID: '{{ matrix_server.user }}'
+{#
+    labels:
+      {{ proxy_config()|indent(width = 6) }}
+#}
+    {{ traefik.declare_labels_mount_path(dns.public.root, service_name, "/_matrix/", 8008,
+        traefik.minimal_middlewares_no_auth,
+        [ 'websecure', 'matrix_alt' ]
+      )|indent(width = 4) }}
+      {{ traefik.use_letsencrypt(service_name) }}
+    {{ dv.volumes_section_complete(vols_matrix_server)|indent(width = 4) }}
+    {{ dn.discovery_network_section()|indent(width = 4) }}
+      matrix_server:
+    {{ dm.common()|indent(width = 4) }}
+    depends_on:
+      - db
+      - redis
+
+{{ dn.discovery_networks_declaration() }}
+  matrix_server:
+
+{{ dv.volumes_declaration(vols_matrix_server + vols_db) }}

@@ -2,21 +2,21 @@ freshrss:
   user: 33
   volumes:
     data:
-      name: rss_data
+      name:         rss_data
       local_folder: "{{ root_dirs.rss }}/rss-data"
-      mount: /var/www/FreshRSS/data
+      mount:        /var/www/FreshRSS/data
     extensions:
-      name: rss_extensions
+      name:         rss_extensions
       local_folder: "{{ root_dirs.rss }}/rss-extensions"
-      mount: /var/www/FreshRSS/extensions
+      mount:        /var/www/FreshRSS/extensions
 
 rss_db:
   user: 999
   volumes:
     data:
-      name: db_data
+      name:         db_data
       local_folder: "{{ root_dirs.rss }}/db-data"
-      mount: /var/lib/postgresql/data
+      mount:        /var/lib/postgresql/data
 
 __tmp: |
   {% set vols = [] %}

@@ -4,9 +4,12 @@
     IN:
         name: string
 #}
-{% macro enable(name) %}
+{% macro enable(name, entrypoints) %}
+{% if entrypoints is not defined %}
+{% set entrypoints = [ 'websecure' ] %}
+{% endif %}
 {{ common.enable(name) }}
-- "traefik.http.routers.{{ name }}.entrypoints=websecure"
+- "traefik.http.routers.{{ name }}.entrypoints={{ entrypoints|join(',') }}"
 - "traefik.http.routers.{{ name }}.tls=true"
 {% endmacro %}
 
@@ -28,6 +31,15 @@
 #}
 {% macro add_route(host, name, path) %}
 - "traefik.http.routers.{{ name }}.rule=Host(`{{ host }}`) && PathPrefix(`{{ path }}`)"
+{% endmacro %}
+
+{#
+    IN:
+        host: string
+        expression: string
+#}
+{% macro add_custom_route(name, expression) %}
+- "traefik.http.routers.{{ name }}.rule={{ expression }}"
 {% endmacro %}
 
 {#
@@ -110,10 +122,7 @@
 {# ########################################################################## #}
 {# ########################################################################## #}
 
-{% set minimal_middlewares = [
-    {
-      'mw': auth
-    },
+{% set minimal_middlewares_no_auth = [
     {
       'mw': trailing_slash,
       'args': {}
@@ -123,6 +132,12 @@
       'args': {}
     }
 ] %}
+
+{% set minimal_middlewares = [
+    {
+      'mw': auth
+    }
+] + minimal_middlewares_no_auth %}
 
 {# ########################################################################## #}
 {# ########################################################################## #}
@@ -156,7 +171,7 @@
         path: string
         port: number
 #}
-{% macro declare_labels_mount_path(host, service_name, path, port, middlewares) %}
+{% macro declare_labels_mount_path(host, service_name, path, port, middlewares, entrypoints) %}
 {% if middlewares is not defined %}
 {% set middlewares =
     minimal_middlewares
@@ -170,7 +185,7 @@
 {% endif %}
 
 labels:
-  {{ enable(service_name)|indent(width = 2) }}
+  {{ enable(service_name, entrypoints)|indent(width = 2) }}
 {% if port is defined %}
   {{ service_port(service_name, port)|indent(width = 2) }}
 {% endif %}

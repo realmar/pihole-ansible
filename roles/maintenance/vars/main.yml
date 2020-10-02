@@ -51,6 +51,7 @@ backup_helper:
     - discord
     - duplicati
     - among_us
+    - redis
 
 maintenance_folders_permissions:
   - folder: "{{ duplicati.volumes.config }}"
