@@ -1,5 +1,5 @@
 host:
-  name: realmar-rpi4
+  name: "{{ inventory_hostname }}"
   public_interface: eth0
   ipv4: 192.168.1.128
   ipv6: 2a02:120b:2c06:57d0::abcf
