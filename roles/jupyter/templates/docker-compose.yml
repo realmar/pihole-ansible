@@ -37,7 +37,6 @@ services:
       {{ dm.disable_auto_update()|indent(width = 4) }}
 
     {{ dv.volumes_section_complete(vols)|indent(width = 4) }}
-{#  {{ dn.map_ports([ (8888,) ])|indent(width = 4) }} #}
     networks:
       {{ network_names.discovery }}:
     {{ dm.common()|indent(width = 4) }}

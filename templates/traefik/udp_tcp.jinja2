@@ -1,15 +1,77 @@
 {% import "traefik/common.jinja2" as common with context -%}
 
+{% macro __generic(protocol, name, endpoints, port) %}
+- "traefik.{{ protocol }}.routers.{{ name }}.entrypoints={{ endpoints|join(',') }}"
+- "traefik.{{ protocol }}.routers.{{ name }}.service={{ name }}"
+- "traefik.{{ protocol }}.services.{{ name }}.loadbalancer.server.port={{ port }}"
+{% endmacro %}
+
 {#
     IN:
         host: string
-        endpoint: string
+        endpoints: string[]
         port: number
 #}
-{% macro declare_labels_udp(name, endpoint, port) %}
+{% macro udp(name, endpoints, port) %}
+{{ __generic('udp', name, endpoints, port) }}
+{% endmacro %}
+
+{#
+    IN:
+        host: string
+        endpoints: string[]
+        port: number
+#}
+{% macro tcp(name, endpoints, port, hostSNI) %}
+{{ __generic('tcp', name, endpoints, port) }}
+- "traefik.tcp.routers.{{ name }}.rule=HostSNI(`{{ hostSNI }}`)"
+{% endmacro %}
+
+{#
+    IN:
+        host: string
+        tcp_endpoints: string[]
+        udp_endpoints: string[]
+        port: number
+#}
+{% macro tcp_udp(name, tcp_endpoints, udp_endpoints, port, hostSNI) %}
+{{ tcp(name, tcp_endpoints, port, hostSNI) }}
+{{ udp(name, udp_endpoints, port) }}
+{% endmacro %}
+
+{#
+    IN:
+        host: string
+        endpoints: string[]
+        port: number
+#}
+{% macro declare_labels_udp(name, endpoints, port) %}
 labels:
   {{ common.enable(name)|indent(width = 2) }}
-  - "traefik.udp.routers.{{ name }}.entrypoints={{ endpoint }}"
-  - "traefik.udp.routers.{{ name }}.service={{ name }}"
-  - "traefik.udp.services.{{ name }}.loadbalancer.server.port={{ port }}"
+  {{ udp(name, endpoints, port)|indent(width = 2) }}
+{% endmacro %}
+
+{#
+    IN:
+        host: string
+        endpoints: string[]
+        port: number
+#}
+{% macro declare_labels_tcp(name, endpoints, port, hostSNI) %}
+labels:
+  {{ common.enable(name)|indent(width = 2) }}
+  {{ tcp(name, endpoints, port, hostSNI)|indent(width = 2) }}
+{% endmacro %}
+
+{#
+    IN:
+        host: string
+        tcp_endpoints: string[]
+        udp_endpoints: string[]
+        port: number
+#}
+{% macro declare_labels_tcp_udp(name, tcp_endpoints, udp_endpoints, port, hostSNI) %}
+labels:
+  {{ common.enable(name)|indent(width = 2) }}
+  {{ tcp_udp(name, tcp_endpoints, udp_endpoints, port, hostSNI)|indent(width = 2) }}
 {% endmacro %}

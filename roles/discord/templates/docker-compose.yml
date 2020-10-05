@@ -14,7 +14,7 @@ services:
   among_us_server:
     build: Imposter
     user: "1000"
-    {{ traefik.declare_labels_udp('among_us', 'among_us', 22023)|indent(width = 4) }}
+    {{ traefik.declare_labels_udp('among_us', [ 'among_us' ], 22023)|indent(width = 4) }}
       {{ dm.disable_auto_update()|indent(width = 6) }}
     {{ dm.journald_logging()|indent(width = 4) }}
     {{ dn.discovery_network_section()|indent(width = 4) }}

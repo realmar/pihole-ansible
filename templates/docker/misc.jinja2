@@ -1,7 +1,9 @@
 {% macro common() %}
-{% raw %}
-restart: always
-{% endraw %}
+{% if is_dev %}
+{##}restart: unless-stopped
+{% else %}
+{##}restart: always
+{% endif %}
 {% endmacro %}
 
 {#

@@ -30,7 +30,6 @@ services:
       CRON_MIN: 4,34
       TZ: {{ timezone }}
     {{ dv.volumes_section_complete(vols_rss)|indent(width = 4) }}
-{#  {{ dn.map_ports([ (9090, 80) ])|indent(width = 4) }} #}
     {{ dn.discovery_network_section()|indent(width = 4) }}
       default:
     depends_on:

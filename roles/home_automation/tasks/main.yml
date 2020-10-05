@@ -27,7 +27,7 @@
     group: "{{ user }}"
     mode: 0644
   tags: ha_config
-
+  register: mqtt_result
 
 - name: Create default configuration
   block:
@@ -36,10 +36,9 @@
       dir: "{{ root_dirs.home_automation }}"
 
   - name: Wait until Home Assistant has finished initializing
-    wait_for:
-      port: 8123
-      state: present
-      delay: 8
+    pause:
+      seconds: 30
+    when: mqtt_result.changed
 
   - include_tasks: docker/stop_stack.yml
     vars:

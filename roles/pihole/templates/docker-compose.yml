@@ -30,21 +30,20 @@ version: '3'
 # docker run -v $OVPN_DATA:/etc/openvpn --rm kylemanna/openvpn ovpn_getclient pihole-vpn > $OVPN_DATA/pihole-vpn.ovpn
 #
 
-{% import "pihole_ipam.jinja2" as pihole_ipam with context -%}
-{% import "password_gen.jinja2" as gen with context -%}
+{% import 'pihole_ipam.jinja2' as pihole_ipam with context -%}
+{% import 'password_gen.jinja2' as gen with context -%}
 {% import 'docker/volumes.jinja2' as dv with context -%}
 {% import 'docker/network.jinja2' as dn with context -%}
-{% import "docker/misc.jinja2" as dm with context -%}
-{% import "traefik/http.jinja2" as traefik with context -%}
+{% import 'docker/misc.jinja2' as dm with context -%}
+{% import 'traefik/http.jinja2' as traefik with context -%}
+{% import 'traefik/udp_tcp.jinja2' as traefik_raw with context -%}
 
 services:
   openvpn:
     container_name: {{ openvpn.name }}
     image: kylemanna/openvpn
-    {{ dm.disable_auto_update_section()|indent(width = 4) }}
-{% if openvpn.use_host_net == false %}
-    {{ dn.map_ports([ (1194, 1194, "udp"), (1194, 1194, "tcp") ])|indent(width = 4) }}
-{% endif %}
+    {{ traefik_raw.declare_labels_udp('openvpn', [ 'openvpn_udp' ], 1194)|indent(width = 4) }}
+      {{ dm.disable_auto_update() }}
     environment:
     # VIRTUAL_PORT=${VIRTUAL_PORT_OPENVPN}
     # VIRTUAL_HOST=${VIRTUAL_HOST_OPENVPN}
@@ -68,6 +67,8 @@ services:
 {%   endif %}
 {%   if pihole.use_host_net == false %}
       {{ pihole.networks.name }}:
+        ipv4_address: {{ openvpn.pihole_ipv4 }}
+      {{ network_names.discovery }}:
 {%   endif %}
 {% endif %}
 {% if openvpn.networks.v6.enable %}
@@ -79,7 +80,9 @@ services:
   pihole:
     image: pihole/pihole:latest
     container_name: {{ pihole.name }}
-    {{ traefik.declare_labels_mount_path_internal("pihole", "/pihole", pihole.web_admin_port)|indent(width = 4) }}
+    entrypoint: {{ pihole.volumes.main.mount }}startup.sh
+    {{ traefik.declare_labels_mount_path_internal('pihole', '/pihole', pihole.web_admin_port)|indent(width = 4) }}
+      {{ traefik_raw.tcp_udp('pihole', [ 'dns_tcp' ], [ 'dns_udp' ], 53, '*')|indent(width = 6) }}
     dns:
       - 127.0.0.1
       - 1.1.1.1
@@ -89,12 +92,6 @@ services:
       - dhcphelper
 {% endif %}
       - openvpn
-{% if pihole.use_host_net == false %}
-{#    (8282, pihole.web_admin_port) #}
-    {{ dn.map_ports([
-      (53, "udp"), (53, "tcp")
-       ])|indent(width = 4) }}
-{% endif %}
     environment:
 {#                 We need to escape $-sign with two $$-signs #}
       WEBPASSWORD: '{{ gen.pw("web") | replace("$", "$$") }}'

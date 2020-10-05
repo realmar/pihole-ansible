@@ -52,6 +52,17 @@
     mode: 0644
   tags: pihole_conf
 
+- name: Copy startup.sh file
+  template:
+    src: pihole/startup.sh
+    dest: "{{ pihole.volumes.main.local_folder }}/startup.sh"
+    owner: "{{ pihole.user }}"
+    group: "{{ user }}"
+    mode: 0755
+  tags:
+    - pihole_conf
+    - pihole_startup
+
 - name: Install update gravity cronjob
   template:
     src: pihole/pihole_update_gravitas

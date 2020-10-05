@@ -15,18 +15,16 @@ services:
     devices:
       - /dev/ttyACM0:/dev/ttyACM0
     networks:
-      {{ mosquitto.networks.name }}:
+      mqtt:
     {{ dv.volumes_section_complete(zigbee2mqtt_vols)|indent(width = 4) }}
     {{ dm.common()|indent(width = 4) }}
 
   mosquitto:
     image: eclipse-mosquitto
     networks:
-      {{ mosquitto.networks.name }}:
-        ipv4_address: {{ mosquitto.ipv4 }}
+      mqtt:
     {{ dv.volumes_section_complete(mosquitto_vols)|indent(width = 4) }}
       - "{{ root_dirs.home_automation }}/mosquitto.conf:/mosquitto/config/mosquitto.conf"
-    {{ dn.map_ports([ (1883,), (9001,) ])|indent(width = 4) }}
     {{ dm.common()|indent(width = 4) }}
 
   home_assistant:
@@ -36,11 +34,11 @@ services:
     networks:
       {{ network_names.discovery }}:
       {{ network_names.datastore }}:
-      {{ mosquitto.networks.name }}:
-    {{ dn.map_ports([ (8123,) ])|indent(width = 4) }}
+      mqtt:
     {{ dv.volumes_section_complete(home_assistant_vols)|indent(width = 4) }}
     {{ dm.common()|indent(width = 4) }}
 
-{{ dn.networks_declaration([ discovery_network, datastore_network, mosquitto.networks ]) }}
+{{ dn.networks_declaration([ discovery_network, datastore_network ]) }}
+  mqtt:
 
 {{ dv.volumes_declaration(zigbee2mqtt_vols + mosquitto_vols + home_assistant_vols) }}

@@ -31,4 +31,5 @@
         chdir: "{{ item }}"
       with_items:
         - "{{ root_dirs.discord }}"
+        - "{{ root_dirs.matrix_server }}"
       when: not is_dev

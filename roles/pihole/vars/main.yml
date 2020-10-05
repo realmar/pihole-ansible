@@ -68,6 +68,9 @@ openvpn:
 
   ipv4: 172.16.2.20
   ipv6: 2a02:120b:2c06:57de::20
+
+  pihole_ipv4: 172.16.1.80
+
   use_host_net: no
   autoupdate: no
   tun_device_name: tun0
