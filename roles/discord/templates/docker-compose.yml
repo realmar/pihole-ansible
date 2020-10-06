@@ -11,6 +11,7 @@ services:
       - "{{ root_dirs.discord }}/{{ music_bot.config_folder_name }}/serversettings.json:{{ music_bot.home }}/serversettings.json:rw"
     {{ dm.disable_auto_update_section()|indent(width = 4) }}
     {{ dm.common()|indent(width = 4) }}
+{#
   among_us_server:
     build: Imposter
     user: "1000"
@@ -19,5 +20,8 @@ services:
     {{ dm.journald_logging()|indent(width = 4) }}
     {{ dn.discovery_network_section()|indent(width = 4) }}
     {{ dm.common()|indent(width = 4) }}
+#}
 
+{#
 {{ dn.networks_declaration([ discovery_network ]) }}
+#}
