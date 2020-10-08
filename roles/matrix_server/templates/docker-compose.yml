@@ -8,15 +8,6 @@
 {% set vols_db = [ matrix_server_db.volumes.data ] %}
 {% set service_name = 'matrix_synapse' %}
 
-{#
-{% macro proxy_config() %}
-{{ traefik.enable(service_name, [ 'websecure', 'matrix_alt' ]) }}
-{{ traefik.add_custom_route(service_name, 'Host(`realmar.net`) && PathPrefix(`/_matrix/`)') }}
-{{ traefik.service_port(service_name, 8008) }}
-{{ traefik.use_letsencrypt(service_name) }}
-{% endmacro %}
-#}
-
 version: "3"
 services:
   db:
@@ -28,13 +19,13 @@ services:
     {{ dv.volumes_section_complete(vols_db)|indent(width = 4) }}
       - {{ root_dirs.matrix_server }}/init_db.sql:/docker-entrypoint-initdb.d/init_db.sql:ro
     networks:
-      matrix_server:
+      {{ matrix_server.networks.name }}:
     {{ dm.common()|indent(width = 4) }}
 
   redis:
     image: redis:latest
     networks:
-      matrix_server:
+      {{ matrix_server.networks.name }}:
     {{ dm.common()|indent(width = 4) }}
 
   server:
@@ -43,10 +34,6 @@ services:
     environment:
       UID: '{{ matrix_server.user }}'
       GID: '{{ matrix_server.user }}'
-{#
-    labels:
-      {{ proxy_config()|indent(width = 6) }}
-#}
     {{ traefik.declare_labels_mount_path(dns.public.root, service_name, "/_matrix/", 8008,
         traefik.minimal_middlewares_no_auth,
         [ 'websecure', 'matrix_alt' ]
@@ -54,13 +41,53 @@ services:
       {{ traefik.use_letsencrypt(service_name) }}
     {{ dv.volumes_section_complete(vols_matrix_server)|indent(width = 4) }}
     {{ dn.discovery_network_section()|indent(width = 4) }}
-      matrix_server:
+      {{ matrix_server.networks.name }}:
     {{ dm.common()|indent(width = 4) }}
     depends_on:
       - db
       - redis
 
-{{ dn.discovery_networks_declaration() }}
-  matrix_server:
+  turnserver:
+    image: killua99/coturn:latest
+{#
+    ports:
+      # P2P Connections
+      - 49152-65535:49152-65535/udp
+
+      # Unencrypted
+      # - 3478:3478
+      - 3478:3478/udp
+
+      # Encrypted
+      # - 5349:5349
+      - 5349:5349/udp
+#}
+    network_mode: host
+    tmpfs:
+      - /var/lib/coturn
+    volumes:
+      - {{ root_dirs.matrix_server }}/turnserver.conf:/etc/coturn/turnserver.conf
+      - {{ global_cert_dir }}/realmar.net.crt:/opt/certificates/realmar.net.crt
+      - {{ global_cert_dir }}/realmar.net.pem:/opt/certificates/realmar.net.pem
+{#
+    networks:
+      {{ matrix_server.networks.name }}:
+ {#     ipv4_address: {{ turnserver.ipv4 }} #}
+#}
+    {{ dm.common()|indent(width = 4) }}
+
+{#{{ dn.networks_declaration([ discovery_network, matrix_server.networks ]) }}#}
+{{ dn.networks_declaration([ discovery_network ]) }}
+  {{ matrix_server.networks.name }}:
+{#
+  matrix_net:
+    driver: macvlan
+    driver_opts:
+      parent: {{ host.public_interface }}.30
+    ipam:
+      config:
+        #- subnet: "172.16.90.0/24"
+        - subnet: "{{ host.networks.v4.subnet }}"
+#}
 
 {{ dv.volumes_declaration(vols_matrix_server + vols_db) }}

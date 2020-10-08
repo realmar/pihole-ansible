@@ -16,5 +16,6 @@
     dest: /etc/docker/daemon.json
     mode: 0644
   notify: restart docker
+  tags: docker_daemon_config
 
 - meta: flush_handlers

@@ -14,7 +14,7 @@
     packages:
       - dhcpcd5
       - isc-dhcp-client
-      - isc-dhcp-common      
+      - isc-dhcp-common
 
 - name: Configure static IPs for debian
   template:
@@ -37,7 +37,7 @@
         dest: /etc/netplan/99-ip-configuration.yaml
       notify: restart computer
       register: netplan_config
-    
+
     - name: apply config
       shell: netplan apply
       when: netplan_config.changed

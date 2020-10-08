@@ -1,0 +1,13 @@
+- name: Enable Promiscuous Mode
+  template:
+    src:   enable-promiscuous-mode.service
+    dest: /etc/systemd/system/enable-promiscuous-mode.service
+    mode: 0644
+  tags: net_conf
+
+- name: Enable systemd Promiscuous Mode service
+  systemd:
+    name: enable-promiscuous-mode.service
+    state: started
+    daemon_reload: yes
+    enabled: yes

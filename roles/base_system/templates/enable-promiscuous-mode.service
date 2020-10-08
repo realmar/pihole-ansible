@@ -1,0 +1,12 @@
+[Unit]
+Description=Promiscuous Mode
+After=network.target
+
+[Service]
+Type=oneshot
+ExecStart=/sbin/ip link set {{ host.public_interface }} promisc on
+RemainAfterExit=true
+ExecStop=/sbin/ip link set {{ host.public_interface }} promisc off
+
+[Install]
+WantedBy=multi-user.target

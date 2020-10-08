@@ -44,6 +44,13 @@
     - tls
     - ssl
 
+- block:
+  - include_tasks: tls/extract_certs.yml
+  tags:
+    - tls
+    - ssl
+  when: not is_dev
+
 # - block:
 #   - include_tasks: fix_permissions.yml
 #     vars:

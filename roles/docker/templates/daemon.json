@@ -3,6 +3,13 @@
  # https://docs.docker.com/config/containers/logging/configure/
  #}
 {
+{#
+  Reduce CPU and RAM usage and also make high number of ports mappable without filling all the RAM
+  https://github.com/moby/moby/issues/11185
+  https://github.com/moby/moby/issues/14856
+  https://stackoverflow.com/questions/44413816/how-to-disable-userland-proxy-for-docker-compose
+#}
+  "userland-proxy": false,
   "log-driver": "syslog",
   "log-opts": {
     "syslog-address": "udp://127.0.0.1:6514",

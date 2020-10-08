@@ -6,6 +6,14 @@ matrix_server:
       local_folder: "{{ root_dirs.matrix_server }}/matrix_server-data"
       mount:        /data
 
+  networks:
+    # v4:
+    #   subnet: 172.16.90.0/24
+    #   netaddress: 172.16.90.0
+    #   netmask: 255.255.255.0
+    #   gateway: 172.16.90.1
+    name: matrix_net
+
 matrix_server_db:
   db_user: synapse
   db_name: synapse
@@ -15,3 +23,6 @@ matrix_server_db:
       name:         matrix_db_data
       local_folder: "{{ root_dirs.matrix_server }}/db-data"
       mount:        /var/lib/postgresql/data
+
+# turnserver:
+#   ipv4: 172.16.90.20

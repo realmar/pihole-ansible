@@ -1,0 +1,1 @@
+0 0 * * * root /usr/bin/python3 {{ root_dirs.proxy }}/extract_certs.py {{ traefik.volumes.certificates.local_folder }}/acme.json {{ global_cert_dir }}

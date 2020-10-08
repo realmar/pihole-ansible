@@ -1,0 +1,25 @@
+#
+# IN
+#     privatekey_path: string
+#     csr_path: string
+#     pem_path: string
+#     common_name: string
+#
+
+- name: Generate a Self Signed OpenSSL certificate
+  block:
+    - openssl_privatekey:
+        path: "{{ privatekey_path }}"
+        type: RSA
+        size: 8192
+
+    - openssl_csr:
+        path: "{{ csr_path }}"
+        privatekey_path: "{{ privatekey_path }}"
+        common_name: "{{ common_name if common_name is defined else dns.public.root }}"
+
+    - openssl_certificate:
+        path: "{{ pem_path }}"
+        privatekey_path: "{{ privatekey_path }}"
+        csr_path: "{{ csr_path }}"
+        provider: selfsigned

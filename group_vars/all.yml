@@ -1,16 +1,20 @@
+data_mountpoint: /data
+application_root: /home/pi
+# application_root: "{{ data_mountpoint }}"
+
 timezone: Europe/Zurich
 user: pi
 root_dirs:
-  pihole: /home/pi/pihole
-  maintenance: /home/pi/maintenance
-  rss: /home/pi/rss
-  proxy: /home/pi/proxy
-  jupyter: /home/pi/jupyter
-  discord: /home/pi/discord
-  personal_website: /home/pi/realmar.net
-  home_automation: /home/pi/home_automation
-  datastore: /home/pi/datastore
-  matrix_server: /home/pi/matrix_server
+  pihole: "{{ application_root }}/pihole"
+  maintenance: "{{ application_root }}/maintenance"
+  rss: "{{ application_root }}/rss"
+  proxy: "{{ application_root }}/proxy"
+  jupyter: "{{ application_root }}/jupyter"
+  discord: "{{ application_root }}/discord"
+  personal_website: "{{ application_root }}/realmar.net"
+  home_automation: "{{ application_root }}/home_automation"
+  datastore: "{{ application_root }}/datastore"
+  matrix_server: "{{ application_root }}/matrix_server"
 
 network_names:
   discovery: discovery
@@ -39,3 +43,5 @@ all_dns:
   - "{{ dns_sub_domains.smarthome }}"
 
 letsencrypt_resolver_name: lets_encrypt
+
+global_cert_dir: "{{ application_root }}/tls_certificates"

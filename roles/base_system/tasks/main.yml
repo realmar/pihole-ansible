@@ -48,6 +48,8 @@
       - tcpdump
       - tmux
       - lvm2
+      - smartmontools
+      - jq
 
 - include_tasks: vim.yml
   tags: vim
@@ -68,6 +70,9 @@
 - include: network.yml
   when: not is_dev
   tags: network
+
+#- include: promiscuous_mode.yml
+#  tags: network
 
 - meta: flush_handlers
 
@@ -97,6 +102,11 @@
     src: resolv.conf
     dest: /etc/resolv.conf
     mode: 0644
+
+- name: Create global certs dir
+  file:
+    path: "{{ global_cert_dir }}"
+    state: directory
 
 - block:
     - name: Setup dev environment

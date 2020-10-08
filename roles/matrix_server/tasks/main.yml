@@ -27,7 +27,7 @@
     - realmar.net.signing.key
   tags: matrix_server_config
 
-- name: Copy DB init scripts
+- name: Copy DB scripts and configs
   template:
     src: "{{ item }}"
     dest: "{{ root_dirs.matrix_server }}/{{ item }}"
@@ -36,4 +36,5 @@
     mode: 0644
   with_items:
     - init_db.sql
+    - turnserver.conf
   tags: matrix_server_config

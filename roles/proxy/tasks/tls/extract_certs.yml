@@ -1,0 +1,11 @@
+- name: Copy python script
+  template:
+    src: "extract_certs.py"
+    dest: "{{ root_dirs.proxy }}/extract_certs.py"
+    mode: 0644
+
+- name: Copy cron job
+  template:
+    src: "extract_certs_cron"
+    dest: "/etc/cron.d/extract_certs_cron"
+    mode: 0644
