@@ -92,6 +92,11 @@
 {% endmacro %}
 {% set fix_wss = { 'name': 'fix-wss', 'f': __fix_wss_f } %}
 
+{% macro __replace_path_f(name, args) %}
+- "traefik.http.middlewares.{{ name }}.replacepath.path={{ args.path }}"
+{% endmacro %}
+{% set replace_path = { 'name': 'replace_path', 'f': __replace_path_f } %}
+
 {# ########################################################################## #}
 {# ########################################################################## #}
 
