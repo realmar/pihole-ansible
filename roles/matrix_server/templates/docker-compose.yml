@@ -49,19 +49,6 @@ services:
 
   turnserver:
     image: killua99/coturn:latest
-{#
-    ports:
-      # P2P Connections
-      - 49152-65535:49152-65535/udp
-
-      # Unencrypted
-      # - 3478:3478
-      - 3478:3478/udp
-
-      # Encrypted
-      # - 5349:5349
-      - 5349:5349/udp
-#}
     network_mode: host
     tmpfs:
       - /var/lib/coturn
@@ -69,25 +56,9 @@ services:
       - {{ root_dirs.matrix_server }}/turnserver.conf:/etc/coturn/turnserver.conf
       - {{ global_cert_dir }}/realmar.net.crt:/opt/certificates/realmar.net.crt
       - {{ global_cert_dir }}/realmar.net.pem:/opt/certificates/realmar.net.pem
-{#
-    networks:
-      {{ matrix_server.networks.name }}:
- {#     ipv4_address: {{ turnserver.ipv4 }} #}
-#}
     {{ dm.common()|indent(width = 4) }}
 
-{#{{ dn.networks_declaration([ discovery_network, matrix_server.networks ]) }}#}
 {{ dn.networks_declaration([ discovery_network ]) }}
   {{ matrix_server.networks.name }}:
-{#
-  matrix_net:
-    driver: macvlan
-    driver_opts:
-      parent: {{ host.public_interface }}.30
-    ipam:
-      config:
-        #- subnet: "172.16.90.0/24"
-        - subnet: "{{ host.networks.v4.subnet }}"
-#}
 
 {{ dv.volumes_declaration(vols_matrix_server + vols_db) }}
