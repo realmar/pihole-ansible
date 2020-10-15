@@ -35,6 +35,7 @@ services:
       {{ network_names.discovery }}:
       {{ network_names.datastore }}:
       mqtt:
+    {{ dn.map_ports([ (8123,) ])|indent(width = 4) }}
     {{ dv.volumes_section_complete(home_assistant_vols)|indent(width = 4) }}
     {{ dm.common()|indent(width = 4) }}
 
