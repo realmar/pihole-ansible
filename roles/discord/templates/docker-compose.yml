@@ -1,3 +1,4 @@
+{#
 {% import "docker/misc.jinja2" as dm with context -%}
 {% import 'docker/network.jinja2' as dn with context -%}
 {% import 'traefik/udp_tcp.jinja2' as traefik with context -%}
@@ -11,6 +12,7 @@ services:
       - "{{ root_dirs.discord }}/{{ music_bot.config_folder_name }}/serversettings.json:{{ music_bot.home }}/serversettings.json:rw"
     {{ dm.disable_auto_update_section()|indent(width = 4) }}
     {{ dm.common()|indent(width = 4) }}
+#}
 {#
   among_us_server:
     build: Imposter
