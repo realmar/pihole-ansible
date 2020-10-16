@@ -50,6 +50,7 @@
       - lvm2
       - smartmontools
       - jq
+      - nload
 
 - include_tasks: vim.yml
   tags: vim

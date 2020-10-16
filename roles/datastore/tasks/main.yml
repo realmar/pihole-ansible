@@ -1,7 +1,9 @@
-- name: Create datastore network
-  include_tasks: docker/network/add_docker_network.yml
-  vars:
-    network: "{{ datastore.networks }}"
+- block:
+  - name: Create datastore network
+    include_tasks: docker/network/add_docker_network.yml
+    vars:
+      network: "{{ datastore.networks }}"
+  tags: docker_network
 
 - block:
     - include_tasks: standard_service.yml

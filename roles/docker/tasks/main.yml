@@ -1,8 +1,23 @@
 - name: Install Docker dependencies
   apt:
-    name: [ 'apt-transport-https', 'ca-certificates', 'gnupg-agent', 'software-properties-common', 'python-docker', 'python-pexpect', 'python-pip', 'libffi-dev' ]
+    name: "{{ packages }}"
     state: latest
     update_cache: yes
+  vars:
+    packages:
+      - apt-transport-https
+      - ca-certificates
+      - gnupg-agent
+      - software-properties-common
+      - python3-pexpect
+      - python3-pip
+      - libffi-dev
+
+- name: Install ansible docker dependencies
+  pip:
+    name: "docker"
+    state: latest
+    executable: pip3
 
 - include_tasks: rasbian_stretch.yml
   when: is_rpi and ansible_distribution_major_version|int == 9
