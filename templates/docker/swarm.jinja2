@@ -1,0 +1,13 @@
+{% import 'docker/misc.jinja2' as dm with context -%}
+
+{% macro common(replicas=1) %}
+replicas: {{ replicas }}
+restart_policy:
+  condition: {{ 'on-failure' if is_dev else 'always' }}
+{% endmacro %}
+
+{% macro deploy_section(replicas=1) %}
+{{ dm.common() }}
+deploy:
+  {{ common(replicas)|indent(width = 2) }}
+{% endmacro %}

@@ -1,0 +1,44 @@
+- hosts: all
+  gather_facts: yes
+  remote_user: root
+  debugger: on_failed
+
+  pre_tasks:
+    - include: tasks/collect_system_data.yml
+      tags: always
+
+  tasks:
+    - name: Running command
+      shell: "docker stack deploy --compose-file docker-compose.yml {{ item.name }}"
+      args:
+        chdir: "{{ item.dir }}"
+      with_items:
+        - dir: "{{ root_dirs.datastore }}"
+          name: datastore
+        - dir: "{{ root_dirs.proxy }}"
+          name: proxy
+        - dir: "{{ root_dirs.maintenance }}"
+          name: maintenance
+        - dir: "{{ root_dirs.pihole }}"
+          name: pihole
+        - dir: "{{ root_dirs.home_automation }}"
+          name: home_automation
+        - dir: "{{ root_dirs.rss }}"
+          name: rss
+        - dir: "{{ root_dirs.jupyter }}"
+          name: jupyter
+        - dir: "{{ root_dirs.personal_website }}"
+          name: personal_website
+      ignore_errors: yes
+
+    - name: Running command
+      shell: "{{ command }}"
+      args:
+        chdir: "{{ item }}"
+      with_items:
+        #- dir: "{{ root_dirs.discord }}"
+        #  name: discord
+        - dir: "{{ root_dirs.matrix_server }}"
+          name: matrix_server
+      when: not is_dev
+      ignore_errors: yes

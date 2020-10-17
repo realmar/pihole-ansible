@@ -3,7 +3,9 @@
       vars:
         usr: "{{ user }}"
         root_dir: "{{ root_dirs.personal_website }}"
-  tags: compose_file
+  tags:
+    - compose_file
+    - personal_website_compose_file
 
 - name: Copy Dockerfile
   template:

@@ -1,6 +1,7 @@
 {% import 'docker/volumes.jinja2' as dv with context -%}
 {% import 'docker/network.jinja2' as dn with context -%}
 {% import 'docker/misc.jinja2' as dm with context -%}
+{% import 'docker/swarm.jinja2' as ds with context -%}
 {% import 'traefik/http.jinja2' as tf with context -%}
 
 {% set vols_traefik = [
@@ -17,12 +18,13 @@ version: "3.3"
 services:
   traefik:
     image: traefik:latest
-    container_name: traefik
     command:
       - "--log.level={{ 'INFO' if is_dev else  'WARN' }}"
       - "--accesslog=true"
 
       - "--providers.docker=true"
+      #- "--providers.docker.endpoint=tcp://127.0.0.1:2377"
+      - "--providers.docker.swarmMode=true"
       - "--providers.docker.network={{ network_names.discovery }}"
       - "--providers.docker.exposedbydefault=false"
       - "--providers.file.directory={{ traefik.volumes.dynamic_conf.mount }}"
@@ -76,7 +78,10 @@ services:
         (53,'tcp'), (53,'udp') ])|indent(width = 4) }}
     {{ dv.volumes_section_complete(vols_traefik)|indent(width = 4) }}
       {{ dv.mount_docker_socket() }}
-    {{ dm.common()|indent(width = 4) }}
+    {{ ds.deploy_section()|indent(width = 4) }}
+      placement:
+        constraints:
+          - "node.role==manager"
     networks:
       - default
       - {{ network_names.discovery }}
@@ -92,18 +97,18 @@ services:
     {{ dv.volumes_section_complete(vols_authelia)|indent(width = 4) }}
     environment:
       TZ: {{ timezone }}
-    labels:
-      {{ tf.enable(service_name)|indent(width = 6) }}
-      {{ tf.use_letsencrypt(service_name) }}
-      {{ tf.service_port(service_name, 9091) }}
-      - "traefik.http.routers.{{ service_name }}.rule=Host(`{{ dns_sub_domains.login }}`)"
-
-      - "traefik.http.middlewares.{{ service_name }}.forwardauth.address=http://authelia:9091/api/verify?rd=https://{{ dns_sub_domains.login }}/"
-      - "traefik.http.middlewares.{{ service_name }}.forwardauth.trustForwardHeader=true"
-      - "traefik.http.middlewares.{{ service_name }}.forwardauth.authResponseHeaders=Remote-User,Remote-Groups,X-Forwarded-User"
     networks:
       {{ network_names.discovery }}:
-    {{ dm.common()|indent(width = 4) }}
+    {{ ds.deploy_section()|indent(width = 4) }}
+      labels:
+        {{ tf.enable(service_name)|indent(width = 6) }}
+        {{ tf.use_letsencrypt(service_name) }}
+        {{ tf.service_port(service_name, 9091) }}
+        - "traefik.http.routers.{{ service_name }}.rule=Host(`{{ dns_sub_domains.login }}`)"
+
+        - "traefik.http.middlewares.{{ service_name }}.forwardauth.address=http://authelia:9091/api/verify?rd=https://{{ dns_sub_domains.login }}/"
+        - "traefik.http.middlewares.{{ service_name }}.forwardauth.trustForwardHeader=true"
+        - "traefik.http.middlewares.{{ service_name }}.forwardauth.authResponseHeaders=Remote-User,Remote-Groups,X-Forwarded-User"
 
 {{ dn.networks_declaration([ discovery_network, datastore_network ]) }}
 
