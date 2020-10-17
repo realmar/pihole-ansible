@@ -1,7 +1,9 @@
-- name: Create datastore network
-  include_tasks: docker/network/add_docker_network.yml
-  vars:
-    network: "{{ datastore.networks }}"
+- block:
+  - name: Create datastore network
+    include_tasks: docker/network/add_docker_network.yml
+    vars:
+      network: "{{ datastore.networks }}"
+  tags: docker_network
 
 - block:
     - include_tasks: standard_service.yml
@@ -13,6 +15,9 @@
           - "{{ chronograf.volumes.data.local_folder }}"
           - "{{ kapacitor.volumes.data.local_folder }}"
           - "{{ grafana.volumes.data.local_folder }}"
+          - "{{ registry.volumes.data.local_folder }}"
+          - "{{ registry.volumes.certificates.local_folder }}"
+          - "{{ redis.volumes.data.local_folder }}"
   tags:
     - compose_file
     - datastore_compose_file
@@ -44,6 +49,15 @@
     - kapacitor.conf
     - grafana.ini
   tags: datastore_config
+
+- name: Copy docker registry configs
+  template:
+    src: registry_config.yml
+    dest: "{{ root_dirs.datastore }}/registry_config.yml"
+    owner: "{{ registry.user }}"
+    group: "{{ registry.user }}"
+    mode: 0644
+  tags: docker_registry_config
 
 - name: Copy stats scripts
   template:
@@ -91,3 +105,21 @@
       - ouroboros
       - traefik
   tags: influxdb_init
+
+- block:
+  - include_tasks: create_self_signed_cert.yml
+    vars:
+      privatekey_path: "{{ registry_tls_key }}"
+      csr_path: "{{ registry_tls_csr }}"
+      pem_path: "{{ registry_tls_crt }}"
+  tags: docker_registry_tls
+
+- block:
+  - include_tasks: fix_permissions.yml
+    vars:
+      items: "{{ datastore_folders_permissions }}"
+  tags:
+    - fix_permissions
+    - datastore_fix_permissions
+    - compose_file
+    - datastore_compose_file

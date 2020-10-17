@@ -32,7 +32,7 @@ services:
 
       - "--entrypoints.web.address=:80"
       - "--entrypoints.websecure.address=:443"
-      - "--entrypoints.matrix_alt.address=:8448"
+{#    - "--entrypoints.matrix_alt.address=:8448" #}
 {#    - "--entryPoints.among_us.address=:22023/udp" #}
 {#    - "--entryPoints.openvpn_tcp.address=:1194" #}
       - "--entryPoints.openvpn_udp.address=:1194/udp"
@@ -66,12 +66,12 @@ services:
 #}
 {% endif %}
 {#
+        (8448,),
         (22023,'udp'),
 #}
     {{ dn.map_ports([
         (80,), (443,),
         (8080,),
-        (8448,),
         (1194,'udp'),
         (53,'tcp'), (53,'udp') ])|indent(width = 4) }}
     {{ dv.volumes_section_complete(vols_traefik)|indent(width = 4) }}

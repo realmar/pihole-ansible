@@ -8,7 +8,9 @@
         - "{{ mosquitto.volumes.data.local_folder }}"
         - "{{ mosquitto.volumes.log.local_folder }}"
         - "{{ home_assistant.volumes.config.local_folder }}"
-  tags: compose_file
+  tags:
+    - compose_file
+    - home_automation_compose_file
 
 - name: Copy zigbee2mqtt configuration
   template:

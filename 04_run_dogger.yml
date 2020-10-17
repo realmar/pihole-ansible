@@ -4,6 +4,7 @@
 #
 # Examples:
 #
+# --extra-vars command='"docker-compose up -d --remove-orphans"'
 # --extra-vars command='"docker-compose stop && docker-compose rm -f"'
 # --extra-vars command='"docker-compose stop && docker-compose rm -f && docker-compose up -d --remove-orphans"'
 #

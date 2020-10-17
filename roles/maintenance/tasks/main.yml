@@ -30,4 +30,6 @@
     - include_tasks: fix_permissions.yml
       vars:
         items: "{{ maintenance_folders_permissions }}"
-  tags: fix_permissions
+  tags:
+    - fix_permissions
+    - maintenance_fix_permissions

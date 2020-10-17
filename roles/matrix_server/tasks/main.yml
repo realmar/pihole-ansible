@@ -37,4 +37,7 @@
   with_items:
     - init_db.sql
     - turnserver.conf
-  tags: matrix_server_config
+    - well-known_server.json
+  tags:
+    - matrix_server_config
+    - matrix_server_config2

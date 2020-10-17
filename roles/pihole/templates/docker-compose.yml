@@ -41,7 +41,11 @@ version: '3'
 services:
   openvpn:
     container_name: {{ openvpn.name }}
-    image: kylemanna/openvpn
+{% if is_dev %}
+    image: kylemanna/openvpn:latest
+{% else %}
+    image: {{ dm.private_image('kylemanna/openvpn') }}
+{% endif %}
     {{ traefik_raw.declare_labels_udp('openvpn', [ 'openvpn_udp' ], 1194)|indent(width = 4) }}
       {{ dm.disable_auto_update() }}
     environment:
@@ -147,7 +151,7 @@ services:
   # https://docs.pi-hole.net/docker/dhcp/
   # https://discourse.pi-hole.net/t/dhcp-with-docker-compose-and-bridge-networking/17038
   dhcphelper:
-    build: ./dhcp-helper
+    image: {{ dm.private_image('dhcphelper') }}
     network_mode: host
     command: -s {{ pihole_ipam.ipam.ipv4 }}
     cap_add:

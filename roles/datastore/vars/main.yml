@@ -39,3 +39,37 @@ syslog_interceptor:
   container_user: interceptor
   container_home: /home/interceptor
   container_app_dir: /home/interceptor/app
+
+registry:
+  user: 1000
+  volumes:
+    data:
+      name:         registry_data
+      local_folder: "{{ root_dirs.datastore }}/registry-data"
+      mount:        /var/lib/registry
+    certificates:
+      name:         registry_certificates
+      local_folder: "{{ root_dirs.datastore }}/registry-certificates"
+      mount:        /certificates
+
+registry_tls_key: "{{ registry.volumes.certificates.local_folder }}/registry.key"
+registry_tls_crt: "{{ registry.volumes.certificates.local_folder }}/registry.crt"
+registry_tls_csr: "{{ registry.volumes.certificates.local_folder }}/registry.csr"
+
+redis:
+  user: 999
+  volumes:
+    data:
+      name:         redis_data
+      local_folder: "{{ root_dirs.datastore }}/redis-data"
+      mount:        /data
+
+__tmp: |
+  {% set vols = [] %}
+  {% for c in [ registry, redis ] %}
+    {% for k, vol in c.volumes.items() %}
+      {% set x = vols.append({'folder': vol.local_folder, 'user': c.user}) %}
+    {% endfor %}
+  {% endfor %}
+  {{ vols|to_json }}
+datastore_folders_permissions: "{{ __tmp|from_json }}"

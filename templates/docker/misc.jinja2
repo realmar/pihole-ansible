@@ -63,3 +63,5 @@ logging:
     tag: "{{.Name}}/{{.ID}}"
 {% endraw %}
 {% endmacro %}
+
+{% macro private_image(name, tag) %}{% if tag is not defined %}{% set tag = 'latest' if is_dev else 'aarch64' %}{% endif %}{{ private_docker_registry }}/{{ name }}:{{ tag }}{% endmacro %}

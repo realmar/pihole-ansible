@@ -45,3 +45,5 @@ all_dns:
 letsencrypt_resolver_name: lets_encrypt
 
 global_cert_dir: "{{ application_root }}/tls_certificates"
+
+private_docker_registry: 192.168.1.128:5000

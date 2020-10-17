@@ -7,6 +7,7 @@
 {% set vols_matrix_server = [ matrix_server.volumes.data ] %}
 {% set vols_db = [ matrix_server_db.volumes.data ] %}
 {% set service_name = 'matrix_synapse' %}
+{% set nginx_name = 'matrix_well_known' %}
 
 version: "3"
 services:
@@ -22,46 +23,28 @@ services:
       {{ matrix_server.networks.name }}:
     {{ dm.common()|indent(width = 4) }}
 
-  redis:
-    image: redis:latest
-    networks:
-      {{ matrix_server.networks.name }}:
-    {{ dm.common()|indent(width = 4) }}
-
   server:
     image: black0/synapse:latest
     container_name: matrix_server
     environment:
       UID: '{{ matrix_server.user }}'
       GID: '{{ matrix_server.user }}'
+{#      [ 'websecure', 'matrix_alt' ] #}
     {{ traefik.declare_labels_mount_path(dns.public.root, service_name, "/_matrix/", 8008,
         traefik.minimal_middlewares_no_auth,
-        [ 'websecure', 'matrix_alt' ]
+        [ 'websecure' ]
       )|indent(width = 4) }}
       {{ traefik.use_letsencrypt(service_name) }}
     {{ dv.volumes_section_complete(vols_matrix_server)|indent(width = 4) }}
     {{ dn.discovery_network_section()|indent(width = 4) }}
+      {{ network_names.datastore }}:
       {{ matrix_server.networks.name }}:
     {{ dm.common()|indent(width = 4) }}
     depends_on:
       - db
-      - redis
 
   turnserver:
     image: killua99/coturn:latest
-{#
-    ports:
-      # P2P Connections
-      - 49152-65535:49152-65535/udp
-
-      # Unencrypted
-      # - 3478:3478
-      - 3478:3478/udp
-
-      # Encrypted
-      # - 5349:5349
-      - 5349:5349/udp
-#}
     network_mode: host
     tmpfs:
       - /var/lib/coturn
@@ -69,25 +52,26 @@ services:
       - {{ root_dirs.matrix_server }}/turnserver.conf:/etc/coturn/turnserver.conf
       - {{ global_cert_dir }}/realmar.net.crt:/opt/certificates/realmar.net.crt
       - {{ global_cert_dir }}/realmar.net.pem:/opt/certificates/realmar.net.pem
-{#
-    networks:
-      {{ matrix_server.networks.name }}:
- {#     ipv4_address: {{ turnserver.ipv4 }} #}
-#}
     {{ dm.common()|indent(width = 4) }}
 
-{#{{ dn.networks_declaration([ discovery_network, matrix_server.networks ]) }}#}
-{{ dn.networks_declaration([ discovery_network ]) }}
+  well_known:
+    image: nginx:latest
+    {{ traefik.declare_labels_mount_path(dns.public.root, nginx_name, "/.well-known/matrix/server", 80,
+        [
+          {
+            "mw": traefik.replace_path,
+            "args": { "path": "/well-known_server.json" }
+          }
+        ],
+        [ 'websecure' ]
+      )|indent(width = 4) }}
+      {{ traefik.use_letsencrypt(nginx_name) }}
+    volumes:
+      - {{ root_dirs.matrix_server }}/well-known_server.json:/usr/share/nginx/html/well-known_server.json:ro
+    {{ dn.discovery_network_section()|indent(width = 4) }}
+    {{ dm.common()|indent(width = 4) }}
+
+{{ dn.networks_declaration([ discovery_network, datastore_network ]) }}
   {{ matrix_server.networks.name }}:
-{#
-  matrix_net:
-    driver: macvlan
-    driver_opts:
-      parent: {{ host.public_interface }}.30
-    ipam:
-      config:
-        #- subnet: "172.16.90.0/24"
-        - subnet: "{{ host.networks.v4.subnet }}"
-#}
 
 {{ dv.volumes_declaration(vols_matrix_server + vols_db) }}
