@@ -1,0 +1,33 @@
+- name: Create cephx fs user
+  ceph_key:
+    name: "{{ ceph_fs.user }}"
+    state: present
+    caps:
+      mon: allow r
+      mds: allow rw
+      osd: allow rw pool=cephfs_data
+    cluster: "ceph"
+    secret: "{{ ceph_fs.secret }}"
+
+- name: Create secret file
+  template:
+    src: ceph.client.fs.secret
+    dest: "{{ ceph_fs.secret_path }}"
+    mode: 0644
+  tags: ceph_mount
+
+- name: Copy ceph.py script
+  template:
+    src: ceph.py
+    dest: /opt/ceph.py
+    mode: 0755
+  tags: ceph_mount
+
+- block:
+  - include_tasks: create_systemd_file.yml
+    vars:
+      filename: "{{ item }}"
+    loop:
+      - data.mount
+      - ceph_mount.service
+  tags: ceph_mount

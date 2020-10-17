@@ -31,12 +31,15 @@
         - "{{ root_dirs.rss }}"
         - "{{ root_dirs.jupyter }}"
         - "{{ root_dirs.personal_website }}"
+        - "{{ root_dirs.matrix_server }}"
+      ignore_errors: yes
 
     - name: Running command
       shell: "{{ command }}"
       args:
         chdir: "{{ item }}"
       with_items:
-        - "{{ root_dirs.discord }}"
+        #- "{{ root_dirs.discord }}"
         - "{{ root_dirs.matrix_server }}"
       when: not is_dev
+      ignore_errors: yes

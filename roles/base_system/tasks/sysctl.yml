@@ -1,0 +1,17 @@
+- name: Copy sysctl config for static ipv6
+  template:
+    src: sysctl/80-ipv6.conf
+    dest: /etc/sysctl.d/80-ipv6.conf
+    mode: 0644
+  when: host.supports_v6
+  tags: net_conf
+  notify: restart computer
+
+- name: Copy other sysctl configs
+  template:
+    src: "sysctl/{{ item }}"
+    dest: "/etc/sysctl.d/{{ item }}"
+    mode: 0644
+  with_items:
+    - 80-vm.conf
+

@@ -1,0 +1,4 @@
+ceph_fs:
+  user: client.fs
+  secret: AQAS8oBfgZBhCBAAPwAnNw9iSe0P21zTd9oCoQ==
+  secret_path: /etc/ceph/ceph.client.fs.secret

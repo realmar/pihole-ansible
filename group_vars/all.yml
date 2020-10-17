@@ -1,6 +1,6 @@
 data_mountpoint: /data
-application_root: /home/pi
-# application_root: "{{ data_mountpoint }}"
+# application_root: /home/pi
+application_root: "{{ data_mountpoint }}"
 
 timezone: Europe/Zurich
 user: pi

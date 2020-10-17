@@ -9,14 +9,16 @@
   https://github.com/moby/moby/issues/14856
   https://stackoverflow.com/questions/44413816/how-to-disable-userland-proxy-for-docker-compose
 #}
-  "userland-proxy": false,
+  "userland-proxy": false{#,
   "log-driver": "syslog",
   "log-opts": {
     "syslog-address": "udp://127.0.0.1:6514",
-    "syslog-format": "rfc5424",
+    "syslog-format": "rfc5424",#}
 {#  "syslog-facility": "daemon", #}
+{#
 {% raw %}
     "tag": "{{.Name}}/{{.ID}}"
 {% endraw %}
+#}
   }
 }

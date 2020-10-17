@@ -1,7 +1,7 @@
 host:
   name: "{{ inventory_hostname }}"
   public_interface: enp0s8
-  ipv4: 192.168.250.102
+  ipv4: "{{ ansible_host }}"
   ipv6: 2a02:120b:2c06:57d0:ae81:e76b:ea6f:6cff
   supports_v6: no
 

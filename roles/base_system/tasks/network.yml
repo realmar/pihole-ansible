@@ -45,13 +45,4 @@
   tags: net_conf
   when: is_ubuntu
 
-- name: Copy sysctl config for static ipv6
-  template:
-    src: ipv6-sysctl.conf
-    dest: /etc/sysctl.d/80-ipv6.conf
-    mode: 0644
-  when: host.supports_v6
-  tags: net_conf
-  notify: restart computer
-
 - meta: flush_handlers

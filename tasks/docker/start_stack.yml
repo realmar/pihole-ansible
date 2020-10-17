@@ -4,9 +4,10 @@
 #
 
 - name: Start stack
-  shell: "docker-compose up -d"
-  args:
-    chdir: "{{ dir }}"
-  register: cli_result
-  changed_when:
-    - '"up-to-date" not in cli_result.stderr'
+  pause:
+  #shell: "docker-compose up -d"
+  #args:
+  #  chdir: "{{ dir }}"
+  #register: cli_result
+  #changed_when:
+  #  - '"up-to-date" not in cli_result.stderr'

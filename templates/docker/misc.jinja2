@@ -1,9 +1,12 @@
 {% macro common() %}
-{% if is_dev %}
-{##}restart: unless-stopped
-{% else %}
-{##}restart: always
-{% endif %}
+restart: {{ 'unless-stopped' if is_dev else 'always' }}
+deploy:
+  replicas: 1
+  update_config:
+    parallelism: 2
+    delay: 10s
+  restart_policy:
+    condition: {{ 'on-failure' if is_dev else 'always' }}
 {% endmacro %}
 
 {#

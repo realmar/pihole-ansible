@@ -1,0 +1,4 @@
+[submodule "3d/ceph-ansible"]
+	path = 3d/ceph-ansible
+	url = https://github.com/ceph/ceph-ansible.git
+	branch = v4.0.36

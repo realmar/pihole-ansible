@@ -1,0 +1,17 @@
+#
+# IN:
+#     filename
+#
+
+- name: Copy systemd file
+  template:
+    src: "{{ filename }}"
+    dest: "/etc/systemd/system/{{ filename }}"
+    mode: 0644
+
+- name: Enable systemd file
+  systemd:
+    name: "{{ filename }}"
+    state: started
+    daemon_reload: yes
+    enabled: yes

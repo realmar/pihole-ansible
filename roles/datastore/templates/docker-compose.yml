@@ -80,7 +80,6 @@ services:
     {{ traefik.declare_labels_mount_path_internal("grafana", "/grafana", 3000)|indent(width = 4) }}
     {{ dv.volumes_section_complete(vols_grafana)|indent(width = 4) }}
       - {{ root_dirs.datastore }}/grafana.ini:/etc/grafana/grafana.ini:ro
-      - {{ root_dirs.datastore }}/syslog-interceptor-config.yml:/etc/grafana/grafana.ini:ro
 {% if is_dev %}
     {{ dn.map_ports([ (3000,) ])|indent(width = 4) }}
 {% endif %}

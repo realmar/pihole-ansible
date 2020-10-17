@@ -5,6 +5,7 @@
   vars:
     packages:
       - openssl
+      - python3-openssl
 
 - include_tasks: create_self_signed_cert.yml
   vars:

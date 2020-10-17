@@ -1,0 +1,22 @@
+- hosts: all
+  gather_facts: yes
+  pre_tasks:
+    - include: tasks/collect_system_data.yml
+      tags: always
+
+  roles:
+    - { role: proxy, tags: proxy }
+    - { role: datastore, tags: datastore }
+    - { role: pihole, tags: pihole }
+    - { role: maintenance, tags: maintenance }
+    - { role: fileserver, tags: fileserver }
+    - { role: rss, tags: rss }
+    - { role: jupyter, tags: jupyter }
+    #- { role: discord, tags: discord }
+    - { role: personal_website, tags: realmar_net }
+    - { role: home_automation, tags: home_automation }
+    - { role: matrix_server, tags: matrix_server }
+
+  handlers:
+    - import_tasks: handlers/services.yml
+    - import_tasks: handlers/docker.yml

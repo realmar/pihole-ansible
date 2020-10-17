@@ -1,0 +1,6 @@
+roles:
+  - stuvusit.systemd-timesyncd
+
+collections:
+  - community.general
+  - ansible.posix

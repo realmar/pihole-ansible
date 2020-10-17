@@ -4,9 +4,10 @@
 #
 
 - name: Stop stack
-  shell: "docker-compose stop"
-  args:
-    chdir: "{{ dir }}"
-  register: cli_result
-  changed_when:
-    - '"Stopping" in cli_result.stderr'
+  pause:
+  #shell: "docker-compose stop"
+  #args:
+  #  chdir: "{{ dir }}"
+  #register: cli_result
+  #changed_when:
+  #  - '"Stopping" in cli_result.stderr'

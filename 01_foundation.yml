@@ -1,0 +1,76 @@
+- hosts: all
+  gather_facts: yes
+  pre_tasks:
+    - include: tasks/collect_system_data.yml
+      tags: always
+
+  roles:
+    - { role: docker, tags: docker }
+
+  handlers:
+    - import_tasks: handlers/services.yml
+    - import_tasks: handlers/docker.yml
+
+- name: Deploy Ceph
+  import_playbook: 3d/ceph-ansible/site.yml
+
+- hosts: all
+  gather_facts: yes
+  pre_tasks:
+    - include: tasks/collect_system_data.yml
+      tags: always
+
+  roles:
+    - { role: ceph, tags: ceph }
+
+# https://github.com/jobin-james/docker-swarm/blob/master/docker-swarm.yml
+
+# initial leader
+- hosts: docker-swarm-manager[0]
+  tasks:
+    - name: Initialize swarm
+      community.general.docker_swarm:
+        state: present
+        advertise_addr: "{{ host.ipv4 }}"
+      register: swarm_init
+
+    - name: Get manager token
+      shell: docker swarm join-token -q manager
+      register: swarm_manager_token_result
+
+    - name: Get worker token
+      shell: docker swarm join-token -q worker
+      register: swarm_worker_token_result
+
+    - set_fact:
+        new_installation: "{{ swarm_init.changed }}"
+        leader_ipv4: "{{ host.ipv4 }}"
+        swarm_manager_token: "{{ swarm_manager_token_result['stdout'] }}"
+        swarm_worker_token: "{{ swarm_worker_token_result['stdout'] }}"
+
+    - debug:
+        msg:
+          - "{{ swarm_manager_token }}"
+          - "{{ swarm_worker_token }}"
+
+# managers
+- hosts: docker-swarm-manager:!docker-swarm-manager[0]
+  tasks:
+    - name: Join swarm
+      community.general.docker_swarm:
+        state: join
+        advertise_addr: "{{ host.ipv4 }}"
+        join_token: "{{ hostvars[groups['docker-swarm-manager'][0]]['swarm_manager_token'] }}"
+        remote_addrs:
+          - "{{ hostvars[groups['docker-swarm-manager'][0]]['leader_ipv4'] }}"
+
+# workers
+- hosts: docker-swarm-workers
+  tasks:
+    - name: Join swarm
+      community.general.docker_swarm:
+        state: join
+        advertise_addr: "{{ host.ipv4 }}"
+        join_token: "{{ hostvars[groups['docker-swarm-manager'][0]]['swarm_worker_token'] }}"
+        remote_addrs:
+          - "{{ hostvars[groups['docker-swarm-manager'][0]]['leader_ipv4'] }}"
