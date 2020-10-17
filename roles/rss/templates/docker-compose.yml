@@ -1,7 +1,7 @@
 {% import "password_gen.jinja2" as gen with context -%}
 {% import "docker/volumes.jinja2" as dv with context -%}
 {% import "docker/network.jinja2" as dn with context -%}
-{% import "docker/misc.jinja2" as dm with context -%}
+{% import "docker/swarm.jinja2" as ds with context -%}
 {% import "traefik/http.jinja2" as traefik with context -%}
 
 {% set vols_rss = [
@@ -13,28 +13,25 @@ version: "3"
 services:
   rss:
     image: {{ 'freshrss/freshrss:latest' if is_dev else 'freshrss/freshrss:arm' }}
-    container_name: freshrss
-    {{ traefik.declare_labels_mount_path_public(
-      "rss", "/rss", None,
-      traefik.minimal_middlewares + [
-        {
-          'mw': traefik.strip_path,
-          'args': { 'path': '/rss' }
-        },
-        {
-          "mw": traefik.redirect,
-          "args": { "old_path": "/rss/api", "new_path": "/rss/api/" }
-        },
-      ])|indent(width = 4) }}
     environment:
       CRON_MIN: 4,34
       TZ: {{ timezone }}
     {{ dv.volumes_section_complete(vols_rss)|indent(width = 4) }}
     {{ dn.discovery_network_section()|indent(width = 4) }}
       default:
-    depends_on:
-      - db
-    {{ dm.common()|indent(width = 4) }}
+    {{ ds.deploy_section()|indent(width = 4) }}
+      {{ traefik.declare_labels_mount_path_public(
+        "rss", "/rss", 80,
+        traefik.minimal_middlewares + [
+          {
+            'mw': traefik.strip_path,
+            'args': { 'path': '/rss' }
+          },
+          {
+            "mw": traefik.redirect,
+            "args": { "old_path": "/rss/api", "new_path": "/rss/api/" }
+          },
+        ])|indent(width = 6) }}
 
   db:
     image: postgres:12
@@ -44,7 +41,7 @@ services:
       POSTGRES_DB: na_default
       TZ: {{ timezone }}
     {{ dv.volumes_section_complete([ rss_db.volumes.data ])|indent(width = 4) }}
-    {{ dm.common()|indent(width = 4) }}
+    {{ ds.deploy_section()|indent(width = 4) }}
 
 {{ dn.discovery_networks_declaration() }}
 
