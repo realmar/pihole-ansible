@@ -6,7 +6,7 @@
 version: "3"
 services:
   music_bot:
-    build: {{ music_bot.config_folder_name }}
+    image: {{ dm.private_image('music_bot') }}
     volumes:
       - "{{ root_dirs.discord }}/{{ music_bot.config_folder_name }}/config.txt:{{ music_bot.home }}/config.txt:ro"
       - "{{ root_dirs.discord }}/{{ music_bot.config_folder_name }}/serversettings.json:{{ music_bot.home }}/serversettings.json:rw"

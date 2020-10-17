@@ -4,22 +4,28 @@
       src: "backup-helper"
       dest: "{{ root_dirs.maintenance }}"
 
-- name: Build image
-  docker_image:
-    name: backup_helper
-    source: build
-    build:
-      path: "{{ root_dirs.maintenance }}/backup-helper"
-      nocache: yes
-      rm: yes
-      pull: yes
-  register: build
+#- name: Build image
+#  docker_image:
+#    name: backup_helper
+#    source: build
+#    build:
+#      path: "{{ root_dirs.maintenance }}/backup-helper"
+#      nocache: yes
+#      rm: yes
+#      pull: yes
+#  register: build
+
+- name: Check backup helper binary exists
+  stat:
+    path: "{{ duplicati.volumes.config.local_folder }}/bh"
+  register: bh_binary_check
+  changed: False
 
 - name: Copy binary
   shell:
-    cmd: docker run --rm -v $(pwd):/mnt backup_helper:latest cp -r bh /mnt/.
+    cmd: docker run --rm -v $(pwd):/mnt {{ private_docker_registry }}/backup_helper:{{ 'latest' if is_dev else 'aarch64' }} cp -r bh /mnt/.
     chdir: "{{ root_dirs.maintenance }}/backup-helper"
-  when: build.changed
+  when: bh_binary_check.stat.exists
 
 - name: Move binary to the right place
   copy:
@@ -27,7 +33,7 @@
     src: "{{ root_dirs.maintenance }}/backup-helper/bh"
     dest: "{{ duplicati.volumes.config.local_folder }}/bh"
     mode: "0755"
-  when: build.changed
+    when: bh_binary_check.stat.exists
 
 - name: Delete original binary
   file:

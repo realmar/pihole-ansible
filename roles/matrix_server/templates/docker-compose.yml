@@ -23,12 +23,6 @@ services:
       {{ matrix_server.networks.name }}:
     {{ dm.common()|indent(width = 4) }}
 
-  redis:
-    image: redis:latest
-    networks:
-      {{ matrix_server.networks.name }}:
-    {{ dm.common()|indent(width = 4) }}
-
   server:
     image: black0/synapse:latest
     container_name: matrix_server
@@ -43,11 +37,11 @@ services:
       {{ traefik.use_letsencrypt(service_name) }}
     {{ dv.volumes_section_complete(vols_matrix_server)|indent(width = 4) }}
     {{ dn.discovery_network_section()|indent(width = 4) }}
+      {{ network_names.datastore }}:
       {{ matrix_server.networks.name }}:
     {{ dm.common()|indent(width = 4) }}
     depends_on:
       - db
-      - redis
 
   turnserver:
     image: killua99/coturn:latest
@@ -77,7 +71,7 @@ services:
     {{ dn.discovery_network_section()|indent(width = 4) }}
     {{ dm.common()|indent(width = 4) }}
 
-{{ dn.networks_declaration([ discovery_network ]) }}
+{{ dn.networks_declaration([ discovery_network, datastore_network ]) }}
   {{ matrix_server.networks.name }}:
 
 {{ dv.volumes_declaration(vols_matrix_server + vols_db) }}

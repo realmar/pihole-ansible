@@ -7,6 +7,8 @@
 {% set vols_chronograf = [ chronograf.volumes.data ] %}
 {% set vols_kapacitor = [ kapacitor.volumes.data ] %}
 {% set vols_grafana = [ grafana.volumes.data ] %}
+{% set vols_registry = [ registry.volumes.data, registry.volumes.certificates ] %}
+{% set vols_redis = [ redis.volumes.data ] %}
 
 version: "3"
 services:
@@ -18,6 +20,39 @@ services:
     networks:
       - {{ network_names.datastore }}
     {{ dm.common()|indent(width = 4) }}#}
+
+  redis:
+    image: redis:latest
+    container_name: redis
+    command: [ "redis-server", "--appendonly", "yes" ]
+    {{ dv.volumes_section_complete(vols_redis)|indent(width = 4) }}
+    networks:
+      {{ network_names.datastore }}:
+    {{ dm.common()|indent(width = 4) }}
+
+################################################################################
+################################################################################
+
+  docker_registry:
+    image: registry:2
+    user: "{{ registry.user }}:{{ registry.user }}"
+    environment:
+      REGISTRY_HTTP_TLS_CERTIFICATE: {{ registry.volumes.certificates.mount }}/registry.crt
+      REGISTRY_HTTP_TLS_KEY: {{ registry.volumes.certificates.mount }}/registry.key
+    {{ dn.map_ports([ (5000,) ])|indent(width = 4) }}
+    {{ dv.volumes_section_complete(vols_registry)|indent(width = 4) }}
+      - {{ root_dirs.datastore }}/registry_config.yml:/etc/docker/registry/config.yml:ro
+    networks:
+      {{ network_names.datastore }}:
+    {{ dm.common()|indent(width = 4) }}
+
+  docker_registry_ui:
+    image: joxit/docker-registry-ui:{{ 'latest' if is_dev else 'arm64v8' }}
+    environment:
+      REGISTRY_URL: https://{{ private_docker_registry }}
+    {{ traefik.declare_labels_mount_path_internal("docker_registry_ui", "/registry", 80)|indent(width = 4) }}
+    networks:
+      - {{ network_names.discovery }}
 
 ################################################################################
 ################################################################################
@@ -93,7 +128,7 @@ services:
 ################################################################################
 
   syslog_interceptor:
-    build: syslog-interceptor
+    image: {{ dm.private_image('syslog_interceptor') }}
     container_name: syslog_interceptor
     {{ dm.journald_logging()|indent(width = 4) }}
     {{ dm.disable_auto_update_section()|indent(width = 4) }}
@@ -109,4 +144,4 @@ services:
 
 {{ dn.networks_declaration([ discovery_network, datastore_network ]) }}
 
-{{ dv.volumes_declaration(vols_influxdb + vols_chronograf + vols_kapacitor + vols_grafana) }}
+{{ dv.volumes_declaration(vols_influxdb + vols_chronograf + vols_kapacitor + vols_grafana + vols_registry + vols_redis) }}

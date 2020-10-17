@@ -10,6 +10,7 @@
   https://stackoverflow.com/questions/44413816/how-to-disable-userland-proxy-for-docker-compose
 #}
   "userland-proxy": false,
+  "insecure-registries": [ "{{ private_docker_registry }}" ],
   "log-driver": "syslog",
   "log-opts": {
     "syslog-address": "udp://127.0.0.1:6514",

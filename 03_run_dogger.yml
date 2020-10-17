@@ -4,6 +4,7 @@
 #
 # Examples:
 #
+# --extra-vars command='"docker-compose up -d --remove-orphans"'
 # --extra-vars command='"docker-compose stop && docker-compose rm -f"'
 # --extra-vars command='"docker-compose stop && docker-compose rm -f && docker-compose up -d --remove-orphans"'
 #
@@ -37,6 +38,6 @@
       args:
         chdir: "{{ item }}"
       with_items:
-        - "{{ root_dirs.discord }}"
+        #- "{{ root_dirs.discord }}"
         - "{{ root_dirs.matrix_server }}"
       when: not is_dev

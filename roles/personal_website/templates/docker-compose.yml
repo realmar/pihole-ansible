@@ -6,7 +6,7 @@
 version: "3"
 services:
   realmar.net:
-    build: .
+    image: {{ dm.private_image('realmar_net') }}
     labels:
       {{ tf.enable(service_name)|indent(width = 6) }}
       {{ tf.use_letsencrypt(service_name) }}

@@ -9,8 +9,8 @@
     state: started
     enabled: yes
 
-- include_tasks: build.openvpn.rpi.yml
-  when: is_rpi
+#- include_tasks: build.openvpn.rpi.yml
+#  when: is_rpi
 
 - name: Create VPN config folder
   file:
