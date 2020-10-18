@@ -16,6 +16,18 @@ root_dirs:
   datastore: "{{ application_root }}/datastore"
   matrix_server: "{{ application_root }}/matrix_server"
 
+stack_names:
+  pihole: pihole
+  maintenance: maintenance
+  rss: rss
+  proxy: proxy
+  jupyter: jupyter
+  discord: discord
+  personal_website: personal_website
+  home_automation: home_automation
+  datastore: datastore
+  matrix_server: matrix_server
+
 network_names:
   discovery: discovery
   datastore: datastore
