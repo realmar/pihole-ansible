@@ -79,9 +79,7 @@ services:
     {{ dv.volumes_section_complete(vols_traefik)|indent(width = 4) }}
       {{ dv.mount_docker_socket() }}
     {{ ds.deploy_section()|indent(width = 4) }}
-      placement:
-        constraints:
-          - "node.role==manager"
+      {{ ds.placement_run_manager_section()|indent(width = 6) }}
     networks:
       - default
       - {{ network_names.discovery }}

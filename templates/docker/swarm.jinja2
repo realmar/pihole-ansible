@@ -1,10 +1,16 @@
 {% macro common(replicas=1) %}
-replicas: {{ replicas }}
 restart_policy:
   condition: {{ 'on-failure' if is_dev else 'always' }}
 {% endmacro %}
 
 {% macro deploy_section(replicas=1) %}
 deploy:
+  replicas: {{ replicas }}
   {{ common(replicas)|indent(width = 2) }}
+{% endmacro %}
+
+{% macro placement_run_manager_section() %}
+placement:
+  constraints:
+    - "node.role==manager"
 {% endmacro %}

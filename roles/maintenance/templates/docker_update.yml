@@ -1,29 +1,13 @@
 {% import 'docker/network.jinja2' as dn with context -%}
 {% import 'docker/volumes.jinja2' as dv with context -%}
-{% import 'docker/misc.jinja2' as dm with context -%}
+{% import 'docker/swarm.jinja2' as ds with context -%}
 
 updater:
-  container_name: ouroboros
-  hostname: ouroboros
-  image: pyouroboros/ouroboros:latest
+  image: mazzolino/shepherd:latest
   environment:
-    LOG_LEVEL: info
-
-    CLEANUP: "true"
-    # INTERVAL: 3600
-    CRON: "*/10 4-6 * * *"
-    SELF_UPDATE: "true"
-    LATEST: "false"
-
-    IGNORE: "{{ updater.ignore|join(' ') }}"
-
-    DATA_EXPORT: "influxdb"
-    INFLUX_URL: influxdb
-    INFLUX_DATABASE: ouroboros
-    INFLUX_USERNAME: None
-    INFLUX_PASSWORD: None
+    SLEEP_TIME: "60m"
+    WITH_INSECURE_REGISTRY: "true"
   {{ dv.volumes_section_complete()|indent(width = 2) }}
     {{ dv.mount_docker_socket() }}
-  {{ dn.discovery_network_section()|indent(width = 2) }}
-    {{ network_names.datastore }}:
-  {{ dm.common()|indent(width = 2) }}
+  {{ ds.deploy_section()|indent(width = 2) }}
+    {{ ds.placement_run_manager_section()|indent(width = 4) }}
