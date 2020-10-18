@@ -5,7 +5,9 @@
         root_dir: "{{ root_dirs.jupyter }}"
         dirs:
           - "{{ jupyter.volumes.data.local_folder }}"
-  tags: compose_file
+  tags:
+    - compose_file
+    - jupyter_compose_file
 
 - name: Copy docker files
   template:
@@ -24,4 +26,6 @@
     - include_tasks: fix_permissions.yml
       vars:
         items: "{{ jupyter_folders_permissions }}"
-  tags: fix_permissions
+  tags:
+    - fix_permissions
+    - jupyter_compose_file

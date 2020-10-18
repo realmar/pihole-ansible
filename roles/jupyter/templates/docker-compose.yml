@@ -1,10 +1,32 @@
 {% import "docker/volumes.jinja2" as dv with context -%}
 {% import "docker/network.jinja2" as dn with context -%}
 {% import "docker/misc.jinja2" as dm with context -%}
+{% import "docker/swarm.jinja2" as ds with context -%}
 {% import "traefik/http.jinja2" as traefik with context -%}
 
 {% set service_name = "jupyter" %}
 {% set vols = [ jupyter.volumes.data ] %}
+
+{% macro labels() %}
+labels:
+  {{ traefik.enable(service_name)|indent(width = 2) }}
+  {{ traefik.use_letsencrypt(service_name) }}
+  {{ traefik.add_route(dns.public.root, service_name, "/jupyter")|indent(width = 2) }}
+  {{ traefik.service_port(service_name, 8888)|indent(width = 2) }}
+  {{ traefik.add_middlewares(service_name, [
+    {
+      "mw": traefik.auth
+    },
+    {
+      "mw": traefik.redirect,
+      "args": { "old_path": "/jupyter", "new_path": "/jupyter/lab/" }
+    },
+    {
+      'mw': traefik.fix_wss,
+      'args': {}
+    }
+  ])|indent(width = 2) }}
+{% endmacro %}
 
 version: "3"
 services:
@@ -17,29 +39,11 @@ services:
       - "--NotebookApp.password=''"
       - "--NotebookApp.base_url='/jupyter/'"
       - "--MappingKernelManager.cull_idle_timeout={{ jupyter.idle_timeout }}"
-    labels:
-      {{ traefik.enable(service_name)|indent(width = 6) }}
-      {{ traefik.use_letsencrypt(service_name) }}
-      {{ traefik.add_route(dns.public.root, service_name, "/jupyter")|indent(width = 6) }}
-      {{ traefik.add_middlewares(service_name, [
-        {
-          "mw": traefik.auth
-        },
-        {
-          "mw": traefik.redirect,
-          "args": { "old_path": "/jupyter", "new_path": "/jupyter/lab/" }
-        },
-        {
-          'mw': traefik.fix_wss,
-          'args': {}
-        }
-      ])|indent(width = 6) }}
-      {{ dm.disable_auto_update()|indent(width = 4) }}
-
     {{ dv.volumes_section_complete(vols)|indent(width = 4) }}
     networks:
       {{ network_names.discovery }}:
-    {{ dm.common()|indent(width = 4) }}
+    {{ ds.deploy_section()|indent(width = 4) }}
+      {{ labels()|indent(width = 6) }}
 
 {{ dn.networks_declaration([ discovery_network ]) }}
 
