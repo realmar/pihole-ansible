@@ -11,4 +11,10 @@
     - include_tasks: fix_permissions.yml
       vars:
         items: "{{ pihole_folders_permissions }}"
-  tags: fix_permissions
+  tags:
+    - fix_permissions
+    - compose_file
+    - pihole_compose_file
+
+
+# # Ignoring unsupported options: cap_add, network_mode

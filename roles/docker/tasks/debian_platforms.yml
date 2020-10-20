@@ -36,7 +36,7 @@
 
 - name: Add Docker apt repository
   apt_repository:
-    repo: "deb [arch={{ arch }}] {{ base_url }} {{ lsb_release.stdout }} stable"
+    repo: "deb [arch={{ arch }}] {{ base_url }} {{ lsb_release.stdout }} test"
     filename: docker
   # ??? need to restart computer before installing docker ??? wut
   # for some reason this only needs to be done on my RPI4 with rasbian buster :thinking_face:

@@ -1,6 +1,9 @@
 {% macro common(replicas=1) %}
 restart_policy:
   condition: {{ 'on-failure' if is_dev else 'always' }}
+update_config:
+  parallelism: 10
+  delay: 1s
 {% endmacro %}
 
 {% macro deploy_section(replicas=1) %}

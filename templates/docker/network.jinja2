@@ -8,7 +8,6 @@ networks:
 {% else %}
   {{ network.name }}:
     driver: overlay
-    scope: swarm
 {%  if use_v6 %}
     driver_opts:
       com.docker.network.enable_ipv6: "true"
