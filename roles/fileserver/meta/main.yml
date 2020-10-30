@@ -1,2 +1,3 @@
 dependencies:
-  - base_system
+  - role: base_system
+    when: not base_system_installed

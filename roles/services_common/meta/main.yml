@@ -1,2 +1,3 @@
 dependencies:
-  - docker
+  - role: docker
+    when: not docker_installed

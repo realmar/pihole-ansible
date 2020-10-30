@@ -13,6 +13,9 @@
   register: arch_raw
   changed_when: False
 
+- package_facts:
+    manager: auto
+
 - set_fact:
     is_rasbian: "{{ raspi_config_check.stat.exists }}"
 
@@ -23,6 +26,8 @@
     is_ubuntu: "{{ ansible_distribution == 'Ubuntu' }}"
     is_debian: "{{ ansible_distribution == 'Debian' }}"
     is_dev: "{{ 'development' in group_names }}"
+    docker_installed: "{{ 'docker-ce' in ansible_facts.packages }}"
+    base_system_installed: "{{ 'nload' in ansible_facts.packages }}"
 
 - debug:
     msg: "is_rpi = {{ is_rpi }} arch = {{ arch_short }}"
