@@ -1,0 +1,5 @@
+controller_influxdb: "http://192.168.1.128:8086"
+controller_influxdb_database: "iot1_prod"
+controller_influxdb_organization: "zhaw_iot1"
+controller_mqtt: "192.168.1.128"
+controller_phillips_hue_ip: "192.168.1.210"

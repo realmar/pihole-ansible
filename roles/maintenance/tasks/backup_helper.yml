@@ -19,7 +19,7 @@
   stat:
     path: "{{ duplicati.volumes.config.local_folder }}/bh"
   register: bh_binary_check
-  changed: False
+  changed_when: False
 
 - name: Copy binary
   shell:
@@ -33,7 +33,7 @@
     src: "{{ root_dirs.maintenance }}/backup-helper/bh"
     dest: "{{ duplicati.volumes.config.local_folder }}/bh"
     mode: "0755"
-    when: bh_binary_check.stat.exists
+  when: bh_binary_check.stat.exists
 
 - name: Delete original binary
   file:

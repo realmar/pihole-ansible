@@ -1,0 +1,44 @@
+- block:
+  - include_tasks: rsync.yml
+    vars:
+      src: "app"
+      dest: "{{ sensor_install_dir }}"
+
+  - name: Copy sensor config
+    template:
+      src: sensor.yml
+      dest: "{{ sensor_install_dir }}/app/sensor.yml"
+      mode: 0644
+    tags: config
+    register: config
+
+- name: Install app dependencies
+  pip:
+    name: "{{ packages }}"
+    state: latest
+    executable: pip3
+    extra_args: --ignore-installed
+  vars:
+    packages:
+      - paho-mqtt
+      - pyyaml
+
+- name: Install sensor service
+  template:
+    src: iot1_app_sensor.service
+    dest: /etc/systemd/system/iot1_app_sensor.service
+    mode: 0644
+
+- name: Start and enable sensor service
+  systemd:
+    name: iot1_app_sensor
+    state: started
+    enabled: yes
+    daemon_reload: yes
+
+- name: Restart sensor service
+  systemd:
+    name: iot1_app_sensor
+    state: restarted
+  tags: config
+  when: config.changed

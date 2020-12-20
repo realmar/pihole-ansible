@@ -87,7 +87,7 @@ services:
       INFLUXDB_URL: http://influxdb:8086
       KAPACITOR_URL: http://kapacitor:9092
       BASE_PATH: /chronograf
-    {{ traefik.declare_labels_mount_path_internal("chronograf", "/chronograf", 8888, traefik.minimal_middlewares)|indent(width = 4) }}
+    {{ traefik.declare_labels_mount_path_public("chronograf", "/chronograf", 8888, traefik.minimal_middlewares)|indent(width = 4) }}
     {{ dv.volumes_section_complete(vols_chronograf)|indent(width = 4) }}
 {% if is_dev %}
     {{ dn.map_ports([ (8888,) ])|indent(width = 4) }}
@@ -112,7 +112,7 @@ services:
   grafana:
     image: grafana/grafana
     container_name: grafana
-    {{ traefik.declare_labels_mount_path_internal("grafana", "/grafana", 3000)|indent(width = 4) }}
+    {{ traefik.declare_labels_mount_path_public("grafana", "/grafana", 3000)|indent(width = 4) }}
     {{ dv.volumes_section_complete(vols_grafana)|indent(width = 4) }}
       - {{ root_dirs.datastore }}/grafana.ini:/etc/grafana/grafana.ini:ro
       - {{ root_dirs.datastore }}/syslog-interceptor-config.yml:/etc/grafana/grafana.ini:ro

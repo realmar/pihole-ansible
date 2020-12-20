@@ -1,0 +1,42 @@
+- name: Create sensor user
+  include_tasks: create_user.yml
+  vars:
+    item: { name: "{{ sensor_mock_user }}", create_home: yes, groups: []  }
+
+- block:
+  - include_tasks: rsync.yml
+    vars:
+      src: "app"
+      dest: "{{ sensor_mock_install_dir }}"
+
+  - name: Copy sensor config
+    template:
+      src: sensor.yml
+      dest: "{{ sensor_mock_install_dir }}/app/sensor.yml"
+      mode: 0644
+  become_user: "{{ sensor_mock_user }}"
+
+- name: Install app dependencies
+  pip:
+    name: "{{ packages }}"
+    state: latest
+    executable: pip3
+    extra_args: --ignore-installed
+  vars:
+    packages:
+      - pipenv
+      - paho-mqtt
+      - pyyaml
+
+- name: Install sensor service
+  template:
+    src: iot1_app_sensor.service
+    dest: /etc/systemd/system/iot1_app_sensor.service
+    mode: 0644
+
+- name: Start and enable sensor service
+  systemd:
+    name: iot1_app_sensor
+    state: started
+    enabled: yes
+    daemon_reload: yes

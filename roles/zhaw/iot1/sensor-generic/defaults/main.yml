@@ -1,0 +1,8 @@
+sensor_user: root
+sensor_install_dir: /opt
+sensor_broker_address: "192.168.1.128"
+
+sensor_loglevel: "INFO"
+sensor_send_interval: 0.5
+
+sensors: []

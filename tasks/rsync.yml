@@ -15,3 +15,7 @@
     compress: no
     rsync_opts:
       - "--exclude=target"
+      - "--exclude=.vs"
+      - "--exclude=out"
+      - "--exclude=bin"
+      - "--exclude=obj"

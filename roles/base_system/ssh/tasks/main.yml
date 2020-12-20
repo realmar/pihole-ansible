@@ -1,0 +1,13 @@
+- name: Disable password authentication for ssh
+  lineinfile: >
+    dest=/etc/ssh/sshd_config
+    regexp='PasswordAuthentication (yes|no)'
+    line='PasswordAuthentication no'
+  notify: restart ssh
+
+- name: Restrict ssh for root to keys only
+  lineinfile: >
+    dest=/etc/ssh/sshd_config
+    regexp=^PermitRootLogin
+    line='PermitRootLogin without-password'
+  notify: restart ssh

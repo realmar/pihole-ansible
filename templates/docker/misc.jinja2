@@ -10,6 +10,7 @@
 logging:
   driver: "syslog"
   options:
+    mode: non-blocking
     syslog-address: "udp://127.0.0.1:6514"
     syslog-format: "rfc5424"
     tag: "{{.Name}}/{{.ID}}"
@@ -28,6 +29,7 @@ labels:
 logging:
   driver: local
   options:
+    mode: non-blocking
     max-size: 10m
 {% endmacro %}
 
@@ -35,6 +37,7 @@ logging:
 logging:
   driver: json-file
   options:
+    mode: non-blocking
     max-size: 10m
     max-file: "3"
 {% endmacro %}
@@ -43,6 +46,7 @@ logging:
 logging:
   driver: syslog
   options:
+    mode: non-blocking
     syslog-facility: daemon
     syslog-format: rfc3164
     syslog-address: unixgram:///dev/log
@@ -56,6 +60,7 @@ logging:
 logging:
   driver: journald
   options:
+    mode: non-blocking
 {% raw %}
     tag: "{{.Name}}/{{.ID}}"
 {% endraw %}

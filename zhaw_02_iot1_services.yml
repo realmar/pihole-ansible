@@ -1,0 +1,56 @@
+################################################################################
+# All
+################################################################################
+
+- hosts: all
+  gather_facts: yes
+  tasks:
+    - include: tasks/collect_system_data.yml
+
+
+################################################################################
+# Controllers
+################################################################################
+
+- hosts: controllers
+  roles:
+    - role: zhaw/iot1/controller
+
+  handlers:
+    - import_tasks: handlers/services.yml
+    - import_tasks: handlers/docker.yml
+
+################################################################################
+# Sensors
+################################################################################
+
+- hosts: development
+  roles:
+    - role: zhaw/iot1/sensor-mock
+
+- hosts: iot1-bathroom
+  vars_files: roles/zhaw/iot1/sensor_types.yml
+  roles:
+    - role: zhaw/iot1/sensor-generic
+      vars:
+        send_interval: 0.2
+        sensors:
+          - name: "light"
+            grovepi_pin: 0
+            grovepi_type: "{{ ANALOG }}"
+            mqtt_qos: 0
+          - name: "ultrasonic"
+            grovepi_pin: 7
+            grovepi_type: "{{ ULTRASONIC }}"
+            mqtt_qos: 2
+
+- hosts: iot1-workplace
+  vars_files: roles/zhaw/iot1/sensor_types.yml
+  roles:
+    - role: zhaw/iot1/sensor-generic
+      vars:
+        sensors:
+          - name: "light"
+            grovepi_pin: 0
+            grovepi_type: "{{ ANALOG }}"
+            mqtt_qos: 0

@@ -1,0 +1,3 @@
+sensor_mock_user: sensor
+sensor_mock_install_dir: /opt
+sensor_mock_broker_address: "192.168.1.128"

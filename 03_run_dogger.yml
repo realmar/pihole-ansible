@@ -4,9 +4,9 @@
 #
 # Examples:
 #
-# --extra-vars command='"docker-compose up -d --remove-orphans"'
-# --extra-vars command='"docker-compose stop && docker-compose rm -f"'
-# --extra-vars command='"docker-compose stop && docker-compose rm -f && docker-compose up -d --remove-orphans"'
+# ansible-playbook -i inventory_dev.ini 03_run_dogger.yml --extra-vars command='"docker-compose up -d --remove-orphans"'
+# ansible-playbook -i inventory_dev.ini 03_run_dogger.yml --extra-vars command='"docker-compose stop && docker-compose rm -f"'
+# ansible-playbook -i inventory_dev.ini 03_run_dogger.yml --extra-vars command='"docker-compose stop && docker-compose rm -f && docker-compose up -d --remove-orphans"'
 #
 
 - hosts: all
@@ -32,6 +32,7 @@
         - "{{ root_dirs.rss }}"
         - "{{ root_dirs.jupyter }}"
         - "{{ root_dirs.personal_website }}"
+        - "{{ root_dirs.zhaw_iot1 }}"
 
     - name: Running command
       shell: "{{ command }}"

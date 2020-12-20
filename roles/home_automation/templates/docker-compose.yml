@@ -23,6 +23,8 @@ services:
     image: eclipse-mosquitto
     networks:
       mqtt:
+      {{ network_names.datastore }}:
+    {{ dn.map_ports([ (1883,) ])|indent(width = 4) }}
     {{ dv.volumes_section_complete(mosquitto_vols)|indent(width = 4) }}
       - "{{ root_dirs.home_automation }}/mosquitto.conf:/mosquitto/config/mosquitto.conf"
     {{ dm.common()|indent(width = 4) }}

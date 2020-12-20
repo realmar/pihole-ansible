@@ -1,0 +1,39 @@
+- block:
+  - include_tasks: standard_service.yml
+    vars:
+      usr: "{{ user }}"
+      root_dir: "{{ root_dirs.zhaw_iot1 }}"
+      dirs: []
+  tags:
+    - compose_file
+    - zhaw_iot1_compose_file
+
+- block:
+  - include_tasks: rsync.yml
+    vars:
+      src: "app"
+      dest: "{{ root_dirs.zhaw_iot1 }}"
+  become_user: "{{ user }}"
+
+- name: Copy config
+  template:
+    src: "{{ item }}"
+    dest: "{{ root_dirs.zhaw_iot1 }}/{{ item }}"
+    owner: "{{ user }}"
+    group: "{{ user }}"
+    mode: 0644
+  loop:
+    - appsettings.json
+    - hue_app_key.txt
+    - telegram_config.json
+
+- name: Check if KVStore.json exists
+  stat:
+    path: "{{ root_dirs.zhaw_iot1 }}/KVStore.json"
+  register: stat_result
+
+- name: Copy KVStore.json
+  file:
+    path: "{{ root_dirs.zhaw_iot1 }}/KVStore.json"
+    state: touch
+  when: not stat_result.stat.exists

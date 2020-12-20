@@ -35,6 +35,7 @@ updater:
     - "jupyter_jupyter"
     - "realmarnet_realmar.net"
     - "pihole_dhcphelper"
+    - "zhawiot1_home_controller_1"
 
 backup_helper:
   exclude:
@@ -52,6 +53,7 @@ backup_helper:
     - duplicati
     - among_us
     - redis
+    - zhaw
 
 maintenance_folders_permissions:
   - folder: "{{ duplicati.volumes.config }}"

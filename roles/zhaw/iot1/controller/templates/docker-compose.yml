@@ -1,0 +1,14 @@
+{% import "docker/misc.jinja2" as dm with context -%}
+
+version: "3"
+services:
+  home_controller:
+    image: {{ dm.private_image('zhaw_iot1_home_controller') }}
+    volumes:
+      - {{ root_dirs.zhaw_iot1 }}/appsettings.json:/app/appsettings.json
+      - {{ root_dirs.zhaw_iot1 }}/hue_app_key.txt:/app/hue_app_key.txt
+      - {{ root_dirs.zhaw_iot1 }}/telegram_config.json:/app/telegram_config.json
+      - {{ root_dirs.zhaw_iot1 }}/KVStore.json:/app/KVStore.json
+    network_mode: host
+    {{ dm.journald_logging()|indent(width = 4) }}
+    {{ dm.common()|indent(width = 4) }}

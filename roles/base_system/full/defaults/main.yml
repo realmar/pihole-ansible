@@ -1,0 +1,5 @@
+base_system:
+  unattended_upgrades:
+    mail: anastassios.martakos@outlook.com
+
+use_dhcp: False
