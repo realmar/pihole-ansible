@@ -1,0 +1,22 @@
+#
+# IN
+#     project_root: string
+#
+
+- name: Check if a virtualenv is already created
+  ignore_errors: true
+  command: "pipenv --venv"
+  args:
+    chdir: "{{ project_root }}"
+  register: pipenv_venv_check_cmd
+  changed_when:
+    - ('No virtualenv' not in pipenv_venv_check_cmd.stderr)
+
+- name: Run a pipenv install
+  environment:
+    LANG: "en_GB.UTF-8"
+  command: "pipenv --bare install --dev"
+  args:
+    chdir: "{{ project_root }}"
+  when:
+    - ('No virtualenv' in pipenv_venv_check_cmd.stderr)

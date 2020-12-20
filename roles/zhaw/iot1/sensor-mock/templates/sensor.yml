@@ -1,0 +1,6 @@
+broker_address: "{{ sensor_mock_broker_address }}"
+local_ip: "{{ ansible_host }}"
+topic: mock/data
+value_range:
+  min: 0
+  max: 100

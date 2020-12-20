@@ -16,6 +16,9 @@ root_dirs:
   datastore: "{{ application_root }}/datastore"
   matrix_server: "{{ application_root }}/matrix_server"
 
+  # ZHAW
+  zhaw_iot1: "{{ application_root }}/zhaw_iot1"
+
 network_names:
   discovery: discovery
   datastore: datastore

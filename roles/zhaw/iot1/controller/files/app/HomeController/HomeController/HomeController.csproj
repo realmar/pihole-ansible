@@ -1,0 +1,27 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net5.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="InfluxDB.Client" Version="1.13.0" />
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="5.0.0" />
+    <PackageReference Include="Microsoft.FASTER.Core" Version="1.8.0" />
+    <PackageReference Include="morelinq" Version="3.3.2" />
+    <PackageReference Include="MQTTnet" Version="3.0.13" />
+    <PackageReference Include="MQTTnet.Extensions.ManagedClient" Version="3.0.13" />
+    <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
+    <PackageReference Include="Q42.HueApi" Version="3.16.0" />
+    <PackageReference Include="Telegram.Bot" Version="15.7.1" />
+    <PackageReference Include="Withings.Netcore" Version="1.0.11" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="appsettings.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+</Project>

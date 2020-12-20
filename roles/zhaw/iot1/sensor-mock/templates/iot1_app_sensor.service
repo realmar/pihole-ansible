@@ -1,0 +1,18 @@
+[Unit]
+Description=ZHAW IoT1 Project Mock Sensor
+After=network.target
+
+[Service]
+User={{ sensor_mock_user }}
+Group={{ sensor_mock_user }}
+
+WorkingDirectory={{ sensor_mock_install_dir }}/app
+
+PIDFile=/var/run/mock_sensor.pid
+ExecStartPre=/bin/rm -rf /var/run/mock_sensor.pid
+ExecStart=/usr/bin/python3 {{ sensor_mock_install_dir }}/app/main.py
+
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

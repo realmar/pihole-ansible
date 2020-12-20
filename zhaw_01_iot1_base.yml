@@ -1,0 +1,27 @@
+################################################################################
+# Base System
+################################################################################
+
+- hosts: all
+  gather_facts: yes
+  tasks:
+    - include: tasks/collect_system_data.yml
+
+- hosts: development
+  roles:
+    - role: base_system/full
+
+  handlers:
+    - import_tasks: handlers/services.yml
+    - import_tasks: handlers/docker.yml
+
+# if we do a production deployment, then the setup needs to be lighter
+# because RPI1's are super slow. Controllers are always heavy hosts, since
+# they run docker and what not.
+- hosts: sensors:!development:!controllers
+  roles:
+    - role: base_system/ssh
+    - role: base_system/vim
+    - role: base_system/hostname
+    - role: base_system/timezone
+    - role: base_system/unattended_upgrades

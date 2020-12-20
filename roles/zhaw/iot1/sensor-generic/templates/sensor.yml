@@ -1,0 +1,13 @@
+broker_address: "{{ sensor_broker_address }}"
+local_ip: "{{ ansible_host }}"
+
+send_interval: {{ sensor_send_interval }}
+loglevel: "{{ sensor_loglevel }}"
+
+sensors:
+{% for sensor in sensors %}
+  - name: "{{ sensor.name }}"
+    grovepi_pin: {{ sensor.grovepi_pin }}
+    grovepi_type: {{ sensor.grovepi_type }}
+    mqtt_qos: {{ sensor.mqtt_qos }}
+{% endfor %}

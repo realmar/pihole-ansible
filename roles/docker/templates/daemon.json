@@ -13,6 +13,7 @@
   "insecure-registries": [ "{{ private_docker_registry }}" ],
   "log-driver": "syslog",
   "log-opts": {
+    "mode": "non-blocking",
     "syslog-address": "udp://127.0.0.1:6514",
     "syslog-format": "rfc5424",
 {#  "syslog-facility": "daemon", #}

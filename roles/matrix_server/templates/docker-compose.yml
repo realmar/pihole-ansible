@@ -24,7 +24,7 @@ services:
     {{ dm.common()|indent(width = 4) }}
 
   server:
-    image: black0/synapse:latest
+    image: black0/synapse:v1.20
     container_name: matrix_server
     environment:
       UID: '{{ matrix_server.user }}'
