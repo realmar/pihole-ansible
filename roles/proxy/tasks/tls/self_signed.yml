@@ -11,3 +11,4 @@
     privatekey_path: "{{ tls.self_signed.private_key_dir }}"
     csr_path: "{{ tls.self_signed.cert_request_dir }}"
     pem_path: "{{ tls.self_signed.cert_dir }}"
+    common_name: "{{ dns.internal.root if not is_dev else dns.public.root }}"
