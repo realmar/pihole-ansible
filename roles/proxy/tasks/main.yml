@@ -15,6 +15,7 @@
         - "{{ traefik.volumes.certificates.local_folder }}"
         - "{{ authelia.volumes.config.local_folder }}"
         - "{{ authelia.volumes.data.local_folder }}"
+        - "{{ static_data.volumes.data.local_folder }}"
   tags:
     - compose_file
     - proxy_compose_file
@@ -39,6 +40,15 @@
     - configuration.yml
     - users_database.yml
   tags: auth_config
+
+- name: Copy nginx config
+  template:
+    src: nginx.conf
+    dest: "{{ root_dirs.proxy }}/nginx.conf"
+    owner: "{{ user }}"
+    group: "{{ user }}"
+    mode: 0644
+  tags: static_data_config
 
 - block:
   - include_tasks: tls/self_signed.yml

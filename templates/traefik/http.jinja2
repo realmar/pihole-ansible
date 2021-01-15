@@ -67,6 +67,21 @@
 
 {% set auth = { 'absolute_name': 'authelia' } %}
 
+{#
+  https://doc.traefik.io/traefik/middlewares/basicauth/
+
+  args: {
+    users: string
+  }
+#}
+{% macro __basic_auth_f(name, args) %}
+- "traefik.http.middlewares.{{ name }}.basicauth.users={{ args.users|replace('$', '$$') }}"
+{% endmacro %}
+{% set basic_auth = { 'name': 'basic-auth', 'f': __basic_auth_f } %}
+
+{#
+  args: {}
+#}
 {% macro __add_trailing_slash_f(name, args) %}
 - "traefik.http.middlewares.{{ name }}.redirectregex.regex=^(https?://[^/]+/[a-z0-9_]+)$$"
 - "traefik.http.middlewares.{{ name }}.redirectregex.replacement=$${1}/"
@@ -74,12 +89,25 @@
 {% endmacro %}
 {% set trailing_slash = { 'name': 'add-trailing-slash', 'f': __add_trailing_slash_f } %}
 
+
+{#
+  args: {
+    path: string
+  }
+#}
 {% macro __strip_path_f(name, args) %}
 - "traefik.http.middlewares.{{ name }}.stripprefix.prefixes={{ args.path }}"
 - "traefik.http.middlewares.{{ name }}.stripprefix.forceslash=true"
 {% endmacro %}
 {% set strip_path = { 'name': 'strip-path', 'f': __strip_path_f } %}
 
+
+{#
+  args: {
+    old_path: string
+    new_path: string
+  }
+#}
 {% macro __add_redirect_f(name, args) %}
 - "traefik.http.middlewares.{{ name }}.redirectregex.regex=^(.*){{ args.old_path }}/?$$"
 - "traefik.http.middlewares.{{ name }}.redirectregex.replacement=$${1}{{ args.new_path }}"
@@ -87,11 +115,19 @@
 {% endmacro %}
 {% set redirect = { 'name': 'redirect', 'f': __add_redirect_f } %}
 
+{#
+  args: {}
+#}
 {% macro __fix_wss_f(name, args) %}
 - "traefik.http.middlewares.{{ name }}.headers.customrequestheaders.X-Forwarded-Proto=https"
 {% endmacro %}
 {% set fix_wss = { 'name': 'fix-wss', 'f': __fix_wss_f } %}
 
+{#
+  args: {
+    path: string
+  }
+#}
 {% macro __replace_path_f(name, args) %}
 - "traefik.http.middlewares.{{ name }}.replacepath.path={{ args.path }}"
 {% endmacro %}

@@ -13,6 +13,12 @@
   authelia.volumes.data
 ] %}
 
+{% set vols_static_data = [
+  static_data.volumes.data
+] %}
+
+{% set vols = vols_traefik + vols_authelia + vols_static_data %}
+
 version: "3.3"
 services:
   traefik:
@@ -105,6 +111,23 @@ services:
       {{ network_names.discovery }}:
     {{ dm.common()|indent(width = 4) }}
 
+  static_data:
+    image: nginx:latest
+    {{ tf.declare_labels_mount_path_public(static_data.name, static_data.path, 80, tf.minimal_middlewares_no_auth + [
+      {
+        'mw': tf.strip_path,
+        'args': { 'path': static_data.path }
+      },
+      {
+        'mw': tf.basic_auth,
+        'args': { 'users': static_data.users }
+      }
+    ] )|indent(width = 4) }}
+    {{ dv.volumes_section_complete(vols_static_data)|indent(width = 4) }}
+      - {{ root_dirs.proxy }}/nginx.conf:/etc/nginx/nginx.conf:ro
+    {{ dn.discovery_network_section()|indent(width = 4) }}
+    {{ dm.common()|indent(width = 4) }}
+
 {{ dn.networks_declaration([ discovery_network, datastore_network ]) }}
 
-{{ dv.volumes_declaration(vols_traefik + vols_authelia) }}
+{{ dv.volumes_declaration(vols) }}

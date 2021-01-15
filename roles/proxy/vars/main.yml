@@ -38,6 +38,13 @@ authelia:
       local_folder: "{{ root_dirs.proxy }}/authelia-data"
       mount:        /app/data
 
+static_data:
+  volumes:
+    data:
+      name:         static_data
+      local_folder: "{{ root_dirs.proxy }}/static-data"
+      mount:        /usr/share/nginx/html
+
 tls:
   self_signed:
     cert:         realmar.net.crt
