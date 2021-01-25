@@ -3,14 +3,24 @@
 {#
     IN:
         name: string
+        entrypoints: string[]
 #}
-{% macro enable(name, entrypoints) %}
+{% macro __enable(name, entrypoints) %}
 {% if entrypoints is not defined %}
 {% set entrypoints = [ 'websecure' ] %}
 {% endif %}
-{{ common.enable(name) }}
 - "traefik.http.routers.{{ name }}.entrypoints={{ entrypoints|join(',') }}"
 - "traefik.http.routers.{{ name }}.tls=true"
+{% endmacro %}
+
+{#
+    IN:
+        name: string
+        entrypoints: string[]
+#}
+{% macro enable(name, entrypoints) %}
+{{ common.enable(name) }}
+{{ __enable(name, entrypoints) }}
 {% endmacro %}
 
 {#
@@ -133,6 +143,34 @@
 {% endmacro %}
 {% set replace_path = { 'name': 'replace_path', 'f': __replace_path_f } %}
 
+{#
+  args: {
+    regex: string
+    replacement: string
+  }
+#}
+{% macro __replace_path_regex_f(name, args) %}
+- "traefik.http.middlewares.{{ name }}.replacepathregex.regex={{ args.regex|replace('$', '$$') }}"
+- "traefik.http.middlewares.{{ name }}.replacepathregex.replacement={{ args.replacement|replace('$', '$$') }}"
+{% endmacro %}
+{% set replace_path_regex = { 'name': 'replace_path_regex', 'f': __replace_path_regex_f } %}
+
+{#
+  args: {
+    methods: string
+    originlist: string
+    allowheaders: string
+  }
+#}
+{% macro __add_cors_f(name, args) %}
+- "traefik.http.middlewares.{{ name }}.headers.accesscontrolallowmethods={{ args.methods }}"
+- "traefik.http.middlewares.{{ name }}.headers.accesscontrolalloworiginlist={{ args.originlist }}"
+{% if args.allowheaders is defined %}
+- "traefik.http.middlewares.{{ name }}.headers.accesscontrolallowheaders={{ args.allowheaders }}"
+{% endif %}
+{% endmacro %}
+{% set add_cors = { 'name': 'add_cors', 'f': __add_cors_f } %}
+
 {# ########################################################################## #}
 {# ########################################################################## #}
 
@@ -212,9 +250,26 @@
         path: string
         port: number
 #}
+{% macro add_more_labels_mount_path(host, service_name, path, port, middlewares, entrypoints) %}
+{{ __enable(service_name, entrypoints) }}
+{% if port is defined %}
+{###}{{ service_port(service_name, port) }}
+{% endif %}
+{{ add_route(host, service_name, path) }}
+- "traefik.http.routers.{{ service_name }}.service={{ service_name }}"
+{{ add_middlewares(service_name, middlewares) }}
+{% endmacro %}
+
+{#
+    IN:
+        host: string
+        service_name: string
+        path: string
+        port: number
+#}
 {% macro declare_labels_mount_path(host, service_name, path, port, middlewares, entrypoints) %}
-{% if middlewares is not defined %}
-{% set middlewares =
+{% if middlewares is not defined %}{#
+#}{% set middlewares =
     minimal_middlewares
       + [
           {
@@ -223,13 +278,13 @@
           },
         ]
 %}
-{% endif %}
+{% endif %}{#
 
+#}{% macro labels() %}
+{{ common.enable(name) }}
+{{ add_more_labels_mount_path(host, service_name, path, port, middlewares, entrypoints) }}
+{% endmacro %}{#
+#}
 labels:
-  {{ enable(service_name, entrypoints)|indent(width = 2) }}
-{% if port is defined %}
-  {{ service_port(service_name, port)|indent(width = 2) }}
-{% endif %}
-  {{ add_route(host, service_name, path)|indent(width = 2) }}
-  {{ add_middlewares(service_name, middlewares)|indent(width = 2) }}
+  {{ labels()|indent(width = 2) }}
 {% endmacro %}

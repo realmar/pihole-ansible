@@ -7,7 +7,8 @@
 {% set vols_matrix_server = [ matrix_server.volumes.data ] %}
 {% set vols_db = [ matrix_server_db.volumes.data ] %}
 {% set service_name = 'matrix_synapse' %}
-{% set nginx_name = 'matrix_well_known' %}
+{% set wk_path = "/.well-known/matrix/" %}
+{% set wk_service_name = "matrix_well_known" %}
 
 version: "3"
 services:
@@ -56,18 +57,31 @@ services:
 
   well_known:
     image: nginx:latest
-    {{ traefik.declare_labels_mount_path(dns.public.root, nginx_name, "/.well-known/matrix/server", 80,
+    {{ traefik.declare_labels_mount_path(dns.public.root, wk_service_name, wk_path, 80,
         [
           {
-            "mw": traefik.replace_path,
-            "args": { "path": "/well-known_server.json" }
-          }
+            "mw": traefik.replace_path_regex,
+            "args": {
+              "regex": "^" + wk_path + "(server|client)$",
+              "replacement": "/well-known_$1.json"
+            }
+          },
+          {
+            "mw": traefik.add_cors,
+            "args": {
+              "originlist": "*",
+              "methods": "GET,POST,PUT,DELETE,OPTIONS",
+              "allowheaders": "Origin,X-Requested-With,Content-Type,Accept,Authorization"
+            }
+          },
         ],
         [ 'websecure' ]
       )|indent(width = 4) }}
-      {{ traefik.use_letsencrypt(nginx_name) }}
+      {{ traefik.use_letsencrypt(wk_service_name) }}
     volumes:
-      - {{ root_dirs.matrix_server }}/well-known_server.json:/usr/share/nginx/html/well-known_server.json:ro
+{% for file in [ "well-known_server.json", "well-known_client.json" ] %}
+      - {{ root_dirs.matrix_server }}/{{ file }}:/usr/share/nginx/html/{{ file }}:ro
+{% endfor %}
     {{ dn.discovery_network_section()|indent(width = 4) }}
     {{ dm.common()|indent(width = 4) }}
 

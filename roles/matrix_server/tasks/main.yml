@@ -38,6 +38,7 @@
     - init_db.sql
     - turnserver.conf
     - well-known_server.json
+    - well-known_client.json
   tags:
     - matrix_server_config
     - matrix_server_config2
