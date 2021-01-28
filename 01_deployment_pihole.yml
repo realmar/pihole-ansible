@@ -15,7 +15,7 @@
     - { role: fileserver, tags: fileserver }
     - { role: rss, tags: rss }
     - { role: jupyter, tags: jupyter }
-    #- { role: discord, tags: discord }
+    - { role: discord, tags: discord }
     - { role: personal_website, tags: realmar_net }
     - { role: home_automation, tags: home_automation }
     - { role: matrix_server, tags: matrix_server }

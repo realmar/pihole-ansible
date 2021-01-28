@@ -1,19 +1,27 @@
-- name: Clone Imposter Server
-  git:
-    repo: 'https://github.com/AeonLucid/Impostor.git'
-    dest: "{{ root_dirs.discord }}/Imposter"
-    version: v1.0.0
+# - name: Clone Imposter Server
+#   git:
+#     repo: 'https://github.com/AeonLucid/Impostor.git'
+#     dest: "{{ root_dirs.discord }}/Imposter"
+#     version: v1.0.0
+#
+# - block:
+#     - name: Change architecture to arm
+#       replace:
+#         path: "{{ root_dirs.discord }}/Imposter/Dockerfile"
+#         regexp: 'linux-musl-x64'
+#         replace: 'linux-arm64'
+#
+#     - name: Don't use alpine image
+#       replace:
+#         path: "{{ root_dirs.discord }}/Imposter/Dockerfile"
+#         regexp: '3\.1-alpine'
+#         replace: '3.1'
+#   when: is_rpi
 
-- block:
-    - name: Change architecture to arm
-      replace:
-        path: "{{ root_dirs.discord }}/Imposter/Dockerfile"
-        regexp: 'linux-musl-x64'
-        replace: 'linux-arm64'
-
-    - name: Don't use alpine image
-      replace:
-        path: "{{ root_dirs.discord }}/Imposter/Dockerfile"
-        regexp: '3\.1-alpine'
-        replace: '3.1'
-  when: is_rpi
+- name: Copy impostor config
+  template:
+    src: impostor_config.json
+    dest: "{{ root_dirs.discord }}/impostor_config.json"
+    owner: "1000"
+    group: "1000"
+    mode: 0644
