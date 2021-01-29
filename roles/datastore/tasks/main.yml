@@ -88,7 +88,7 @@
     pip:
       name: [ "influxdb", "requests" ]
       state: latest
-      executable: pip
+      executable: pip3
 
   - include_tasks: docker/start_stack.yml
     vars:

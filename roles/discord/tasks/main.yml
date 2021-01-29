@@ -17,3 +17,5 @@
         items: "{{ discord_folders_permissions }}"
   tags:
     - fix_permissions
+    - compose_file
+    - discord_compose_file

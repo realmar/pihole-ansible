@@ -281,7 +281,7 @@
 {% endif %}{#
 
 #}{% macro labels() %}
-{{ common.enable(name) }}
+{{ common.enable(service_name) }}
 {{ add_more_labels_mount_path(host, service_name, path, port, middlewares, entrypoints) }}
 {% endmacro %}{#
 #}

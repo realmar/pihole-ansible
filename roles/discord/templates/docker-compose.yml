@@ -17,16 +17,11 @@ services:
   among_us_server:
     image: aeonlucid/impostor:nightly
     user: "1000"
-{#
-    {{ traefik.declare_labels_tcp('among_us', [ 'among_us' ], 22023)|indent(width = 4) }}
-    {{ dn.discovery_network_section()|indent(width = 4) }}
-#}
+    {{ traefik.declare_labels_udp('among_us', [ 'among_us' ], 22023)|indent(width = 4) }}
     volumes:
       - "{{ root_dirs.discord }}/impostor_config.json:/app/config.json:ro"
-    {{ dn.map_ports([ (22023,"tcp"), (22023,"udp") ])|indent(width = 4) }}
+    {{ dn.discovery_network_section()|indent(width = 4) }}
     {{ dm.journald_logging()|indent(width = 4) }}
     {{ dm.common()|indent(width = 4) }}
 
-{#
-{{ dn.networks_declaration([ discovery_network ]) }}
-#}
+{{ dn.discovery_networks_declaration() }}

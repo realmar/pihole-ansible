@@ -39,7 +39,7 @@ services:
       - "--entrypoints.web.address=:80"
       - "--entrypoints.websecure.address=:443"
 {#    - "--entrypoints.matrix_alt.address=:8448" #}
-{#    - "--entryPoints.among_us.address=:22023/udp" #}
+      - "--entryPoints.among_us.address=:22023/udp"
 {#    - "--entryPoints.openvpn_tcp.address=:1194" #}
       - "--entryPoints.openvpn_udp.address=:1194/udp"
       - "--entryPoints.dns_tcp.address=:53"
@@ -79,6 +79,7 @@ services:
         (80,), (443,),
         (8080,),
         (1194,'udp'),
+        (22023,'udp'),
         (53,'tcp'), (53,'udp') ])|indent(width = 4) }}
     {{ dv.volumes_section_complete(vols_traefik)|indent(width = 4) }}
       {{ dv.mount_docker_socket() }}
@@ -113,14 +114,14 @@ services:
 
   static_data:
     image: nginx:latest
-    {{ tf.declare_labels_mount_path_public(static_data.name, static_data.path, 80, tf.minimal_middlewares_no_auth + [
+    {{ tf.declare_labels_mount_path_public(static_data_secrets.name, static_data_secrets.path, 80, tf.minimal_middlewares_no_auth + [
       {
         'mw': tf.strip_path,
-        'args': { 'path': static_data.path }
+        'args': { 'path': static_data_secrets.path }
       },
       {
         'mw': tf.basic_auth,
-        'args': { 'users': static_data.users }
+        'args': { 'users': static_data_secrets.users }
       }
     ] )|indent(width = 4) }}
     {{ dv.volumes_section_complete(vols_static_data)|indent(width = 4) }}

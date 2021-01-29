@@ -6,6 +6,8 @@
   tags: docker_network
 
 - block:
+  - include_vars:
+      file: passwords.yml
   - include_tasks: standard_service.yml
     vars:
       usr: "1000"
@@ -67,4 +69,7 @@
 #   - include_tasks: fix_permissions.yml
 #     vars:
 #       items: "{{ rss_folders_permissions }}"
-#   tags: fix_permissions
+#   tags:
+#      - fix_permissions
+#      - compose_file
+#      - proxy_compose_file
