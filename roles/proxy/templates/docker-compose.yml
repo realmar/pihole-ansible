@@ -38,9 +38,7 @@ services:
 
       - "--entrypoints.web.address=:80"
       - "--entrypoints.websecure.address=:443"
-{#    - "--entrypoints.matrix_alt.address=:8448" #}
       - "--entryPoints.among_us.address=:22023/udp"
-{#    - "--entryPoints.openvpn_tcp.address=:1194" #}
       - "--entryPoints.openvpn_udp.address=:1194/udp"
       - "--entryPoints.dns_tcp.address=:53"
       - "--entryPoints.dns_udp.address=:53/udp"
@@ -71,10 +69,6 @@ services:
       - "--certificatesresolvers.{{ traefik.lets_encrypt.resolver_name }}.acme.dnschallenge.delaybeforecheck=0"
 #}
 {% endif %}
-{#
-        (8448,),
-        (22023,'udp'),
-#}
     {{ dn.map_ports([
         (80,), (443,),
         (8080,),

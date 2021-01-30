@@ -24,13 +24,14 @@ services:
       {{ matrix_server.networks.name }}:
     {{ dm.common()|indent(width = 4) }}
 
+{# https://github.com/matrix-org/synapse/tree/master/docker #}
   server:
-    image: black0/synapse:v1.20
+    image: matrixdotorg/synapse:v1.26.0
     container_name: matrix_server
     environment:
       UID: '{{ matrix_server.user }}'
       GID: '{{ matrix_server.user }}'
-{#      [ 'websecure', 'matrix_alt' ] #}
+      TZ: {{ timezone }}
     {{ traefik.declare_labels_mount_path(dns.public.root, service_name, "/_matrix/", 8008,
         traefik.minimal_middlewares_no_auth,
         [ 'websecure' ]
